@@ -4,7 +4,10 @@ on:
   schedule:
     # Runs daily at 15:55 UTC (9:25 PM IST)
     - cron: '55 15 * * *'
-  workflow_dispatch: # Allows manual triggers from the Actions tab
+  workflow_dispatch:
+
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true # Silences deprecation warnings
 
 jobs:
   book-mess:
