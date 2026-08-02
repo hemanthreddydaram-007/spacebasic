@@ -6,8 +6,12 @@ USER_ID = "380170"
 
 TOKEN = os.getenv("SPACEBASIC_TOKEN")
 
+# Clean up Bearer formatting
+if TOKEN and not TOKEN.startswith("Bearer "):
+    TOKEN = f"Bearer {TOKEN}"
+
 HEADERS = {
-    "Authorization": f"Bearer {TOKEN}" if TOKEN and not TOKEN.startswith("Bearer") else (TOKEN or ""),
+    "Authorization": TOKEN or "",
     "Content-Type": "application/json",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 }
@@ -24,6 +28,7 @@ def get_upcoming_meals():
             return None
         else:
             print(f"⚠️ Failed to fetch menu. Status Code: {response.status_code}")
+            print(f"📄 Response Body: {response.text}")
             return None
     except Exception as e:
         print(f"❌ Error fetching menu: {e}")
