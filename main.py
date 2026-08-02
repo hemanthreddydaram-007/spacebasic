@@ -20,13 +20,14 @@ except Exception as e:
 if isinstance(users, dict):
     users = [users]
 
-# SpaceBasic RSVP Endpoint
-URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
+# SpaceBasic Endpoints
+MENU_URL = "https://api.spacebasic.com/api/v3/messmanager/getstudentmeals"
+RSVP_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
 
 # 3. Process each user
 for user in users:
     name = user.get("name", "Unknown")
-    user_id = user.get("userId")
+    user_id = str(user.get("userId"))
     token = str(user.get("token", "")).strip().replace("\n", "").replace("\r", "")
 
     print(f"\n==========================================")
@@ -39,29 +40,57 @@ for user in users:
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
     }
 
-    # Example target dates (Today & Tomorrow)
     dates_to_book = [
         datetime.now().strftime("%Y-%m-%d"),
         (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
     ]
 
     for target_date in dates_to_book:
-        print(f"🔍 Sending RSVP request for date: {target_date}...")
+        print(f"\n🔍 Checking meals for date: {target_date}...")
 
-        # Typical JSON payload expected by rsvpmeal endpoint
-        payload = {
-            "userId": user_id,
-            "date": target_date
-        }
-
+        # Step 3a: Fetch available meals for this date
         try:
-            # Note: Changed from GET to POST
-            response = requests.post(URL, headers=headers, json=payload)
+            menu_res = requests.get(f"{MENU_URL}?date={target_date}&userId={user_id}", headers=headers)
+            
+            if menu_res.status_code != 200:
+                print(f"⚠️ Failed to fetch menu: Status {menu_res.status_code}")
+                continue
 
-            if response.status_code == 200:
-                print(f"✅ Success for {name} on {target_date}: {response.text}")
-            else:
-                print(f"⚠️ Failed with status code {response.status_code}: {response.text}")
+            menu_data = menu_res.json()
+            
+            # Extract meals list (handles common SpaceBasic response structures)
+            meals = []
+            if isinstance(menu_data, list):
+                meals = menu_data
+            elif isinstance(menu_data, dict):
+                meals = menu_data.get("data", []) or menu_data.get("meals", [])
+
+            if not meals:
+                print(f"ℹ️ No meals found for date {target_date}.")
+                continue
+
+            # Step 3b: Loop through each meal and RSVP
+            for meal in meals:
+                meal_id = meal.get("mealId") or meal.get("id")
+                meal_name = meal.get("mealName") or meal.get("name", "Meal")
+
+                if not meal_id:
+                    continue
+
+                payload = {
+                    "mealId": int(meal_id),
+                    "userId": user_id,
+                    "status": "1",
+                    "createdBy": user_id,
+                    "isSpecial": 0
+                }
+
+                rsvp_res = requests.post(RSVP_URL, headers=headers, json=payload)
+
+                if rsvp_res.status_code == 200:
+                    print(f"  ✅ Booked {meal_name} (ID: {meal_id}) successfully!")
+                else:
+                    print(f"  ⚠️ Failed to book {meal_name} (ID: {meal_id}): {rsvp_res.text}")
 
         except Exception as e:
-            print(f"❌ Exception occurred: {e}")
+            print(f"❌ Exception occurred for date {target_date}: {e}")
