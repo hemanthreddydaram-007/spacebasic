@@ -2,9 +2,9 @@ name: SpaceBasic Auto Mess Booking
 
 on:
   schedule:
-    # Runs daily at 12:05 AM IST (18:35 UTC previous day)
-    - cron: '35 18 * * *'
-  workflow_dispatch: # Allows manual trigger from GitHub UI
+    # Runs daily at 9:25 PM IST (3:55 PM UTC)
+    - cron: '55 15 * * *'
+  workflow_dispatch: # Allows manual trigger anytime from GitHub UI
 
 jobs:
   run-booking:
@@ -26,5 +26,5 @@ jobs:
 
       - name: Execute Booking Script
         env:
-          SPACEBASIC_TOKEN: ${{ secrets.SPACEBASIC_TOKEN }}
+          USERS_DATA: ${{ secrets.USERS_DATA }}
         run: python main.py
