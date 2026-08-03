@@ -22,17 +22,23 @@ URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
 for user in users:
     name = user.get("name", "Unknown")
     user_id = str(user.get("userId"))
-    token = str(user.get("token", "")).strip()
     
-    # Get user-specific meal IDs, default to empty list if not provided
-    meal_ids = user.get("mealIds", [])
+    # Clean the token: remove spaces/newlines/extra 'Bearer ' prefixes
+    raw_token = str(user.get("token", "")).strip()
+    if raw_token.lower().startswith("bearer "):
+        clean_jwt = raw_token[7:].strip()
+    else:
+        clean_jwt = raw_token
+
+    auth_header = f"Bearer {clean_jwt}"
+    meal_ids = user.get("mealIds", [307800 if name != "Wafiq" else 307790])
 
     print(f"\n==========================================")
     print(f"👤 Processing User: {name} (ID: {user_id})")
     print(f"==========================================")
 
     headers = {
-        "Authorization": token,
+        "Authorization": auth_header,
         "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
     }
@@ -49,7 +55,7 @@ for user in users:
         try:
             res = requests.post(URL, headers=headers, json=payload)
             if res.status_code == 200:
-                print(f"  ✅ Successfully sent booking request for mealId {meal_id} ({name})!")
+                print(f"  ✅ Successfully booked mealId {meal_id} for {name}!")
             else:
                 print(f"  ⚠️ Failed for mealId {meal_id}: Status {res.status_code} - {res.text}")
         except Exception as e:
