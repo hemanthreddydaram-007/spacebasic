@@ -23,19 +23,24 @@ for user in users:
     name = user.get("name", "Unknown")
     user_id = str(user.get("userId"))
     
-    # Clean the token: remove spaces/newlines/extra 'Bearer ' prefixes
-    raw_token = str(user.get("token", "")).strip()
+    # Clean token string
+    raw_token = str(user.get("token", "")).strip().replace('"', '').replace("'", "")
+    
+    # Strip any leading 'Bearer ' (case-insensitive)
     if raw_token.lower().startswith("bearer "):
         clean_jwt = raw_token[7:].strip()
     else:
         clean_jwt = raw_token
 
-    auth_header = f"Bearer {clean_jwt}"
-    meal_ids = user.get("mealIds", [307800 if name != "Wafiq" else 307790])
-
+    # Debug: Print period count to confirm valid JWT structure without leaking secret
+    period_count = clean_jwt.count(".")
     print(f"\n==========================================")
     print(f"👤 Processing User: {name} (ID: {user_id})")
+    print(f"🔍 Token Period Count: {period_count} (Should be 2)")
     print(f"==========================================")
+
+    auth_header = f"Bearer {clean_jwt}"
+    meal_ids = user.get("mealIds", [307800 if name != "Wafiq" else 307790])
 
     headers = {
         "Authorization": auth_header,
