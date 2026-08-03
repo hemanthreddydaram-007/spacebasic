@@ -2,7 +2,6 @@ import os
 import json
 import requests
 
-# 1. Load multi-user JSON secret
 raw_secret = os.getenv("SPACEBASIC_TOKEN")
 
 if not raw_secret:
@@ -18,17 +17,15 @@ except Exception as e:
 if isinstance(users, dict):
     users = [users]
 
-# SpaceBasic RSVP Endpoint
 URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
 
-# Replace or expand this list with any active meal IDs for the day
-MEAL_IDS = [307800]
-
-# 2. Iterate through all users
 for user in users:
     name = user.get("name", "Unknown")
     user_id = str(user.get("userId"))
-    token = str(user.get("token", "")).strip().replace("\n", "").replace("\r", "")
+    token = str(user.get("token", "")).strip()
+    
+    # Get user-specific meal IDs, default to empty list if not provided
+    meal_ids = user.get("mealIds", [])
 
     print(f"\n==========================================")
     print(f"👤 Processing User: {name} (ID: {user_id})")
@@ -40,7 +37,7 @@ for user in users:
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
     }
 
-    for meal_id in MEAL_IDS:
+    for meal_id in meal_ids:
         payload = {
             "mealId": meal_id,
             "userId": user_id,
@@ -52,7 +49,7 @@ for user in users:
         try:
             res = requests.post(URL, headers=headers, json=payload)
             if res.status_code == 200:
-                print(f"  ✅ Successfully booked mealId {meal_id} for {name}!")
+                print(f"  ✅ Successfully sent booking request for mealId {meal_id} ({name})!")
             else:
                 print(f"  ⚠️ Failed for mealId {meal_id}: Status {res.status_code} - {res.text}")
         except Exception as e:
