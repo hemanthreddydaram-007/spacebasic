@@ -20,9 +20,10 @@ if isinstance(users, dict):
 URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
 
 for user in users:
-    name = user.get("name", "Unknown")
-    user_id = str(user.get("userId"))
+    name = user.get("name", "Hemanth")
+    user_id = str(user.get("userId", "380170"))
     
+    # Sanitize JWT token
     raw_token = str(user.get("token", "")).strip().replace('"', '').replace("'", "")
     if raw_token.lower().startswith("bearer "):
         clean_jwt = raw_token[7:].strip()
@@ -30,7 +31,7 @@ for user in users:
         clean_jwt = raw_token
 
     auth_header = f"Bearer {clean_jwt}"
-    meal_ids = user.get("mealIds", [307800 if name != "Wafiq" else 307790])
+    meal_ids = user.get("mealIds", [307802, 307810, 307808])
 
     print(f"\n==========================================")
     print(f"👤 Processing User: {name} (ID: {user_id})")
@@ -53,7 +54,13 @@ for user in users:
 
         try:
             res = requests.post(URL, headers=headers, json=payload)
-            print(f"  📥 Server Response for mealId {meal_id}: Status {res.status_code}")
-            print(f"  📥 Response Body: {res.text}")
+            data = res.json()
+            
+            if data.get("statusCode") == "S" or data.get("status") == "Success":
+                print(f"  🎉 SUCCESS! Booked mealId {meal_id} for {name}!")
+            else:
+                reason = data.get("result", "Unknown error")
+                print(f"  ❌ FAILED for mealId {meal_id}: {reason} (Response: {res.text})")
+
         except Exception as e:
-            print(f"  ❌ Error for mealId {meal_id}: {e}")
+            print(f"  ❌ Error processing request for mealId {meal_id}: {e}")
