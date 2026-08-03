@@ -19,6 +19,34 @@ def get_target_date_str():
     target_date = now_ist.date() + timedelta(days=1)
     return target_date.strftime("%Y-%m-%d")
 
+def select_preferred_meal(meal_options):
+    """
+    Selects meal based on strict priority:
+    1. Non-Veg (Chicken, Fish, Mutton, Meat, Non Veg)
+    2. Egg
+    3. Fallback (Veg / First available)
+    """
+    if not meal_options:
+        return None
+
+    non_veg_keywords = ["non veg", "non-veg", "nonveg", "chicken", "fish", "mutton", "meat"]
+    egg_keywords = ["egg", "eg"]
+
+    # Priority 1: Check for Non-Veg
+    for m in meal_options:
+        name = m.get("mealName", "").lower()
+        if any(k in name for k in non_veg_keywords):
+            return m
+
+    # Priority 2: Check for Egg
+    for m in meal_options:
+        name = m.get("mealName", "").lower()
+        if any(k in name for k in egg_keywords):
+            return m
+
+    # Priority 3: Fallback (Veg)
+    return meal_options[0]
+
 def run_automation():
     raw_secret = os.getenv("SPACEBASIC_TOKEN")
     if not raw_secret:
@@ -39,10 +67,7 @@ def run_automation():
     for user in users:
         name = user.get("name", "Sai Krishna")
         user_id = str(user.get("userId", "380180"))
-        tenant_id = str(user.get("tenantId", "143")) # Defaults to 143
-        
-        lunch_pref = user.get("lunchPreference", "Non Veg")
-        dinner_pref = user.get("dinnerPreference", "Non Veg")
+        tenant_id = str(user.get("tenantId", "143"))
 
         # Clean Authorization Bearer Token
         raw_token = str(user.get("token", "")).strip().strip('"').strip("'")
@@ -59,7 +84,7 @@ def run_automation():
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
         }
 
-        # Step 1: Fetch active meals from /mealsmenu
+        # Query Parameters for SpaceBasic /mealsmenu
         params = {
             "userId": user_id,
             "tenantId": tenant_id,
@@ -79,7 +104,7 @@ def run_automation():
                 print(f"❌ Failed to fetch meals for {target_date}: {data}")
                 continue
 
-            # Extract meals list (handles response structure)
+            # Parse menu response
             result = data.get("result", {})
             available_meals = result.get("meals", []) if isinstance(result, dict) else result
 
@@ -87,32 +112,28 @@ def run_automation():
                 print(f"⚠️ No meals available for booking on {target_date}.")
                 continue
 
-            # Separate meal categories
+            # Separate into categories
             breakfast_opts = [m for m in available_meals if "Breakfast" in m.get("mealName", "")]
             lunch_opts = [m for m in available_meals if "Lunch" in m.get("mealName", "")]
             dinner_opts = [m for m in available_meals if "Dinner" in m.get("mealName", "")]
 
             to_book = []
 
-            # Pick Breakfast
+            # 1. Breakfast (Take first available)
             if breakfast_opts:
                 to_book.append(breakfast_opts[0])
 
-            # Pick Preferred Lunch
-            selected_lunch = next((m for m in lunch_opts if lunch_pref.lower() in m.get("mealName", "").lower()), None)
-            if not selected_lunch and lunch_opts:
-                selected_lunch = lunch_opts[0]
+            # 2. Lunch (Priority: Non-Veg -> Egg -> Veg)
+            selected_lunch = select_preferred_meal(lunch_opts)
             if selected_lunch:
                 to_book.append(selected_lunch)
 
-            # Pick Preferred Dinner
-            selected_dinner = next((m for m in dinner_opts if dinner_pref.lower() in m.get("mealName", "").lower()), None)
-            if not selected_dinner and dinner_opts:
-                selected_dinner = dinner_opts[0]
+            # 3. Dinner (Priority: Non-Veg -> Egg -> Veg)
+            selected_dinner = select_preferred_meal(dinner_opts)
             if selected_dinner:
                 to_book.append(selected_dinner)
 
-            print(f"🔍 Meals discovered for {target_date}:")
+            print(f"🔍 Meals selected for booking on {target_date}:")
             for m in to_book:
                 status_text = "Already Booked" if m.get("status") == 1 else "Unbooked"
                 print(f"   • {m.get('mealName')} (ID: {m.get('mealId')}) -> [{status_text}]")
@@ -121,7 +142,7 @@ def run_automation():
             print(f"❌ Exception fetching meal schedule: {e}")
             continue
 
-        # Step 2: Book unbooked slots
+        # Step 2: Book unbooked slots via RSVP
         for meal in to_book:
             meal_id = meal.get("mealId")
             meal_name = meal.get("mealName")
