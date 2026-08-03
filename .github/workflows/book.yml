@@ -2,8 +2,8 @@ name: SpaceBasic Auto Booking
 
 on:
   schedule:
-    - cron: '15 4 * * *'  # Runs every day at 9:45 AM IST (4:15 AM UTC)
-  workflow_dispatch:      # Allows you to click a button to run it manually anytime!
+    - cron: '9 4 * * *'  # Runs every day at 9:39 AM IST (4:09 AM UTC)
+  workflow_dispatch:      # Allows you to test it manually anytime!
 
 jobs:
   book-meals:
