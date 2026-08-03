@@ -4,7 +4,7 @@ import requests
 from datetime import datetime, timezone, timedelta
 
 # SpaceBasic API Base URLs
-GET_MEALS_URL = "https://api.spacebasic.com/api/v3/messmanager/getmeals"
+GET_MEALS_URL = "https://api.spacebasic.com/api/v3/mess/getmeals"
 RSVP_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
 
 # IST Timezone (+5:30)
