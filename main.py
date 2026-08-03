@@ -23,24 +23,18 @@ for user in users:
     name = user.get("name", "Unknown")
     user_id = str(user.get("userId"))
     
-    # Clean token string
     raw_token = str(user.get("token", "")).strip().replace('"', '').replace("'", "")
-    
-    # Strip any leading 'Bearer ' (case-insensitive)
     if raw_token.lower().startswith("bearer "):
         clean_jwt = raw_token[7:].strip()
     else:
         clean_jwt = raw_token
 
-    # Debug: Print period count to confirm valid JWT structure without leaking secret
-    period_count = clean_jwt.count(".")
-    print(f"\n==========================================")
-    print(f"👤 Processing User: {name} (ID: {user_id})")
-    print(f"🔍 Token Period Count: {period_count} (Should be 2)")
-    print(f"==========================================")
-
     auth_header = f"Bearer {clean_jwt}"
     meal_ids = user.get("mealIds", [307800 if name != "Wafiq" else 307790])
+
+    print(f"\n==========================================")
+    print(f"👤 Processing User: {name} (ID: {user_id})")
+    print(f"==========================================")
 
     headers = {
         "Authorization": auth_header,
@@ -59,9 +53,7 @@ for user in users:
 
         try:
             res = requests.post(URL, headers=headers, json=payload)
-            if res.status_code == 200:
-                print(f"  ✅ Successfully booked mealId {meal_id} for {name}!")
-            else:
-                print(f"  ⚠️ Failed for mealId {meal_id}: Status {res.status_code} - {res.text}")
+            print(f"  📥 Server Response for mealId {meal_id}: Status {res.status_code}")
+            print(f"  📥 Response Body: {res.text}")
         except Exception as e:
             print(f"  ❌ Error for mealId {meal_id}: {e}")
