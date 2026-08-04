@@ -2,13 +2,21 @@ name: Automated Mess Booking
 
 on:
   schedule:
-    # 05:16 UTC = 10:46 AM IST (30 minutes from now)
-    - cron: '16 5 * * *'
-  workflow_dispatch:
+    # Target 1: 4:55 PM IST (11:25 AM UTC) - Early check
+    - cron: '25 11 * * *'
+    
+    # Target 2: 5:00 PM IST (11:30 AM UTC) - Primary target
+    - cron: '30 11 * * *'
+    
+    # Target 3: 5:05 PM IST (11:35 AM UTC) - Safety backup
+    - cron: '35 11 * * *'
+
+  workflow_dispatch: # Allows manual trigger anytime from GitHub UI
 
 jobs:
   run-booking:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
