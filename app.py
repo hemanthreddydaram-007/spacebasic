@@ -19,8 +19,8 @@ with st.expander("🎥 How to find your User ID and Authorization Token (Video G
     st.write("Follow the quick step-by-step video below to grab your credentials:")
     st.video("Screen Recording 2026-08-08 151423.mp4")
 
-user_name = st.text_input("Your Name", placeholder="e.g. Hemanth")
-user_id = st.text_input("SpaceBasic User ID", placeholder="e.g. 380170")
+user_name = st.text_input("Your Name", placeholder="e.g. Bob")
+user_id = st.text_input("SpaceBasic User ID", placeholder="e.g. 123456")
 bearer_token = st.text_input("SpaceBasic Authorization Token", type="password", help="Paste your Bearer token starting with 'Bearer ...'")
 
 # --- 2. MEAL PREFERENCES ---
