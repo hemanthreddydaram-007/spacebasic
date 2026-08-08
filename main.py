@@ -10,14 +10,18 @@ RSVP_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
 # IST Timezone (+5:30)
 IST = timezone(timedelta(hours=5, minutes=30))
 
-def get_target_date_str():
+def get_target_date_info():
     """
-    Returns tomorrow's date in YYYY-MM-DD format (IST).
-    SpaceBasic requires booking 1 day in advance before 9:30 PM IST.
+    Returns tomorrow's date string (YYYY-MM-DD) and day name (e.g., 'sunday').
+    SpaceBasic requires booking 1 day in advance.
     """
     now_ist = datetime.now(IST)
     target_date = now_ist.date() + timedelta(days=1)
-    return target_date.strftime("%Y-%m-%d")
+    
+    target_date_str = target_date.strftime("%Y-%m-%d")
+    target_day_name = target_date.strftime("%A").lower()  # 'monday', 'sunday', etc.
+    
+    return target_date_str, target_day_name
 
 def select_preferred_meal(meal_options):
     """
@@ -47,6 +51,30 @@ def select_preferred_meal(meal_options):
     # Priority 3: Fallback (Veg)
     return meal_options[0]
 
+def cancel_meal_rsvp(headers, user_id, meal_id, meal_name):
+    """
+    Sends RSVP payload with status '0' to unbook/cancel a meal on SpaceBasic.
+    """
+    payload = {
+        "mealId": meal_id,
+        "userId": user_id,
+        "status": "0",  # Status 0 indicates cancellation/unbooking
+        "createdBy": user_id,
+        "isSpecial": 0
+    }
+    
+    try:
+        rsvp_res = requests.post(RSVP_URL, headers=headers, json=payload)
+        rsvp_data = rsvp_res.json()
+
+        if rsvp_data.get("statusCode") == "S" or rsvp_data.get("status") == "Success":
+            print(f"   🚫 SUCCESS! Cancelled {meal_name} (ID: {meal_id}) on SpaceBasic!")
+        else:
+            reason = rsvp_data.get("result", "Unknown Error")
+            print(f"   ❌ FAILED to cancel {meal_name} (ID: {meal_id}): {reason}")
+    except Exception as e:
+        print(f"   ❌ Error cancelling {meal_name} (ID: {meal_id}): {e}")
+
 def run_automation():
     raw_secret = os.getenv("SPACEBASIC_TOKEN")
     if not raw_secret:
@@ -61,13 +89,17 @@ def run_automation():
         print(f"❌ Error parsing JSON secret: {e}")
         exit(1)
 
-    target_date = get_target_date_str()
-    print(f"📅 Target Booking Date (IST): {target_date}")
+    target_date, target_day = get_target_date_info()
+    print(f"📅 Target Booking Date (IST): {target_date} ({target_day.title()})")
 
     for user in users:
         name = user.get("name", "Sai Krishna")
         user_id = str(user.get("userId", "380180"))
         tenant_id = str(user.get("tenantId", "143"))
+
+        # Retrieve day-based skip rules (e.g., {"sunday": ["Breakfast"]})
+        skip_days_config = user.get("skip_days", {})
+        today_meal_skips = [m.lower() for m in skip_days_config.get(target_day, [])]
 
         # Clean Authorization Bearer Token
         raw_token = str(user.get("token", "")).strip().strip('"').strip("'")
@@ -77,6 +109,11 @@ def run_automation():
         print(f"\n==========================================")
         print(f"👤 Processing User: {name} (ID: {user_id})")
         print(f"==========================================")
+
+        # Check whole-day skip rule
+        if "all" in today_meal_skips:
+            print(f"🌴 {target_day.title()} is set to skip ALL meals for {name}! Skipping day.")
+            continue
 
         headers = {
             "Authorization": auth_header,
@@ -117,38 +154,50 @@ def run_automation():
             lunch_opts = [m for m in available_meals if "Lunch" in m.get("mealName", "")]
             dinner_opts = [m for m in available_meals if "Dinner" in m.get("mealName", "")]
 
-            to_book = []
+            to_process = []
 
-            # 1. Breakfast (Take first available)
+            # 1. Breakfast
             if breakfast_opts:
-                to_book.append(breakfast_opts[0])
+                to_process.append(("breakfast", breakfast_opts[0]))
 
             # 2. Lunch (Priority: Non-Veg -> Egg -> Veg)
             selected_lunch = select_preferred_meal(lunch_opts)
             if selected_lunch:
-                to_book.append(selected_lunch)
+                to_process.append(("lunch", selected_lunch))
 
             # 3. Dinner (Priority: Non-Veg -> Egg -> Veg)
             selected_dinner = select_preferred_meal(dinner_opts)
             if selected_dinner:
-                to_book.append(selected_dinner)
+                to_process.append(("dinner", selected_dinner))
 
-            print(f"🔍 Meals selected for booking on {target_date}:")
-            for m in to_book:
+            print(f"🔍 Meal options evaluated for {target_date} ({target_day.title()}):")
+            for category, m in to_process:
                 status_text = "Already Booked" if m.get("status") == 1 else "Unbooked"
-                print(f"   • {m.get('mealName')} (ID: {m.get('mealId')}) -> [{status_text}]")
+                skip_flag = " [CANCEL REQUESTED]" if category in today_meal_skips else ""
+                print(f"   • {m.get('mealName')} (ID: {m.get('mealId')}) -> [{status_text}]{skip_flag}")
 
         except Exception as e:
             print(f"❌ Exception fetching meal schedule: {e}")
             continue
 
-        # Step 2: Book unbooked slots via RSVP
-        for meal in to_book:
+        # Step 2: Book or Cancel meals based on weekly rules
+        for category, meal in to_process:
             meal_id = meal.get("mealId")
             meal_name = meal.get("mealName")
+            is_booked = (meal.get("status") == 1)
 
-            if meal.get("status") == 1:
-                print(f"  ℹ️ Skipping {meal_name} (ID: {meal_id}) - already booked.")
+            # Check if user configured a skip/cancel rule for this meal on this day
+            if category in today_meal_skips:
+                if is_booked:
+                    print(f"🛑 {category.title()} is set to SKIP on {target_day.title()}s for {name}. Cancelling booking...")
+                    cancel_meal_rsvp(headers, user_id, meal_id, meal_name)
+                else:
+                    print(f"   ℹ️ Skipping {category.title()} ({target_day.title()} skip rule) - meal is not booked.")
+                continue
+
+            # Normal Booking Execution
+            if is_booked:
+                print(f"   ℹ️ Skipping {meal_name} (ID: {meal_id}) - already booked.")
                 continue
 
             payload = {
@@ -164,13 +213,13 @@ def run_automation():
                 rsvp_data = rsvp_res.json()
 
                 if rsvp_data.get("statusCode") == "S" or rsvp_data.get("status") == "Success":
-                    print(f"  🎉 SUCCESS! Booked {meal_name} (ID: {meal_id})!")
+                    print(f"   🎉 SUCCESS! Booked {meal_name} (ID: {meal_id})!")
                 else:
                     reason = rsvp_data.get("result", "Unknown Error")
-                    print(f"  ❌ FAILED for {meal_name} (ID: {meal_id}): {reason}")
+                    print(f"   ❌ FAILED for {meal_name} (ID: {meal_id}): {reason}")
 
             except Exception as e:
-                print(f"  ❌ Request error for {meal_name} (ID: {meal_id}): {e}")
+                print(f"   ❌ Request error for {meal_name} (ID: {meal_id}): {e}")
 
 if __name__ == "__main__":
     run_automation()
