@@ -15,15 +15,13 @@ if not SUPABASE_URL or not SUPABASE_KEY:
     print("❌ Error: SUPABASE_URL or SUPABASE_KEY environment variable is missing!")
     exit(1)
 
-# SpaceBasic v3 Endpoints
+# SpaceBasic Endpoints
 SPACEBASIC_BOOKING_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
-# Replace with the exact GET endpoint URL from DevTools Network tab
-SPACEBASIC_GET_MEALS_URL = "https://api.spacebasic.com/api/v3/messmanager/getupcomingmeals"
+
+# ⚠️ UPDATE THIS URL with the GET request found on '/module/messmanager/bookings'
+SPACEBASIC_GET_MEALS_URL = "https://api.spacebasic.com/api/v3/messmanager/getstudentmeals"
 
 SPACEBASIC_PUBLISHABLE_KEY = "sb_publishable_vw0I2KilIjFmtr1mm3Wl0A_sbbtaF1_"
-
-# Fallback meal ID when auto-fetching is unavailable
-DEFAULT_MEAL_ID = 307872 
 
 # ==========================================
 # SUPABASE UTILITIES
@@ -69,17 +67,25 @@ def should_skip_today(skip_days):
     return skip_days.get(today_name, False)
 
 def fetch_dynamic_meal_id(user_id, token, headers):
-    """Fetches the exact active mealId for a specific user from SpaceBasic."""
+    """Fetches the exact active mealId for a specific user live from SpaceBasic."""
     try:
         response = requests.get(SPACEBASIC_GET_MEALS_URL, headers=headers, timeout=10)
+        print(f"🔍 Fetching active meals for {user_id} - Status: {response.status_code}")
+        
         if response.status_code == 200:
             data = response.json()
             if isinstance(data, list) and len(data) > 0:
-                return data[0].get("mealId") or data[0].get("id")
+                meal_id = data[0].get("mealId") or data[0].get("id")
+                print(f"💡 Auto-fetched active mealId: {meal_id}")
+                return meal_id
             elif isinstance(data, dict):
-                meals = data.get("data") or data.get("meals") or []
+                meals = data.get("data") or data.get("meals") or data.get("result") or []
                 if meals:
-                    return meals[0].get("mealId") or meals[0].get("id")
+                    meal_id = meals[0].get("mealId") or meals[0].get("id")
+                    print(f"💡 Auto-fetched active mealId: {meal_id}")
+                    return meal_id
+        else:
+            print(f"⚠️ GET meals endpoint returned HTTP {response.status_code}")
     except Exception as e:
         print(f"⚠️ Could not auto-fetch dynamic meal ID for {user_id}: {e}")
     return None
@@ -117,11 +123,11 @@ def process_user_booking(user, max_retries=3, delay=3):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
 
-    # Resolution order: Supabase 'meal_id' column -> Live API fetch -> DEFAULT_MEAL_ID
-    meal_id = user.get("meal_id") or fetch_dynamic_meal_id(user_id, token, headers) or DEFAULT_MEAL_ID
+    # Resolution order: Supabase DB row 'meal_id' -> Live API fetch
+    meal_id = user.get("meal_id") or fetch_dynamic_meal_id(user_id, token, headers)
 
     if not meal_id:
-        print(f"❌ Error: Could not determine valid mealId for {name}. Skipping...")
+        print(f"❌ Error: Could not determine valid active mealId for {name}. Skipping...")
         return False
 
     print(f"📌 Targeted Meal ID: {meal_id}")
@@ -147,12 +153,13 @@ def process_user_booking(user, max_retries=3, delay=3):
             if response.status_code in [200, 201]:
                 res_json = response.json() if response.text else {}
                 if res_json.get("Status") == "FAILED" or "error" in str(res_json).lower():
-                    print(f"⚠️ API Warning ({response.status_code}): {response.text}")
+                    print(f"⚠️ API Response Failure: {response.text}")
+                    return False
                 else:
                     print(f"🎉 SUCCESS: Mess RSVP confirmed for {name}!")
                     return True
             elif response.status_code in [401, 403]:
-                print(f"⛔ AUTH ERROR ({response.status_code}): Token expired/invalid for {name}.")
+                print(f"⛔ AUTH ERROR ({response.status_code}): Token expired or invalid for {name}.")
                 return False
             else:
                 print(f"⚠️ API Response ({response.status_code}): {response.text}")
