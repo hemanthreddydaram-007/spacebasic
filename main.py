@@ -15,10 +15,13 @@ if not SUPABASE_URL or not SUPABASE_KEY:
     print("❌ Error: SUPABASE_URL or SUPABASE_KEY environment variable is missing!")
     exit(1)
 
-# SpaceBasic v3 Endpoint
+# SpaceBasic v3 Endpoints
 SPACEBASIC_BOOKING_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
 
-# Fallback Meal ID for the current active booking window
+# Your Supabase Publishable Key used for API headers
+SPACEBASIC_PUBLISHABLE_KEY = "sb_publishable_vw0I2KilIjFmtr1mm3Wl0A_sbbtaF1_"
+
+# Fallback Meal ID if not explicitly provided per user row
 DEFAULT_MEAL_ID = 307872
 
 # ==========================================
@@ -96,9 +99,11 @@ def process_user_booking(user, max_retries=3, delay=3):
         print(f"⏭️ Skipping booking for {name} today based on 'skip_days' preference.")
         return True
 
+    # Headers including x-publishable-key
     headers = {
         "Authorization": f"Bearer {token}" if not str(token).startswith("Bearer ") else str(token),
         "User-ID": user_id,
+        "x-publishable-key": SPACEBASIC_PUBLISHABLE_KEY,
         "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
