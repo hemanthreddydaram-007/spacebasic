@@ -15,8 +15,8 @@ if not SUPABASE_URL or not SUPABASE_KEY:
     print("❌ Error: SUPABASE_URL or SUPABASE_KEY environment variable is missing!")
     exit(1)
 
-# Update if your SpaceBasic API endpoint route differs
-SPACEBASIC_BOOKING_URL = "https://api.spacebasic.com/v1/mess/book"
+# Updated SpaceBasic v3 Endpoint
+SPACEBASIC_BOOKING_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
 
 # ==========================================
 # SUPABASE UTILITIES
@@ -83,7 +83,7 @@ def process_user_booking(user, max_retries=3, delay=3):
     print(f"👤 Processing User: {name} (ID: {user_id or 'Missing'})")
     print(f"==========================================")
 
-    # Detailed credential validations
+    # Credential validations
     if not user_id and not token:
         print(f"⚠️ Skipping {name}: Missing both User-ID and Token in database.")
         return False
@@ -99,7 +99,7 @@ def process_user_booking(user, max_retries=3, delay=3):
         print(f"⏭️ Skipping booking for {name} today based on 'skip_days' preference.")
         return True
 
-    # Build Headers and Payload
+    # Build Headers
     headers = {
         "Authorization": f"Bearer {token}" if not str(token).startswith("Bearer ") else str(token),
         "User-ID": str(user_id),
@@ -107,14 +107,20 @@ def process_user_booking(user, max_retries=3, delay=3):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
 
+    # Current date in IST (YYYY-MM-DD)
+    ist = pytz.timezone("Asia/Kolkata")
+    today_date = datetime.now(ist).strftime("%Y-%m-%d")
+
+    # SpaceBasic v3 Payload
     payload = {
-        "status": "booked"
+        "date": today_date,
+        "status": 1
     }
 
     # Execute SpaceBasic API Request with Retries
     for attempt in range(1, max_retries + 1):
         try:
-            print(f"🚀 Sending booking request for {name} (Attempt {attempt}/{max_retries})...")
+            print(f"🚀 Sending RSVP request for {name} (Attempt {attempt}/{max_retries})...")
             response = requests.post(
                 SPACEBASIC_BOOKING_URL,
                 json=payload,
