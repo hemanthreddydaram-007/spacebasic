@@ -15,7 +15,7 @@ if not SUPABASE_URL or not SUPABASE_KEY:
     print("❌ Error: SUPABASE_URL or SUPABASE_KEY environment variable is missing!")
     exit(1)
 
-# Updated SpaceBasic v3 Endpoint
+# SpaceBasic v3 Endpoint
 SPACEBASIC_BOOKING_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
 
 # ==========================================
@@ -26,10 +26,7 @@ def get_supabase_client() -> Client:
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def get_active_users(max_retries=3, delay=5):
-    """
-    Fetches user records from Supabase with retry logic 
-    to handle connection drops or cold starts.
-    """
+    """Fetches user records from Supabase with retry logic."""
     for attempt in range(1, max_retries + 1):
         try:
             print(f"🔄 Connecting to Supabase (Attempt {attempt}/{max_retries})...")
@@ -56,16 +53,12 @@ def get_active_users(max_retries=3, delay=5):
 # HELPER FUNCTIONS
 # ==========================================
 def should_skip_today(skip_days):
-    """
-    Checks if current day in IST is set to True inside the user's skip_days dict.
-    Example skip_days format in DB: {"monday": false, "tuesday": true, ...}
-    """
+    """Checks if current day in IST is set to True inside skip_days dict."""
     if not isinstance(skip_days, dict):
         return False
         
     ist = pytz.timezone("Asia/Kolkata")
-    today_name = datetime.now(ist).strftime("%A").lower()  # e.g., 'sunday', 'monday'
-    
+    today_name = datetime.now(ist).strftime("%A").lower()
     return skip_days.get(today_name, False)
 
 # ==========================================
@@ -74,16 +67,17 @@ def should_skip_today(skip_days):
 def process_user_booking(user, max_retries=3, delay=3):
     name = user.get("name", "Unknown")
     
-    # Flexible column resolution matching your Supabase fields
-    user_id = user.get("user_id") or user.get("userid")
+    user_id = str(user.get("user_id") or user.get("userid"))
     token = user.get("token") or user.get("auth_token")
     skip_days = user.get("skip_days", {})
+    
+    # Get dynamic meal_id from user table row (fallback to 307870 if not explicitly stored per row)
+    meal_id = user.get("meal_id", 307870)
 
     print(f"\n==========================================")
     print(f"👤 Processing User: {name} (ID: {user_id or 'Missing'})")
     print(f"==========================================")
 
-    # Credential validations
     if not user_id and not token:
         print(f"⚠️ Skipping {name}: Missing both User-ID and Token in database.")
         return False
@@ -94,30 +88,26 @@ def process_user_booking(user, max_retries=3, delay=3):
         print(f"⚠️ Skipping {name}: Token field is missing or null.")
         return False
 
-    # Check day skipping preference
     if should_skip_today(skip_days):
         print(f"⏭️ Skipping booking for {name} today based on 'skip_days' preference.")
         return True
 
-    # Build Headers
     headers = {
         "Authorization": f"Bearer {token}" if not str(token).startswith("Bearer ") else str(token),
-        "User-ID": str(user_id),
+        "User-ID": user_id,
         "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
 
-    # Current date in IST (YYYY-MM-DD)
-    ist = pytz.timezone("Asia/Kolkata")
-    today_date = datetime.now(ist).strftime("%Y-%m-%d")
-
-    # SpaceBasic v3 Payload
+    # Exact SpaceBasic payload structure
     payload = {
-        "date": today_date,
-        "status": 1
+        "mealId": int(meal_id),
+        "userId": user_id,
+        "status": "1",
+        "createdBy": user_id,
+        "isSpecial": 0
     }
 
-    # Execute SpaceBasic API Request with Retries
     for attempt in range(1, max_retries + 1):
         try:
             print(f"🚀 Sending RSVP request for {name} (Attempt {attempt}/{max_retries})...")
