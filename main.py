@@ -18,6 +18,9 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 # SpaceBasic v3 Endpoint
 SPACEBASIC_BOOKING_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
 
+# Fallback Meal ID for the current active booking window
+DEFAULT_MEAL_ID = 307872
+
 # ==========================================
 # SUPABASE UTILITIES
 # ==========================================
@@ -71,17 +74,18 @@ def process_user_booking(user, max_retries=3, delay=3):
     token = user.get("token") or user.get("auth_token")
     skip_days = user.get("skip_days", {})
     
-    # Get dynamic meal_id from user table row (fallback to 307870 if not explicitly stored per row)
-    meal_id = user.get("meal_id", 307870)
+    # Priority: DB row 'meal_id' -> Default fallback '307872'
+    meal_id = user.get("meal_id") or DEFAULT_MEAL_ID
 
     print(f"\n==========================================")
     print(f"👤 Processing User: {name} (ID: {user_id or 'Missing'})")
+    print(f"📌 Targeted Meal ID: {meal_id}")
     print(f"==========================================")
 
     if not user_id and not token:
         print(f"⚠️ Skipping {name}: Missing both User-ID and Token in database.")
         return False
-    elif not user_id:
+    elif not user_id or user_id == "None":
         print(f"⚠️ Skipping {name}: User-ID field is missing or null.")
         return False
     elif not token:
@@ -99,7 +103,7 @@ def process_user_booking(user, max_retries=3, delay=3):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
 
-    # Exact SpaceBasic payload structure
+    # SpaceBasic v3 payload structure matching DevTools inspection
     payload = {
         "mealId": int(meal_id),
         "userId": user_id,
@@ -119,7 +123,7 @@ def process_user_booking(user, max_retries=3, delay=3):
             )
 
             if response.status_code in [200, 201]:
-                print(f"🎉 SUCCESS: Mess booked for {name}!")
+                print(f"🎉 SUCCESS: Mess RSVP processed for {name}!")
                 return True
             elif response.status_code in [401, 403]:
                 print(f"⛔ AUTH ERROR ({response.status_code}): Token expired or invalid for {name}.")
