@@ -17,12 +17,10 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 
 # SpaceBasic v3 Endpoints
 SPACEBASIC_BOOKING_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
+# Update this GET URL if DevTools shows a slightly different path (e.g., getmeals/student)
+SPACEBASIC_GET_MEALS_URL = "https://api.spacebasic.com/api/v3/messmanager/getupcomingmeals"
 
-# Your Supabase Publishable Key used for API headers
 SPACEBASIC_PUBLISHABLE_KEY = "sb_publishable_vw0I2KilIjFmtr1mm3Wl0A_sbbtaF1_"
-
-# Fallback Meal ID if not explicitly provided per user row
-DEFAULT_MEAL_ID = 307872
 
 # ==========================================
 # SUPABASE UTILITIES
@@ -67,6 +65,23 @@ def should_skip_today(skip_days):
     today_name = datetime.now(ist).strftime("%A").lower()
     return skip_days.get(today_name, False)
 
+def fetch_dynamic_meal_id(user_id, token, headers):
+    """Fetches the exact active mealId for a specific user from SpaceBasic."""
+    try:
+        response = requests.get(SPACEBASIC_GET_MEALS_URL, headers=headers, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            # Inspect response JSON structure to match your API response
+            if isinstance(data, list) and len(data) > 0:
+                return data[0].get("mealId") or data[0].get("id")
+            elif isinstance(data, dict):
+                meals = data.get("data") or data.get("meals") or []
+                if meals:
+                    return meals[0].get("mealId") or meals[0].get("id")
+    except Exception as e:
+        print(f"⚠️ Failed to auto-fetch dynamic meal ID for {user_id}: {e}")
+    return None
+
 # ==========================================
 # BOOKING PROCESSING LOGIC
 # ==========================================
@@ -76,19 +91,12 @@ def process_user_booking(user, max_retries=3, delay=3):
     user_id = str(user.get("user_id") or user.get("userid"))
     token = user.get("token") or user.get("auth_token")
     skip_days = user.get("skip_days", {})
-    
-    # Priority: DB row 'meal_id' -> Default fallback '307872'
-    meal_id = user.get("meal_id") or DEFAULT_MEAL_ID
 
     print(f"\n==========================================")
     print(f"👤 Processing User: {name} (ID: {user_id or 'Missing'})")
-    print(f"📌 Targeted Meal ID: {meal_id}")
     print(f"==========================================")
 
-    if not user_id and not token:
-        print(f"⚠️ Skipping {name}: Missing both User-ID and Token in database.")
-        return False
-    elif not user_id or user_id == "None":
+    if not user_id or user_id == "None":
         print(f"⚠️ Skipping {name}: User-ID field is missing or null.")
         return False
     elif not token:
@@ -99,7 +107,6 @@ def process_user_booking(user, max_retries=3, delay=3):
         print(f"⏭️ Skipping booking for {name} today based on 'skip_days' preference.")
         return True
 
-    # Headers including x-publishable-key
     headers = {
         "Authorization": f"Bearer {token}" if not str(token).startswith("Bearer ") else str(token),
         "User-ID": user_id,
@@ -108,7 +115,15 @@ def process_user_booking(user, max_retries=3, delay=3):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
 
-    # SpaceBasic v3 payload structure matching DevTools inspection
+    # Retrieve user's dynamic meal ID (check DB row first, then fetch live from SpaceBasic)
+    meal_id = user.get("meal_id") or fetch_dynamic_meal_id(user_id, token, headers)
+
+    if not meal_id:
+        print(f"❌ Error: Could not determine valid mealId for {name}. Skipping...")
+        return False
+
+    print(f"📌 Targeted Meal ID: {meal_id}")
+
     payload = {
         "mealId": int(meal_id),
         "userId": user_id,
@@ -128,10 +143,15 @@ def process_user_booking(user, max_retries=3, delay=3):
             )
 
             if response.status_code in [200, 201]:
-                print(f"🎉 SUCCESS: Mess RSVP processed for {name}!")
-                return True
+                res_json = response.json() if response.text else {}
+                # Verify that status returned in body is SUCCESS
+                if res_json.get("Status") == "FAILED" or "error" in str(res_json).lower():
+                    print(f"⚠️ API Warning ({response.status_code}): {response.text}")
+                else:
+                    print(f"🎉 SUCCESS: Mess RSVP confirmed for {name}!")
+                    return True
             elif response.status_code in [401, 403]:
-                print(f"⛔ AUTH ERROR ({response.status_code}): Token expired or invalid for {name}.")
+                print(f"⛔ AUTH ERROR ({response.status_code}): Token expired/invalid for {name}.")
                 return False
             else:
                 print(f"⚠️ API Response ({response.status_code}): {response.text}")
