@@ -17,10 +17,13 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 
 # SpaceBasic v3 Endpoints
 SPACEBASIC_BOOKING_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
-# Update this GET URL if DevTools shows a slightly different path (e.g., getmeals/student)
+# Replace with the exact GET endpoint URL from DevTools Network tab
 SPACEBASIC_GET_MEALS_URL = "https://api.spacebasic.com/api/v3/messmanager/getupcomingmeals"
 
 SPACEBASIC_PUBLISHABLE_KEY = "sb_publishable_vw0I2KilIjFmtr1mm3Wl0A_sbbtaF1_"
+
+# Fallback meal ID when auto-fetching is unavailable
+DEFAULT_MEAL_ID = 307872 
 
 # ==========================================
 # SUPABASE UTILITIES
@@ -71,7 +74,6 @@ def fetch_dynamic_meal_id(user_id, token, headers):
         response = requests.get(SPACEBASIC_GET_MEALS_URL, headers=headers, timeout=10)
         if response.status_code == 200:
             data = response.json()
-            # Inspect response JSON structure to match your API response
             if isinstance(data, list) and len(data) > 0:
                 return data[0].get("mealId") or data[0].get("id")
             elif isinstance(data, dict):
@@ -79,7 +81,7 @@ def fetch_dynamic_meal_id(user_id, token, headers):
                 if meals:
                     return meals[0].get("mealId") or meals[0].get("id")
     except Exception as e:
-        print(f"⚠️ Failed to auto-fetch dynamic meal ID for {user_id}: {e}")
+        print(f"⚠️ Could not auto-fetch dynamic meal ID for {user_id}: {e}")
     return None
 
 # ==========================================
@@ -115,8 +117,8 @@ def process_user_booking(user, max_retries=3, delay=3):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
 
-    # Retrieve user's dynamic meal ID (check DB row first, then fetch live from SpaceBasic)
-    meal_id = user.get("meal_id") or fetch_dynamic_meal_id(user_id, token, headers)
+    # Resolution order: Supabase 'meal_id' column -> Live API fetch -> DEFAULT_MEAL_ID
+    meal_id = user.get("meal_id") or fetch_dynamic_meal_id(user_id, token, headers) or DEFAULT_MEAL_ID
 
     if not meal_id:
         print(f"❌ Error: Could not determine valid mealId for {name}. Skipping...")
@@ -144,7 +146,6 @@ def process_user_booking(user, max_retries=3, delay=3):
 
             if response.status_code in [200, 201]:
                 res_json = response.json() if response.text else {}
-                # Verify that status returned in body is SUCCESS
                 if res_json.get("Status") == "FAILED" or "error" in str(res_json).lower():
                     print(f"⚠️ API Warning ({response.status_code}): {response.text}")
                 else:
