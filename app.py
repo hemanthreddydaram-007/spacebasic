@@ -9,68 +9,93 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- CUSTOM CSS FOR MODERN UI ---
+# --- TRENDY GLASSMORPHISM & GRADIENT CSS ---
 st.markdown("""
     <style>
-    /* Main container styling */
+    /* Dark Trendy Background */
+    .stApp {
+        background: linear-gradient(135deg, #0b0f19 0%, #111827 50%, #070a12 100%) !important;
+        color: #f1f5f9;
+    }
+    
     .main .block-container {
         padding-top: 2rem;
         padding-bottom: 3rem;
         max-width: 720px;
     }
     
-    /* Header card styling */
+    /* Modern Glassmorphism Header Banner */
     .header-card {
-        background: linear-gradient(135deg, #1e2640 0%, #0f172a 100%);
-        border: 1px solid #334155;
-        border-radius: 12px;
-        padding: 24px;
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 28px;
         margin-bottom: 24px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        text-align: center;
     }
     .header-title {
-        color: #f8fafc;
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin-bottom: 4px;
+        background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 2.1rem;
+        font-weight: 800;
+        margin-bottom: 6px;
     }
     .header-subtitle {
         color: #94a3b8;
-        font-size: 0.95rem;
-        margin-bottom: 0px;
-    }
-    
-    /* Day card styling for skip rules */
-    .day-card {
-        background-color: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 8px;
-        padding: 12px 16px;
-        margin-bottom: 12px;
+        font-size: 1rem;
+        font-weight: 400;
     }
 
-    /* Primary Button Custom Styling */
+    /* Highlighted Video Guide Card */
+    .video-highlight-card {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+        border: 1.5px solid rgba(168, 85, 247, 0.4);
+        border-radius: 16px;
+        padding: 18px 20px;
+        margin-bottom: 24px;
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+    }
+    .video-title {
+        color: #f472b6;
+        font-size: 1.05rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    /* Input Field Labels & Tooltips */
+    .stTextInput > label, .stSelectbox > label {
+        color: #e2e8f0 !important;
+        font-weight: 600 !important;
+    }
+    
+    /* Neon Gradient Deploy Button */
     div.stButton > button:first-child {
-        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-        color: #ffffff;
-        font-weight: 600;
-        font-size: 1rem;
-        border-radius: 8px;
-        padding: 0.6rem 1rem;
-        border: none;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        transition: all 0.2s ease-in-out;
+        background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        font-size: 1.05rem !important;
+        border-radius: 12px !important;
+        padding: 0.75rem 1.5rem !important;
+        border: none !important;
+        box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4) !important;
+        transition: all 0.3s ease-in-out !important;
     }
     div.stButton > button:first-child:hover {
-        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
-        transform: translateY(-1px);
+        box-shadow: 0 6px 28px rgba(168, 85, 247, 0.6) !important;
+        transform: translateY(-2px) scale(1.01) !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
 # --- SUPABASE INITIALIZATION ---
-SUPABASE_URL = st.secrets.get("SUPABASE_URL", "")
+SUPABASE_URL = st.secrets.get("SUPABASE_URL", "https://ywljhdtygqzgvzrnognn.supabase.co")
 SUPABASE_KEY = st.secrets.get("SUPABASE_KEY", "")
 
 @st.cache_resource
@@ -82,17 +107,28 @@ supabase = init_supabase()
 # --- HEADER SECTION ---
 st.markdown("""
     <div class="header-card">
-        <div class="header-title">🍱 Mess Automator Dashboard</div>
-        <div class="header-subtitle">Autopilot mess RSVPs and custom weekly schedule manager</div>
+        <div class="header-title">🍱 SpaceBasic Mess Automator</div>
+        <div class="header-subtitle">Set your daily mess booking preferences on autopilot</div>
     </div>
 """, unsafe_allow_html=True)
 
-# --- SECTION 1: ACCOUNT CREDENTIALS ---
-st.subheader("🔑 Account Credentials")
+# --- HIGHLIGHTED VIDEO GUIDE CONTAINER ---
+st.markdown("""
+    <div class="video-highlight-card">
+        <div class="video-title">🎥 Video Tutorial: Get Your User ID & Token</div>
+        <span style="color: #cbd5e1; font-size: 0.9rem;">
+            Watch this quick guide to copy your <b>User ID</b> and <b>Bearer Token</b> from DevTools (<code>F12</code>) in 30 seconds.
+        </span>
+    </div>
+""", unsafe_allow_html=True)
 
-with st.expander("📺 Video Tutorial: How to find User ID & Token", expanded=False):
-    st.write("Follow this quick screencast to copy your credentials from DevTools (`F12`):")
+with st.expander("▶️ Watch Setup Guide Video", expanded=True):
     st.video("Screen Recording 2026-08-08 151423.mp4")
+
+st.divider()
+
+# --- SECTION 1: ACCOUNT CREDENTIALS ---
+st.subheader("🔑 1. Account Credentials")
 
 col1, col2 = st.columns(2)
 with col1:
@@ -104,28 +140,28 @@ bearer_token = st.text_input(
     "SpaceBasic Authorization Token", 
     type="password", 
     placeholder="eyJhbGciOiJIUzI1NiJ9...",
-    help="Paste token string with or without 'Bearer'"
+    help="Paste token string starting with or without 'Bearer'"
 )
 
 st.divider()
 
 # --- SECTION 2: MEAL PREFERENCES ---
-st.subheader("🍽️ Preference Chain")
+st.subheader("🍽️ 2. Preference Chain")
 
 priority_option = st.selectbox(
-    "Select preferred fallback order for Lunch & Dinner:",
+    "Preferred fallback order for Lunch & Dinner:",
     options=[
         "Non-Veg ➔ Egg ➔ Veg (Default)",
         "Egg ➔ Veg",
         "Veg Only"
     ],
-    help="If your top preference is unavailable, the system fallbacks to the next choice automatically."
+    help="If your top preference is unavailable, the runner falls back automatically."
 )
 
 st.divider()
 
 # --- SECTION 3: WEEKLY SKIP SCHEDULE ---
-st.subheader("📅 Weekly Skip Schedule")
+st.subheader("📅 3. Weekly Skip Schedule")
 st.caption("Check any meals you **DO NOT** want the autopilot to book:")
 
 days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
@@ -170,10 +206,10 @@ if st.button("🚀 Deploy Autopilot Preferences", use_container_width=True):
         }
         
         try:
-            with st.spinner("Connecting to Supabase..."):
+            with st.spinner("Saving preferences to Supabase..."):
                 supabase.table("users").upsert(user_data, on_conflict="user_id").execute()
             
-            st.success(f"🎉 **{user_name}** is now configured!")
-            st.toast("Autopilot profile updated successfully!", icon="✅")
+            st.success(f"🎉 **{user_name}** is active in the autopilot queue!")
+            st.toast("Autopilot configuration deployed successfully!", icon="✅")
         except Exception as e:
-            st.error(f"❌ Connection Error: {e}")
+            st.error(f"❌ Supabase Connection Error: {e}")
