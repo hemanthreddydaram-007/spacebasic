@@ -9,13 +9,13 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- TRENDY GLASSMORPHISM & GRADIENT CSS ---
+# --- MATCHED THEME CSS ---
 st.markdown("""
     <style>
-    /* Dark Trendy Background */
+    /* Global App Background */
     .stApp {
-        background: linear-gradient(135deg, #0b0f19 0%, #111827 50%, #070a12 100%) !important;
-        color: #f1f5f9;
+        background: linear-gradient(135deg, #090d16 0%, #0f172a 60%, #080a10 100%) !important;
+        color: #f8fafc;
     }
     
     .main .block-container {
@@ -24,16 +24,16 @@ st.markdown("""
         max-width: 720px;
     }
     
-    /* Modern Glassmorphism Header Banner */
+    /* Header Card */
     .header-card {
-        background: rgba(30, 41, 59, 0.6);
+        background: rgba(30, 41, 59, 0.7);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 16px;
         padding: 28px;
         margin-bottom: 24px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
         text-align: center;
     }
     .header-title {
@@ -47,35 +47,68 @@ st.markdown("""
     .header-subtitle {
         color: #94a3b8;
         font-size: 1rem;
-        font-weight: 400;
     }
 
-    /* Highlighted Video Guide Card */
+    /* Video Banner Card */
     .video-highlight-card {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
-        border: 1.5px solid rgba(168, 85, 247, 0.4);
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.18) 0%, rgba(168, 85, 247, 0.18) 100%);
+        border: 1.5px solid rgba(168, 85, 247, 0.45);
         border-radius: 16px;
         padding: 18px 20px;
-        margin-bottom: 24px;
-        box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+        margin-bottom: 16px;
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.25);
     }
     .video-title {
         color: #f472b6;
         font-size: 1.05rem;
         font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
 
-    /* Input Field Labels & Tooltips */
+    /* Streamlit Expander Match */
+    div[data-testid="stExpander"] {
+        background-color: rgba(30, 41, 59, 0.5) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+    }
+
+    /* Input Field Labels */
     .stTextInput > label, .stSelectbox > label {
         color: #e2e8f0 !important;
         font-weight: 600 !important;
+        font-size: 0.95rem !important;
     }
     
-    /* Neon Gradient Deploy Button */
+    /* Input Fields (Matched with Cards) */
+    div[data-baseweb="input"] {
+        background-color: rgba(30, 41, 59, 0.8) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 10px !important;
+        color: #f8fafc !important;
+    }
+    div[data-baseweb="input"]:focus-within {
+        border-color: #818cf8 !important;
+        box-shadow: 0 0 12px rgba(129, 140, 248, 0.35) !important;
+    }
+    
+    /* Select Box Styling */
+    div[data-baseweb="select"] > div {
+        background-color: rgba(30, 41, 59, 0.8) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 10px !important;
+        color: #f8fafc !important;
+    }
+
+    /* Custom Checkbox Alignment */
+    div[data-testid="stCheckbox"] {
+        background: rgba(30, 41, 59, 0.4);
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        margin-bottom: 6px;
+    }
+
+    /* Neon Deploy Button */
     div.stButton > button:first-child {
         background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
         color: #ffffff !important;
