@@ -15,23 +15,18 @@ if not SUPABASE_URL or not SUPABASE_KEY:
     print("❌ Error: SUPABASE_URL or SUPABASE_KEY environment variable is missing!")
     exit(1)
 
-# SpaceBasic Endpoints
 SPACEBASIC_BOOKING_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
-
-# ⚠️ UPDATE THIS URL with the GET request found on '/module/messmanager/bookings'
 SPACEBASIC_GET_MEALS_URL = "https://api.spacebasic.com/api/v3/messmanager/getstudentmeals"
-
 SPACEBASIC_PUBLISHABLE_KEY = "sb_publishable_vw0I2KilIjFmtr1mm3Wl0A_sbbtaF1_"
+DEFAULT_FALLBACK_MEAL_ID = 307872
 
 # ==========================================
 # SUPABASE UTILITIES
 # ==========================================
 def get_supabase_client() -> Client:
-    """Creates a fresh Supabase client instance."""
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def get_active_users(max_retries=3, delay=5):
-    """Fetches user records from Supabase with retry logic."""
     for attempt in range(1, max_retries + 1):
         try:
             print(f"🔄 Connecting to Supabase (Attempt {attempt}/{max_retries})...")
@@ -42,13 +37,12 @@ def get_active_users(max_retries=3, delay=5):
                 print(f"✅ Successfully retrieved {len(response.data)} user record(s).")
                 return response.data
             else:
-                print("⚠️ Query succeeded, but no user records were found in the database.")
+                print("⚠️ Query succeeded, but no user records were found in database.")
                 return []
                 
         except Exception as e:
             print(f"❌ Attempt {attempt} failed fetching users: {e}")
             if attempt < max_retries:
-                print(f"⏳ Retrying in {delay} seconds...")
                 time.sleep(delay)
 
     print("❌ Critical Error: Could not connect to Supabase after retries.")
@@ -58,36 +52,41 @@ def get_active_users(max_retries=3, delay=5):
 # HELPER FUNCTIONS
 # ==========================================
 def should_skip_today(skip_days):
-    """Checks if current day in IST is set to True inside skip_days dict."""
+    """
+    Checks if today's day name in IST exists in the user's skip_days dict.
+    Example skip_days: {"monday": ["Lunch", "Dinner"]}
+    """
     if not isinstance(skip_days, dict):
         return False
         
     ist = pytz.timezone("Asia/Kolkata")
     today_name = datetime.now(ist).strftime("%A").lower()
-    return skip_days.get(today_name, False)
+    
+    day_skips = skip_days.get(today_name, [])
+    if isinstance(day_skips, list) and len(day_skips) > 0:
+        return True
+    return False
 
-def fetch_dynamic_meal_id(user_id, token, headers):
-    """Fetches the exact active mealId for a specific user live from SpaceBasic."""
+def fetch_dynamic_meal_id(user_id, headers):
+    """Attempts to fetch active mealId dynamically from SpaceBasic API."""
     try:
         response = requests.get(SPACEBASIC_GET_MEALS_URL, headers=headers, timeout=10)
-        print(f"🔍 Fetching active meals for {user_id} - Status: {response.status_code}")
-        
         if response.status_code == 200:
             data = response.json()
             if isinstance(data, list) and len(data) > 0:
                 meal_id = data[0].get("mealId") or data[0].get("id")
-                print(f"💡 Auto-fetched active mealId: {meal_id}")
-                return meal_id
+                if meal_id:
+                    print(f"💡 Auto-fetched live mealId: {meal_id}")
+                    return meal_id
             elif isinstance(data, dict):
                 meals = data.get("data") or data.get("meals") or data.get("result") or []
                 if meals:
                     meal_id = meals[0].get("mealId") or meals[0].get("id")
-                    print(f"💡 Auto-fetched active mealId: {meal_id}")
-                    return meal_id
-        else:
-            print(f"⚠️ GET meals endpoint returned HTTP {response.status_code}")
+                    if meal_id:
+                        print(f"💡 Auto-fetched live mealId: {meal_id}")
+                        return meal_id
     except Exception as e:
-        print(f"⚠️ Could not auto-fetch dynamic meal ID for {user_id}: {e}")
+        print(f"⚠️ Dynamic mealId fetch skipped for {user_id}: {e}")
     return None
 
 # ==========================================
@@ -95,9 +94,8 @@ def fetch_dynamic_meal_id(user_id, token, headers):
 # ==========================================
 def process_user_booking(user, max_retries=3, delay=3):
     name = user.get("name", "Unknown")
-    
-    user_id = str(user.get("user_id") or user.get("userid"))
-    token = user.get("token") or user.get("auth_token")
+    user_id = str(user.get("user_id") or user.get("userid") or "")
+    raw_token = str(user.get("token") or user.get("auth_token") or "")
     skip_days = user.get("skip_days", {})
 
     print(f"\n==========================================")
@@ -105,30 +103,29 @@ def process_user_booking(user, max_retries=3, delay=3):
     print(f"==========================================")
 
     if not user_id or user_id == "None":
-        print(f"⚠️ Skipping {name}: User-ID field is missing or null.")
+        print(f"⚠️ Skipping {name}: Invalid or missing User-ID.")
         return False
-    elif not token:
-        print(f"⚠️ Skipping {name}: Token field is missing or null.")
+    if not raw_token or len(raw_token) < 10:
+        print(f"⚠️ Skipping {name}: Invalid or missing Token.")
         return False
 
     if should_skip_today(skip_days):
-        print(f"⏭️ Skipping booking for {name} today based on 'skip_days' preference.")
+        print(f"⏭️ Skipping booking for {name} today based on 'skip_days' configuration.")
         return True
 
+    # Normalize Authorization header format
+    token_header = raw_token if raw_token.startswith("Bearer ") else f"Bearer {raw_token}"
+
     headers = {
-        "Authorization": f"Bearer {token}" if not str(token).startswith("Bearer ") else str(token),
+        "Authorization": token_header,
         "User-ID": user_id,
         "x-publishable-key": SPACEBASIC_PUBLISHABLE_KEY,
         "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
 
-    # Resolution order: Supabase DB row 'meal_id' -> Live API fetch
-    meal_id = user.get("meal_id") or fetch_dynamic_meal_id(user_id, token, headers)
-
-    if not meal_id:
-        print(f"❌ Error: Could not determine valid active mealId for {name}. Skipping...")
-        return False
+    # Resolution order: Supabase DB row 'meal_id' -> API auto-fetch -> Default Fallback
+    meal_id = user.get("meal_id") or fetch_dynamic_meal_id(user_id, headers) or DEFAULT_FALLBACK_MEAL_ID
 
     print(f"📌 Targeted Meal ID: {meal_id}")
 
@@ -153,13 +150,13 @@ def process_user_booking(user, max_retries=3, delay=3):
             if response.status_code in [200, 201]:
                 res_json = response.json() if response.text else {}
                 if res_json.get("Status") == "FAILED" or "error" in str(res_json).lower():
-                    print(f"⚠️ API Response Failure: {response.text}")
+                    print(f"⚠️ API Response Warning: {response.text}")
                     return False
                 else:
                     print(f"🎉 SUCCESS: Mess RSVP confirmed for {name}!")
                     return True
             elif response.status_code in [401, 403]:
-                print(f"⛔ AUTH ERROR ({response.status_code}): Token expired or invalid for {name}.")
+                print(f"⛔ AUTH ERROR ({response.status_code}): Token expired for {name}.")
                 return False
             else:
                 print(f"⚠️ API Response ({response.status_code}): {response.text}")
