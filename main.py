@@ -1,5 +1,84 @@
-def extract_all_meal_ids(data):
-    """Parses SpaceBasic menu array and returns a list of all bookable meal objects."""
+import os
+import time
+import requests
+import pytz
+from datetime import datetime, timedelta
+from supabase import create_client, Client
+
+# ==========================================
+# ENVIRONMENT VARIABLES & CONFIGURATION
+# ==========================================
+SPACEBASIC_PUBLISHABLE_KEY = "sb_publishable_vw0I2KilIjFmtr1mm3Wl0A_sbbtaF1_"
+
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://ywljhdtygqzgvzrnognn.supabase.co")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+if not SUPABASE_KEY:
+    print("❌ Error: SUPABASE_KEY environment variable is missing!")
+    exit(1)
+
+SPACEBASIC_BOOKING_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
+SPACEBASIC_MENU_URL = "https://api.spacebasic.com/api/v3/messmanager/mealsmenu"
+
+# ==========================================
+# SUPABASE UTILITIES
+# ==========================================
+def get_supabase_client() -> Client:
+    """Creates a fresh Supabase client instance."""
+    return create_client(SUPABASE_URL, SUPABASE_KEY)
+
+def get_active_users(max_retries=3, delay=5):
+    """Fetches user records from Supabase with retry logic."""
+    for attempt in range(1, max_retries + 1):
+        try:
+            print(f"🔄 Connecting to Supabase (Attempt {attempt}/{max_retries})...")
+            supabase = get_supabase_client()
+            response = supabase.table("users").select("*").execute()
+            
+            if response.data:
+                print(f"✅ Successfully retrieved {len(response.data)} user record(s).")
+                return response.data
+            else:
+                print("⚠️ Query succeeded, but no user records were found in database.")
+                return []
+                
+        except Exception as e:
+            print(f"❌ Attempt {attempt} failed fetching users: {e}")
+            if attempt < max_retries:
+                time.sleep(delay)
+
+    print("❌ Critical Error: Could not connect to Supabase after retries.")
+    return []
+
+# ==========================================
+# HELPER FUNCTIONS
+# ==========================================
+def should_skip_today(skip_days):
+    """
+    Checks if current day in IST is set to skip.
+    Supports both boolean format {'monday': True} and list format {'monday': ['Breakfast', 'Lunch', 'Dinner']}.
+    Only skips the entire runner process if ALL three main meals are explicitly marked for skipping today.
+    """
+    if not isinstance(skip_days, dict):
+        return False
+        
+    ist = pytz.timezone("Asia/Kolkata")
+    today_name = datetime.now(ist).strftime("%A").lower()
+    
+    day_skips = skip_days.get(today_name, [])
+    
+    if day_skips is True:
+        return True
+        
+    if isinstance(day_skips, list):
+        skips_lower = [str(item).lower() for item in day_skips]
+        if "breakfast" in skips_lower and "lunch" in skips_lower and "dinner" in skips_lower:
+            return True
+            
+    return False
+
+def extract_all_meals_from_data(data):
+    """Parses SpaceBasic menu response array and extracts all bookable meal items."""
     meals_to_book = []
     
     if isinstance(data, dict):
@@ -7,7 +86,7 @@ def extract_all_meal_ids(data):
         meals = result.get("meals", []) if isinstance(result, dict) else []
         
         for meal in meals:
-            # Only pick meals where booking is allowed
+            # Pick meals where booking is enabled
             if str(meal.get("allowBooking")) == "1":
                 meal_id = meal.get("mealId")
                 meal_name = meal.get("mealName", "Unknown Meal")
@@ -16,6 +95,9 @@ def extract_all_meal_ids(data):
                     
     return meals_to_book
 
+# ==========================================
+# BOOKING PROCESSING LOGIC
+# ==========================================
 def process_user_booking(user, max_retries=3, delay=3):
     name = user.get("name", "Unknown")
     user_id = str(user.get("user_id") or user.get("userid") or "")
@@ -44,19 +126,22 @@ def process_user_booking(user, max_retries=3, delay=3):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
 
-    # Fetch menu list for tomorrow
     ist = pytz.timezone("Asia/Kolkata")
     tomorrow_date = (datetime.now(ist) + timedelta(days=1)).strftime("%Y-%m-%d")
     url = f"{SPACEBASIC_MENU_URL}?userId={user_id}&tenantId={tenant_id}&mealDate={tomorrow_date}"
 
     try:
+        print(f"🔍 Fetching menu for User {user_id} on {tomorrow_date}...")
         response = requests.get(url, headers=headers, timeout=10)
+        
         if response.status_code == 200:
-            meals = extract_all_meal_ids(response.json())
+            meals = extract_all_meals_from_data(response.json())
             if not meals:
                 print(f"⚠️ No bookable meals found for {name} on {tomorrow_date}.")
                 return False
 
+            print(f"💡 Found {len(meals)} bookable meal slot(s) for tomorrow.")
+            
             all_success = True
             for meal in meals:
                 meal_id = meal["id"]
@@ -70,7 +155,7 @@ def process_user_booking(user, max_retries=3, delay=3):
                     "isSpecial": 0
                 }
 
-                print(f"🚀 Booking {meal_name} (ID: {meal_id}) for {name}...")
+                print(f"🚀 Booking '{meal_name}' (Meal ID: {meal_id}) for {name}...")
                 res = requests.post(SPACEBASIC_BOOKING_URL, json=payload, headers=headers, timeout=15)
                 
                 if res.status_code in [200, 201]:
@@ -80,7 +165,42 @@ def process_user_booking(user, max_retries=3, delay=3):
                     all_success = False
 
             return all_success
+        else:
+            print(f"⚠️ Failed to fetch menu: HTTP {response.status_code}")
     except Exception as e:
-        print(f"❌ Network error processing {name}: {e}")
+        print(f"❌ Error processing booking for {name}: {e}")
 
     return False
+
+# ==========================================
+# MAIN EXECUTION
+# ==========================================
+def main():
+    print("=" * 50)
+    print("🤖 STARTING AUTOMATED MESS BOOKING PROCESS")
+    print("=" * 50)
+
+    users = get_active_users()
+
+    if not users:
+        print("🛑 Execution stopped: No active users retrieved from Supabase.")
+        return
+
+    print(f"📋 Found {len(users)} user(s) in Supabase to process.")
+    
+    success_count = 0
+    failure_count = 0
+
+    for user in users:
+        is_success = process_user_booking(user)
+        if is_success:
+            success_count += 1
+        else:
+            failure_count += 1
+
+    print("\n" + "=" * 50)
+    print(f"📊 SUMMARY: {success_count} Succeeded | {failure_count} Failed/Skipped")
+    print("=" * 50)
+
+if __name__ == "__main__":
+    main()
