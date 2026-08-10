@@ -128,7 +128,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- SUPABASE INITIALIZATION ---
-SUPABASE_URL = st.secrets.get("SUPABASE_URL", "https://ywljhdtygqzgvzrnognn.supabase.co")
+SUPABASE_URL = st.secrets.get("SUPABASE_URL", "https://YOUR_PROJECT_REF.supabase.co")
 SUPABASE_KEY = st.secrets.get("SUPABASE_KEY", "")
 
 @st.cache_resource
@@ -165,14 +165,14 @@ st.subheader("🔑 1. Account Credentials")
 
 col1, col2 = st.columns(2)
 with col1:
-    user_name = st.text_input("Your Name", placeholder="e.g. Hemanth")
+    user_name = st.text_input("Your Name", placeholder="e.g. Bob")
 with col2:
-    user_id = st.text_input("SpaceBasic User ID", placeholder="e.g. 380170")
+    user_id = st.text_input("SpaceBasic User ID", placeholder="e.g. 123456")
 
 bearer_token = st.text_input(
     "SpaceBasic Authorization Token", 
     type="password", 
-    placeholder="eyJhbGciOiJIUzI1NiJ9...",
+    placeholder="Paste Bearer token here...",
     help="Paste token string starting with or without 'Bearer'"
 )
 
