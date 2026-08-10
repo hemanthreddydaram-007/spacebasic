@@ -3,7 +3,6 @@ from supabase import create_client, Client
 
 st.set_page_config(page_title="SpaceBasic Mess Automator", page_icon="🍱", layout="centered")
 
-# Retrieve credentials from Streamlit Secrets
 SUPABASE_URL = st.secrets.get("SUPABASE_URL", "")
 SUPABASE_KEY = st.secrets.get("SUPABASE_KEY", "")
 
@@ -19,14 +18,13 @@ st.caption("Configure your daily mess booking autopilot once and forget it!")
 # --- 1. USER LOGIN / CREDENTIALS ---
 st.header("1. Account Setup")
 
-with st.expander("🎥 How to find your User ID, Token, and Meal ID", expanded=False):
+with st.expander("🎥 How to find your User ID and Authorization Token", expanded=False):
     st.write("Follow the quick step-by-step video below to grab your credentials from DevTools:")
     st.video("Screen Recording 2026-08-08 151423.mp4")
 
 user_name = st.text_input("Your Name", placeholder="e.g. Bob")
 user_id = st.text_input("SpaceBasic User ID", placeholder="e.g. 380170")
-bearer_token = st.text_input("SpaceBasic Authorization Token", type="password", help="Paste token string with or without 'Bearer'")
-meal_id_input = st.number_input("Active Meal ID (from DevTools)", min_value=100000, value=307872, step=1)
+bearer_token = st.text_input("SpaceBasic Authorization Token", type="password", help="Paste your Bearer token starting with 'Bearer ...'")
 
 # --- 2. MEAL PREFERENCES ---
 st.header("2. Meal Preferences")
@@ -39,7 +37,7 @@ priority_option = st.selectbox(
     ]
 )
 
-# --- 3. DAY-BASED CANCELLATION RULES ---
+# --- 3. DAY-BASED SKIP RULES ---
 st.header("3. Day-Based Skip Rules")
 st.write("Select which meals you **DO NOT** want to book every week:")
 
@@ -69,7 +67,6 @@ if st.button("💾 Save Configuration", type="primary", use_container_width=True
     if not user_name or not user_id or not bearer_token:
         st.error("⚠️ Please fill in your Name, User ID, and Authorization Token!")
     else:
-        # Clean Bearer token string
         clean_token = bearer_token.strip()
         if not clean_token.startswith("Bearer "):
             clean_token = f"Bearer {clean_token}"
@@ -79,9 +76,8 @@ if st.button("💾 Save Configuration", type="primary", use_container_width=True
             "user_id": str(user_id).strip(),
             "tenant_id": "143",
             "token": clean_token,
-            "meal_id": int(meal_id_input),
-            "lunch_preference": priority_option.split(" ")[0],
-            "dinner_preference": priority_option.split(" ")[0],
+            "lunch_preference": "Non Veg",
+            "dinner_preference": "Non Veg",
             "skip_days": skip_days
         }
         
