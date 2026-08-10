@@ -24,9 +24,11 @@ SPACEBASIC_MENU_URL = "https://api.spacebasic.com/api/v3/messmanager/mealsmenu"
 # SUPABASE UTILITIES
 # ==========================================
 def get_supabase_client() -> Client:
+    """Creates a fresh Supabase client instance."""
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def get_active_users(max_retries=3, delay=5):
+    """Fetches user records from Supabase with retry logic."""
     for attempt in range(1, max_retries + 1):
         try:
             print(f"🔄 Connecting to Supabase (Attempt {attempt}/{max_retries})...")
@@ -52,6 +54,11 @@ def get_active_users(max_retries=3, delay=5):
 # HELPER FUNCTIONS
 # ==========================================
 def should_skip_today(skip_days):
+    """
+    Checks if current day in IST is set to skip.
+    Supports both boolean format {'monday': True} and list format {'monday': ['Breakfast', 'Lunch', 'Dinner']}.
+    Only skips the entire runner process if ALL three main meals are explicitly marked for skipping today.
+    """
     if not isinstance(skip_days, dict):
         return False
         
@@ -78,20 +85,19 @@ def extract_meal_id_from_data(data):
             if res:
                 return res
     elif isinstance(data, dict):
-        # Direct key matches
         if "mealId" in data and data["mealId"]:
             return data["mealId"]
         if "meal_id" in data and data["meal_id"]:
             return data["meal_id"]
+        if "id" in data and data["id"]:
+            return data["id"]
             
-        # Check sub-arrays/dictionaries
-        for key in ["data", "result", "meals", "menu", "slots", "items"]:
+        for key in ["data", "result", "meals", "menu", "slots", "items", "mealList"]:
             if key in data and data[key]:
                 res = extract_meal_id_from_data(data[key])
                 if res:
                     return res
 
-        # Fallback to general dict value check
         for v in data.values():
             if isinstance(v, (dict, list)):
                 res = extract_meal_id_from_data(v)
@@ -112,8 +118,6 @@ def fetch_live_meal_id(user_id, tenant_id, headers):
         
         if response.status_code == 200:
             data = response.json()
-            print(f"📦 RAW RESPONSE: {data}")  # Debug log
-            
             meal_id = extract_meal_id_from_data(data)
             if meal_id:
                 print(f"💡 Successfully extracted active mealId: {meal_id}")
