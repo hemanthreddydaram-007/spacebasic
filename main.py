@@ -8,27 +8,25 @@ from supabase import create_client, Client
 # ==========================================
 # ENVIRONMENT VARIABLES & CONFIGURATION
 # ==========================================
-SUPABASE_URL = os.getenv("SUPABASE_URL")
+SPACEBASIC_PUBLISHABLE_KEY = "sb_publishable_vw0I2KilIjFmtr1mm3Wl0A_sbbtaF1_"
+
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://ywljhdtygqzgvzrnognn.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-if not SUPABASE_URL or not SUPABASE_KEY:
-    print("❌ Error: SUPABASE_URL or SUPABASE_KEY environment variable is missing!")
+if not SUPABASE_KEY:
+    print("❌ Error: SUPABASE_KEY environment variable is missing!")
     exit(1)
 
-# SpaceBasic Endpoints
 SPACEBASIC_BOOKING_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
 SPACEBASIC_MENU_URL = "https://api.spacebasic.com/api/v3/messmanager/mealsmenu"
-SPACEBASIC_PUBLISHABLE_KEY = "sb_publishable_vw0I2KilIjFmtr1mm3Wl0A_sbbtaF1_"
 
 # ==========================================
 # SUPABASE UTILITIES
 # ==========================================
 def get_supabase_client() -> Client:
-    """Creates a fresh Supabase client instance."""
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def get_active_users(max_retries=3, delay=5):
-    """Fetches user records from Supabase with retry logic."""
     for attempt in range(1, max_retries + 1):
         try:
             print(f"🔄 Connecting to Supabase (Attempt {attempt}/{max_retries})...")
@@ -54,11 +52,6 @@ def get_active_users(max_retries=3, delay=5):
 # HELPER FUNCTIONS
 # ==========================================
 def should_skip_today(skip_days):
-    """
-    Checks if current day in IST is set to skip.
-    Supports both boolean format {'monday': True} and list format {'monday': ['Breakfast', 'Lunch', 'Dinner']}.
-    Only skips the entire runner process if ALL three main meals are explicitly marked for skipping today.
-    """
     if not isinstance(skip_days, dict):
         return False
         
@@ -67,11 +60,9 @@ def should_skip_today(skip_days):
     
     day_skips = skip_days.get(today_name, [])
     
-    # If explicitly set as boolean True
     if day_skips is True:
         return True
         
-    # If all 3 meals are marked skipped in the UI list
     if isinstance(day_skips, list):
         skips_lower = [str(item).lower() for item in day_skips]
         if "breakfast" in skips_lower and "lunch" in skips_lower and "dinner" in skips_lower:
@@ -79,8 +70,37 @@ def should_skip_today(skip_days):
             
     return False
 
+def extract_meal_id_from_data(data):
+    """Recursively parses SpaceBasic JSON response to find a valid mealId."""
+    if isinstance(data, list):
+        for item in data:
+            res = extract_meal_id_from_data(item)
+            if res:
+                return res
+    elif isinstance(data, dict):
+        # Direct key matches
+        if "mealId" in data and data["mealId"]:
+            return data["mealId"]
+        if "meal_id" in data and data["meal_id"]:
+            return data["meal_id"]
+            
+        # Check sub-arrays/dictionaries
+        for key in ["data", "result", "meals", "menu", "slots", "items"]:
+            if key in data and data[key]:
+                res = extract_meal_id_from_data(data[key])
+                if res:
+                    return res
+
+        # Fallback to general dict value check
+        for v in data.values():
+            if isinstance(v, (dict, list)):
+                res = extract_meal_id_from_data(v)
+                if res:
+                    return res
+    return None
+
 def fetch_live_meal_id(user_id, tenant_id, headers):
-    """Dynamically queries SpaceBasic's mealsmenu endpoint for tomorrow's date."""
+    """Queries SpaceBasic's mealsmenu endpoint for tomorrow's date."""
     ist = pytz.timezone("Asia/Kolkata")
     tomorrow_date = (datetime.now(ist) + timedelta(days=1)).strftime("%Y-%m-%d")
     
@@ -92,15 +112,12 @@ def fetch_live_meal_id(user_id, tenant_id, headers):
         
         if response.status_code == 200:
             data = response.json()
+            print(f"📦 RAW RESPONSE: {data}")  # Debug log
             
-            # Extract mealId from SpaceBasic menu response array or dictionary
-            meals_list = data if isinstance(data, list) else data.get("data") or data.get("meals") or []
-            
-            if meals_list and len(meals_list) > 0:
-                meal_id = meals_list[0].get("mealId") or meals_list[0].get("id")
-                if meal_id:
-                    print(f"💡 Successfully retrieved active mealId: {meal_id}")
-                    return meal_id
+            meal_id = extract_meal_id_from_data(data)
+            if meal_id:
+                print(f"💡 Successfully extracted active mealId: {meal_id}")
+                return meal_id
             print(f"⚠️ Response received, but no active meal items found for date {tomorrow_date}.")
         else:
             print(f"⚠️ Failed to fetch menu: HTTP {response.status_code} - {response.text[:100]}")
@@ -135,7 +152,6 @@ def process_user_booking(user, max_retries=3, delay=3):
         print(f"⏭️ Skipping booking for {name} today based on 'skip_days' configuration.")
         return True
 
-    # Normalize Authorization token header
     token_header = raw_token if raw_token.startswith("Bearer ") else f"Bearer {raw_token}"
 
     headers = {
@@ -146,7 +162,6 @@ def process_user_booking(user, max_retries=3, delay=3):
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
     }
 
-    # Automatically fetch live mealId from SpaceBasic
     meal_id = fetch_live_meal_id(user_id, tenant_id, headers)
 
     if not meal_id:
