@@ -24,9 +24,11 @@ SPACEBASIC_PUBLISHABLE_KEY = "sb_publishable_vw0I2KilIjFmtr1mm3Wl0A_sbbtaF1_"
 # SUPABASE UTILITIES
 # ==========================================
 def get_supabase_client() -> Client:
+    """Creates a fresh Supabase client instance."""
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def get_active_users(max_retries=3, delay=5):
+    """Fetches user records from Supabase with retry logic."""
     for attempt in range(1, max_retries + 1):
         try:
             print(f"🔄 Connecting to Supabase (Attempt {attempt}/{max_retries})...")
@@ -52,6 +54,11 @@ def get_active_users(max_retries=3, delay=5):
 # HELPER FUNCTIONS
 # ==========================================
 def should_skip_today(skip_days):
+    """
+    Checks if current day in IST is set to skip.
+    Supports both boolean format {'monday': True} and list format {'monday': ['Breakfast', 'Lunch', 'Dinner']}.
+    Only skips the entire runner process if ALL three main meals are explicitly marked for skipping today.
+    """
     if not isinstance(skip_days, dict):
         return False
         
@@ -59,8 +66,17 @@ def should_skip_today(skip_days):
     today_name = datetime.now(ist).strftime("%A").lower()
     
     day_skips = skip_days.get(today_name, [])
-    if isinstance(day_skips, list) and len(day_skips) > 0:
+    
+    # If explicitly set as boolean True
+    if day_skips is True:
         return True
+        
+    # If all 3 meals are marked skipped in the UI list
+    if isinstance(day_skips, list):
+        skips_lower = [str(item).lower() for item in day_skips]
+        if "breakfast" in skips_lower and "lunch" in skips_lower and "dinner" in skips_lower:
+            return True
+            
     return False
 
 def fetch_live_meal_id(user_id, tenant_id, headers):
@@ -81,7 +97,6 @@ def fetch_live_meal_id(user_id, tenant_id, headers):
             meals_list = data if isinstance(data, list) else data.get("data") or data.get("meals") or []
             
             if meals_list and len(meals_list) > 0:
-                # Retrieve the active mealId (or first available meal slot)
                 meal_id = meals_list[0].get("mealId") or meals_list[0].get("id")
                 if meal_id:
                     print(f"💡 Successfully retrieved active mealId: {meal_id}")
@@ -120,6 +135,7 @@ def process_user_booking(user, max_retries=3, delay=3):
         print(f"⏭️ Skipping booking for {name} today based on 'skip_days' configuration.")
         return True
 
+    # Normalize Authorization token header
     token_header = raw_token if raw_token.startswith("Bearer ") else f"Bearer {raw_token}"
 
     headers = {
