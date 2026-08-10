@@ -7,7 +7,11 @@ st.set_page_config(page_title="SpaceBasic Mess Automator", page_icon="🍱", lay
 SUPABASE_URL = st.secrets.get("SUPABASE_URL", "")
 SUPABASE_KEY = st.secrets.get("SUPABASE_KEY", "")
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+@st.cache_resource
+def init_supabase():
+    return create_client(SUPABASE_URL, SUPABASE_KEY)
+
+supabase = init_supabase()
 
 st.title("🍱 SpaceBasic Mess Automator")
 st.caption("Configure your daily mess booking autopilot once and forget it!")
@@ -15,13 +19,14 @@ st.caption("Configure your daily mess booking autopilot once and forget it!")
 # --- 1. USER LOGIN / CREDENTIALS ---
 st.header("1. Account Setup")
 
-with st.expander("🎥 How to find your User ID and Authorization Token (Video Guide)", expanded=False):
-    st.write("Follow the quick step-by-step video below to grab your credentials:")
+with st.expander("🎥 How to find your User ID, Token, and Meal ID", expanded=False):
+    st.write("Follow the quick step-by-step video below to grab your credentials from DevTools:")
     st.video("Screen Recording 2026-08-08 151423.mp4")
 
 user_name = st.text_input("Your Name", placeholder="e.g. Bob")
-user_id = st.text_input("SpaceBasic User ID", placeholder="e.g. 123456")
-bearer_token = st.text_input("SpaceBasic Authorization Token", type="password", help="Paste your Bearer token starting with 'Bearer ...'")
+user_id = st.text_input("SpaceBasic User ID", placeholder="e.g. 380170")
+bearer_token = st.text_input("SpaceBasic Authorization Token", type="password", help="Paste token string with or without 'Bearer'")
+meal_id_input = st.number_input("Active Meal ID (from DevTools)", min_value=100000, value=307872, step=1)
 
 # --- 2. MEAL PREFERENCES ---
 st.header("2. Meal Preferences")
@@ -64,13 +69,19 @@ if st.button("💾 Save Configuration", type="primary", use_container_width=True
     if not user_name or not user_id or not bearer_token:
         st.error("⚠️ Please fill in your Name, User ID, and Authorization Token!")
     else:
+        # Clean Bearer token string
+        clean_token = bearer_token.strip()
+        if not clean_token.startswith("Bearer "):
+            clean_token = f"Bearer {clean_token}"
+
         user_data = {
             "name": user_name,
-            "user_id": user_id,
+            "user_id": str(user_id).strip(),
             "tenant_id": "143",
-            "token": bearer_token,
-            "lunch_preference": "Non Veg",
-            "dinner_preference": "Non Veg",
+            "token": clean_token,
+            "meal_id": int(meal_id_input),
+            "lunch_preference": priority_option.split(" ")[0],
+            "dinner_preference": priority_option.split(" ")[0],
             "skip_days": skip_days
         }
         
