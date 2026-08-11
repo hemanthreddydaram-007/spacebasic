@@ -2,14 +2,14 @@ name: Automated Mess Booking
 
 on:
   schedule:
-    # Target 1: 8:10 AM IST (2:40 AM UTC) - Primary target
-    - cron: '40 2 * * *'
+    # Target 1: 7:00 AM IST (1:30 AM UTC) - Primary target
+    - cron: '30 1 * * *'
     
-    # Target 2: 8:15 AM IST (2:45 AM UTC) - Backup target
-    - cron: '45 2 * * *'
+    # Target 2: 7:05 AM IST (1:35 AM UTC) - Backup target
+    - cron: '35 1 * * *'
     
-    # Target 3: 8:20 AM IST (2:50 AM UTC) - Safety backup
-    - cron: '50 2 * * *'
+    # Target 3: 7:10 AM IST (1:40 AM UTC) - Safety backup
+    - cron: '40 1 * * *'
 
   workflow_dispatch: # Allows manual trigger anytime from GitHub UI
 
