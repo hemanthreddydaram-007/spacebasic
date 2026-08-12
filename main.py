@@ -5,6 +5,9 @@ import pytz
 from datetime import datetime, timedelta
 from supabase import create_client, Client
 
+# ==========================================
+# ENVIRONMENT VARIABLES & CONFIGURATION
+# ==========================================
 SPACEBASIC_PUBLISHABLE_KEY = "sb_publishable_vw0I2KilIjFmtr1mm3Wl0A_sbbtaF1_"
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://ywljhdtygqzgvzrnognn.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
@@ -16,10 +19,15 @@ if not SUPABASE_KEY:
 SPACEBASIC_BOOKING_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
 SPACEBASIC_MENU_URL = "https://api.spacebasic.com/api/v3/messmanager/mealsmenu"
 
+# ==========================================
+# SUPABASE UTILITIES
+# ==========================================
 def get_supabase_client() -> Client:
+    """Creates a fresh Supabase client instance."""
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def get_active_users(max_retries=3, delay=5):
+    """Fetches user records from Supabase with retry logic."""
     for attempt in range(1, max_retries + 1):
         try:
             print(f"🔄 Connecting to Supabase (Attempt {attempt}/{max_retries})...")
@@ -37,21 +45,53 @@ def get_active_users(max_retries=3, delay=5):
                 time.sleep(delay)
     return []
 
-def should_skip_today(skip_days):
+# ==========================================
+# HELPER & SKIP FILTER FUNCTIONS
+# ==========================================
+def should_skip_tomorrow(skip_days):
+    """
+    Checks if TOMORROW (the target booking date) in IST is set for a full day skip.
+    """
     if not isinstance(skip_days, dict):
         return False
+        
     ist = pytz.timezone("Asia/Kolkata")
-    today_name = datetime.now(ist).strftime("%A").lower()
-    day_skips = skip_days.get(today_name, [])
+    tomorrow_name = (datetime.now(ist) + timedelta(days=1)).strftime("%A").lower()
+    
+    day_skips = skip_days.get(tomorrow_name, [])
+    
     if day_skips is True:
         return True
+        
     if isinstance(day_skips, list):
         skips_lower = [str(item).lower() for item in day_skips]
         if "breakfast" in skips_lower and "lunch" in skips_lower and "dinner" in skips_lower:
             return True
+            
+    return False
+
+def is_meal_skipped_tomorrow(skip_days, meal_type):
+    """Checks if a specific meal type (breakfast/lunch/dinner) is set to skip for tomorrow."""
+    if not isinstance(skip_days, dict):
+        return False
+        
+    ist = pytz.timezone("Asia/Kolkata")
+    tomorrow_name = (datetime.now(ist) + timedelta(days=1)).strftime("%A").lower()
+    
+    day_skips = skip_days.get(tomorrow_name, [])
+    
+    if day_skips is True:
+        return True
+        
+    if isinstance(day_skips, list):
+        skips_lower = [str(item).lower() for item in day_skips]
+        if meal_type.lower() in skips_lower:
+            return True
+            
     return False
 
 def extract_all_meals_from_data(data):
+    """Parses SpaceBasic menu response array and extracts all bookable meal items."""
     meals_to_book = []
     if isinstance(data, dict):
         result = data.get("result", {})
@@ -65,6 +105,7 @@ def extract_all_meals_from_data(data):
     return meals_to_book
 
 def filter_by_preference(meal_list, preference):
+    """Filters a list of meal options based on dietary preference chain."""
     pref = str(preference).lower()
     if "non" in pref:
         for meal in meal_list:
@@ -83,7 +124,8 @@ def filter_by_preference(meal_list, preference):
             if "veg" in meal["name"].lower() and "non" not in meal["name"].lower(): return meal
     return meal_list[0] if meal_list else None
 
-def select_preferred_meals(meals, lunch_pref, dinner_pref):
+def select_preferred_meals(meals, lunch_pref, dinner_pref, skip_days):
+    """Selects preferred meals while omitting any explicitly skipped meal types for tomorrow."""
     categorized = {"breakfast": [], "lunch": [], "dinner": []}
     for meal in meals:
         name = meal["name"].lower()
@@ -95,17 +137,35 @@ def select_preferred_meals(meals, lunch_pref, dinner_pref):
             categorized["dinner"].append(meal)
             
     selected_meals = []
+
+    # 1. Breakfast check
     if categorized["breakfast"]:
-        selected_meals.append(categorized["breakfast"][0])
+        if is_meal_skipped_tomorrow(skip_days, "breakfast"):
+            print("  └─ ⏭️ Skipping Breakfast based on user schedule for tomorrow.")
+        else:
+            selected_meals.append(categorized["breakfast"][0])
+
+    # 2. Lunch check
     if categorized["lunch"]:
-        sel = filter_by_preference(categorized["lunch"], lunch_pref)
-        if sel: selected_meals.append(sel)
+        if is_meal_skipped_tomorrow(skip_days, "lunch"):
+            print("  └─ ⏭️ Skipping Lunch based on user schedule for tomorrow.")
+        else:
+            sel = filter_by_preference(categorized["lunch"], lunch_pref)
+            if sel: selected_meals.append(sel)
+
+    # 3. Dinner check
     if categorized["dinner"]:
-        sel = filter_by_preference(categorized["dinner"], dinner_pref)
-        if sel: selected_meals.append(sel)
+        if is_meal_skipped_tomorrow(skip_days, "dinner"):
+            print("  └─ ⏭️ Skipping Dinner based on user schedule for tomorrow.")
+        else:
+            sel = filter_by_preference(categorized["dinner"], dinner_pref)
+            if sel: selected_meals.append(sel)
 
     return selected_meals
 
+# ==========================================
+# BOOKING PROCESSING LOGIC
+# ==========================================
 def process_user_booking(user, max_retries=3, delay=3):
     name = user.get("name", "Unknown")
     user_id = str(user.get("user_id") or user.get("userid") or "")
@@ -123,8 +183,8 @@ def process_user_booking(user, max_retries=3, delay=3):
         print(f"⚠️ Skipping {name}: Invalid credentials.")
         return False
 
-    if should_skip_today(skip_days):
-        print(f"⏭️ Skipping booking for {name} today based on 'skip_days' configuration.")
+    if should_skip_tomorrow(skip_days):
+        print(f"⏭️ Skipping all bookings for {name} tomorrow based on 'skip_days' configuration.")
         return True
 
     token_header = raw_token if raw_token.startswith("Bearer ") else f"Bearer {raw_token}"
@@ -148,9 +208,14 @@ def process_user_booking(user, max_retries=3, delay=3):
                 print(f"⚠️ No bookable meals found for {name} on {tomorrow_date}.")
                 return False
 
-            # Filter meals based on user dietary preferences
-            target_meals = select_preferred_meals(all_meals, lunch_pref, dinner_pref)
-            print(f"💡 Selected {len(target_meals)} meal(s) based on preferences ({lunch_pref} / {dinner_pref}).")
+            # Filter meals based on preferences and tomorrow's skip schedule
+            target_meals = select_preferred_meals(all_meals, lunch_pref, dinner_pref, skip_days)
+            
+            if not target_meals:
+                print(f"⏭️ All available meals for {name} on {tomorrow_date} are marked as skipped.")
+                return True
+
+            print(f"💡 Selected {len(target_meals)} meal(s) for tomorrow.")
 
             all_success = True
             for meal in target_meals:
@@ -182,6 +247,9 @@ def process_user_booking(user, max_retries=3, delay=3):
 
     return False
 
+# ==========================================
+# MAIN EXECUTION
+# ==========================================
 def main():
     print("=" * 50)
     print("🤖 STARTING AUTOMATED MESS BOOKING PROCESS")
