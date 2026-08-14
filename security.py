@@ -3,9 +3,8 @@ import hashlib
 from cryptography.fernet import Fernet
 
 def get_cipher():
-    """Retrieves Fernet cipher using key from environment or Streamlit secrets."""
+    """Retrieves Fernet cipher instance using key from environment or Streamlit secrets."""
     key = os.getenv("ENCRYPTION_KEY")
-    
     if not key:
         try:
             import streamlit as st
@@ -18,25 +17,29 @@ def get_cipher():
 
     return Fernet(key.encode() if isinstance(key, str) else key)
 
-def encrypt_value(raw_val: str) -> str:
-    """Encrypts any plaintext string (token, name, user_id)."""
-    if not raw_val:
+def encrypt_value(val: str) -> str:
+    """Encrypts any string into a Fernet ciphertext (randomized IV)."""
+    if not val:
         return ""
-    clean_val = str(raw_val).strip()
     cipher = get_cipher()
-    return cipher.encrypt(clean_val.encode()).decode()
+    return cipher.encrypt(str(val).strip().encode()).decode()
 
-def decrypt_value(encrypted_val: str) -> str:
-    """Decrypts ciphertext string back to plaintext."""
-    if not encrypted_val:
+def decrypt_value(val: str) -> str:
+    """Decrypts Fernet ciphertext back to plain text."""
+    if not val:
         return ""
+    # If not encrypted (legacy plain text), return as-is
+    if not str(val).startswith("gAAAAA"):
+        return str(val)
     try:
         cipher = get_cipher()
-        return cipher.decrypt(str(encrypted_val).encode()).decode()
-    except Exception:
-        # Backward compatibility if already plain
-        return str(encrypted_val)
+        return cipher.decrypt(str(val).encode()).decode()
+    except Exception as e:
+        print(f"❌ Decryption error: {e}")
+        return str(val)
 
-def hash_id(user_id: str) -> str:
-    """Generates a consistent SHA-256 hash for database row identification."""
-    return hashlib.sha256(str(user_id).strip().encode()).hexdigest()
+def hash_identifier(val: str) -> str:
+    """Creates a consistent SHA-256 hash used as the unique database row key."""
+    if not val:
+        return ""
+    return hashlib.sha256(str(val).strip().encode()).hexdigest()
