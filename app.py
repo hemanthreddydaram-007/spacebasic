@@ -100,7 +100,7 @@ with st.form("user_config_form"):
     # Decrypt stored token for display/editing if existing user selected
     display_token = decrypt_token(raw_token_val) if raw_token_val else ""
     
-    token_input = st.text_area(
+    token_input = st.text_input(
         "Authorization Token (Bearer Token)",
         value=display_token,
         help="Paste your active SpaceBasic Bearer token copied from DevTools headers.",
