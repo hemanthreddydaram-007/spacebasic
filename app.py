@@ -66,45 +66,74 @@ st.title("🍱 SpaceBasic Mess Autopilot")
 st.caption("Configure your automated daily mess RSVP preferences securely.")
 
 # ==========================================
-# USER SELECTION / REGISTRATION FORM
+# USER IDENTIFICATION (NO PUBLIC LIST)
 # ==========================================
-st.subheader("👤 Account Configuration")
+st.subheader("👤 User Authentication")
 
-# Fetch existing users for auto-filling
-try:
-    existing_users = supabase.table("users").select("*").execute().data
-except Exception as e:
-    existing_users = []
-    st.warning(f"Note: Unable to load existing users list: {e}")
+col_search1, col_search2 = st.columns([3, 1])
+with col_search1:
+    entered_user_id = st.text_input(
+        "Enter your SpaceBasic User ID",
+        value=st.session_state.get("current_user_id", ""),
+        placeholder="e.g. 380170",
+        help="Enter your User ID to load existing preferences or register freshly."
+    ).strip()
 
-user_options = ["Add New User"] + [f"{u.get('name', 'Unknown')} ({u.get('user_id')})" for u in existing_users]
-selected_option = st.selectbox("Select Account or Create New", user_options)
+with col_search2:
+    st.write("") # Spacer
+    st.write("")
+    lookup_clicked = st.button("🔍 Load Account")
 
+# Fetch specific user data only if User ID is entered
 selected_user_data = {}
-if selected_option != "Add New User":
-    selected_id = selected_option.split("(")[-1].replace(")", "").strip()
-    for u in existing_users:
-        if str(u.get("user_id")) == selected_id:
-            selected_user_data = u
-            break
+if entered_user_id:
+    st.session_state["current_user_id"] = entered_user_id
+    try:
+        res = supabase.table("users").select("*").eq("user_id", entered_user_id).execute()
+        if res.data and len(res.data) > 0:
+            selected_user_data = res.data[0]
+            st.info(f"👋 Welcome back, **{selected_user_data.get('name', 'User')}**! Your saved preferences have been loaded.")
+        else:
+            st.info("✨ New User ID detected. Fill in the form below to register freshly.")
+    except Exception as e:
+        st.error(f"Error fetching account data: {e}")
 
+st.markdown("---")
+
+# ==========================================
+# PREFERENCES & CONFIGURATION FORM
+# ==========================================
 with st.form("user_config_form"):
+    st.subheader("⚙️ Account & Booking Details")
+    
     col1, col2 = st.columns(2)
     with col1:
-        name = st.text_input("Name", value=selected_user_data.get("name", ""))
-        user_id = st.text_input("User ID", value=selected_user_data.get("user_id", ""))
+        name = st.text_input(
+            "Your Full Name", 
+            value=selected_user_data.get("name", ""),
+            placeholder="e.g. John Doe"
+        )
+        user_id_final = st.text_input(
+            "User ID", 
+            value=entered_user_id, 
+            disabled=bool(entered_user_id), 
+            help="Locked to the User ID entered above."
+        )
     with col2:
-        tenant_id = st.text_input("Tenant ID", value=selected_user_data.get("tenant_id", "143"))
+        tenant_id = st.text_input(
+            "Tenant ID", 
+            value=selected_user_data.get("tenant_id", "143")
+        )
 
     raw_token_val = selected_user_data.get("token", "")
-    # Decrypt stored token for display/editing if existing user selected
     display_token = decrypt_token(raw_token_val) if raw_token_val else ""
     
     token_input = st.text_input(
         "Authorization Token (Bearer Token)",
         value=display_token,
         help="Paste your active SpaceBasic Bearer token copied from DevTools headers.",
-        type="password"
+        type="password",
+        placeholder="Paste Bearer token here..."
     )
 
     st.markdown("---")
@@ -112,19 +141,14 @@ with st.form("user_config_form"):
     col_pref1, col_pref2 = st.columns(2)
     
     with col_pref1:
-        lunch_pref = st.selectbox(
-            "Lunch Preference Chain",
-            ["Non Veg", "Egg", "Veg"],
-            index=["Non Veg", "Egg", "Veg"].index(selected_user_data.get("lunch_preference", "Non Veg"))
-            if selected_user_data.get("lunch_preference") in ["Non Veg", "Egg", "Veg"] else 0
-        )
+        saved_lunch = selected_user_data.get("lunch_preference", "Non Veg")
+        lunch_index = ["Non Veg", "Egg", "Veg"].index(saved_lunch) if saved_lunch in ["Non Veg", "Egg", "Veg"] else 0
+        lunch_pref = st.selectbox("Lunch Preference Chain", ["Non Veg", "Egg", "Veg"], index=lunch_index)
+        
     with col_pref2:
-        dinner_pref = st.selectbox(
-            "Dinner Preference Chain",
-            ["Non Veg", "Egg", "Veg"],
-            index=["Non Veg", "Egg", "Veg"].index(selected_user_data.get("dinner_preference", "Non Veg"))
-            if selected_user_data.get("dinner_preference") in ["Non Veg", "Egg", "Veg"] else 0
-        )
+        saved_dinner = selected_user_data.get("dinner_preference", "Non Veg")
+        dinner_index = ["Non Veg", "Egg", "Veg"].index(saved_dinner) if saved_dinner in ["Non Veg", "Egg", "Veg"] else 0
+        dinner_pref = st.selectbox("Dinner Preference Chain", ["Non Veg", "Egg", "Veg"], index=dinner_index)
 
     st.markdown("---")
     st.subheader("📅 Skip Days Schedule")
@@ -158,16 +182,17 @@ with st.form("user_config_form"):
     submit = st.form_submit_button("🔒 Save Preferences & Encrypt Token")
 
 if submit:
-    if not name or not user_id or not token_input:
-        st.error("Please fill in all required fields (Name, User ID, and Authorization Token).")
+    effective_user_id = entered_user_id or user_id_final
+    if not name or not effective_user_id or not token_input:
+        st.error("Please provide your User ID, Name, and Authorization Token before saving.")
     else:
         try:
-            # Encrypt raw input token before saving to database
+            # Encrypt raw input token before writing to Supabase
             encrypted_token_str = encrypt_token(token_input)
 
             payload = {
                 "name": name.strip(),
-                "user_id": str(user_id).strip(),
+                "user_id": str(effective_user_id).strip(),
                 "tenant_id": str(tenant_id).strip(),
                 "token": encrypted_token_str,
                 "lunch_preference": lunch_pref,
@@ -176,7 +201,7 @@ if submit:
             }
 
             supabase.table("users").upsert(payload, on_conflict="user_id").execute()
-            st.success("🎉 Preferences saved securely with encrypted token encryption!")
+            st.success("🎉 Preferences saved securely with encrypted token protection!")
             st.rerun()
         except Exception as err:
             st.error(f"❌ Failed to save preferences to database: {err}")
