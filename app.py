@@ -1,7 +1,7 @@
 import os
 import streamlit as st
 from supabase import create_client, Client
-from security import encrypt_token
+from security import encrypt_value, hash_id
 
 # ==========================================
 # PAGE CONFIGURATION & STYLING
@@ -87,7 +87,7 @@ st.markdown("---")
 # FRESH USER REGISTRATION / UPDATE FORM
 # ==========================================
 with st.form("fresh_user_form"):
-    st.subheader("👤 Account Configuration")
+    st.subheader("👤 Account Configuration (Full End-to-End Encryption)")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -134,27 +134,32 @@ with st.form("fresh_user_form"):
         if day_skips_list:
             skip_config[day] = day_skips_list
 
-    submit = st.form_submit_button("🔒 Save Preferences & Encrypt Token")
+    submit = st.form_submit_button("🔒 Save Preferences & Encrypt All Data")
 
 if submit:
     if not name or not user_id or not token_input:
         st.error("Please fill in all required fields (Name, User ID, and Authorization Token).")
     else:
         try:
-            # Encrypt raw input token before saving to database
-            encrypted_token_str = encrypt_token(token_input)
+            # Encrypt sensitive fields: token, name, user_id
+            encrypted_token = encrypt_value(token_input)
+            encrypted_name = encrypt_value(name)
+            encrypted_user_id = encrypt_value(user_id)
+            user_hash = hash_id(user_id)
 
             payload = {
-                "name": name.strip(),
-                "user_id": str(user_id).strip(),
+                "id": user_hash,
+                "name": encrypted_name,
+                "user_id": encrypted_user_id,
                 "tenant_id": str(tenant_id).strip(),
-                "token": encrypted_token_str,
+                "token": encrypted_token,
                 "lunch_preference": lunch_pref,
                 "dinner_preference": dinner_pref,
                 "skip_days": skip_config
             }
 
-            supabase.table("users").upsert(payload, on_conflict="user_id").execute()
-            st.success("🎉 Preferences saved securely with encrypted token protection!")
+            # Upsert using 'id' hash
+            supabase.table("users").upsert(payload, on_conflict="id").execute()
+            st.success("🎉 All account information, names, IDs, and tokens have been encrypted!")
         except Exception as err:
-            st.error(f"❌ Failed to save preferences to database: {err}")
+            st.error(f"❌ Failed to save preferences: {err}")
