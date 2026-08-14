@@ -73,7 +73,7 @@ with st.expander("📹 How to get your Token & User ID (Video Guide & Steps)", e
     3. Click on any meal or refresh the mess menu page.
     4. Click on the `mealsmenu` request.
     5. Under **Request Headers**, copy the full `Authorization` value (starts with `Bearer eyJ...`).
-    6. Under the URL query parameters, find your `userId` (e.g. `380170`).
+    6. Under the URL query parameters, find your `userId` (e.g. `123456`).
     """)
     # If you have a video link/file, replace the URL below:
     # st.video("https://www.youtube.com/watch?v=YOUR_VIDEO_ID")
@@ -88,8 +88,8 @@ with st.form("fresh_user_form"):
     
     col1, col2 = st.columns(2)
     with col1:
-        name = st.text_input("Full Name", placeholder="e.g. Hemanth Reddy")
-        user_id = st.text_input("SpaceBasic User ID", placeholder="e.g. 380170")
+        name = st.text_input("Full Name", placeholder="e.g. Alex Kumar")
+        user_id = st.text_input("SpaceBasic User ID", placeholder="e.g. 123456")
     with col2:
         tenant_id = st.text_input("Tenant ID", value="143")
 
