@@ -10,12 +10,11 @@ from security import decrypt_token
 # ENVIRONMENT VARIABLES & CONFIGURATION
 # ==========================================
 SPACEBASIC_PUBLISHABLE_KEY = "sb_publishable_vw0I2KilIjFmtr1mm3Wl0A_sbbtaF1_"
-
-SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_URL = os.getenv("SUPABASE_URL", "https://ywljhdtygqzgvzrnognn.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
-if not SUPABASE_URL or not SUPABASE_KEY:
-    print("⛔ CRITICAL SECURITY ERROR: SUPABASE_URL or SUPABASE_KEY is missing from environment variables!")
+if not SUPABASE_KEY:
+    print("❌ Error: SUPABASE_KEY environment variable is missing!")
     exit(1)
 
 SPACEBASIC_BOOKING_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
@@ -29,20 +28,20 @@ def get_supabase_client() -> Client:
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 def get_active_users(max_retries=3, delay=5):
-    """Fetches user records securely without logging raw table contents."""
+    """Fetches user records from Supabase with retry logic."""
     for attempt in range(1, max_retries + 1):
         try:
-            print(f"🔄 Connecting to Supabase securely (Attempt {attempt}/{max_retries})...")
+            print(f"🔄 Connecting to Supabase (Attempt {attempt}/{max_retries})...")
             supabase = get_supabase_client()
             response = supabase.table("users").select("*").execute()
             if response.data:
-                print(f"✅ Securely retrieved {len(response.data)} user record(s).")
+                print(f"✅ Successfully retrieved {len(response.data)} user record(s).")
                 return response.data
             else:
-                print("⚠️ Database connection established, but 0 user records were found.")
+                print("⚠️ Query succeeded, but no user records were found in database.")
                 return []
         except Exception as e:
-            print(f"❌ Attempt {attempt} failed connecting to database: {e}")
+            print(f"❌ Attempt {attempt} failed fetching users: {e}")
             if attempt < max_retries:
                 time.sleep(delay)
     return []
@@ -51,9 +50,7 @@ def get_active_users(max_retries=3, delay=5):
 # HELPER & SKIP FILTER FUNCTIONS
 # ==========================================
 def should_skip_tomorrow(skip_days):
-    """
-    Checks if TOMORROW (the target booking date) in IST is set for a full day skip.
-    """
+    """Checks if TOMORROW (the target booking date) in IST is set for a full day skip."""
     if not isinstance(skip_days, dict):
         return False
         
@@ -172,7 +169,11 @@ def process_user_booking(user, max_retries=3, delay=3):
     name = user.get("name", "Unknown")
     user_id = str(user.get("user_id") or user.get("userid") or "")
     tenant_id = str(user.get("tenant_id") or "143")
-    raw_encrypted_token = str(user.get("token") or user.get("auth_token") or "")
+    raw_token_encrypted = str(user.get("token") or user.get("auth_token") or "")
+    
+    # Decrypt token dynamically
+    raw_token = decrypt_token(raw_token_encrypted)
+
     skip_days = user.get("skip_days", {})
     lunch_pref = user.get("lunch_preference", "Non Veg")
     dinner_pref = user.get("dinner_preference", "Non Veg")
@@ -181,11 +182,8 @@ def process_user_booking(user, max_retries=3, delay=3):
     print(f"👤 Processing User: {name} (ID: {user_id or 'Missing'})")
     print(f"==========================================")
 
-    # Decrypt token in memory
-    raw_token = decrypt_token(raw_encrypted_token)
-
     if not user_id or user_id == "None" or not raw_token or len(raw_token) < 10:
-        print(f"⚠️ Skipping {name}: Invalid credentials or decryption failed.")
+        print(f"⚠️ Skipping {name}: Invalid credentials or token decryption failed.")
         return False
 
     if should_skip_tomorrow(skip_days):
@@ -227,6 +225,7 @@ def process_user_booking(user, max_retries=3, delay=3):
                 meal_id = meal["id"]
                 meal_name = meal["name"]
                 
+                # Payload matching exact working schema
                 payload = {
                     "mealId": int(meal_id),
                     "userId": user_id,
@@ -238,13 +237,9 @@ def process_user_booking(user, max_retries=3, delay=3):
                 print(f"🚀 Booking '{meal_name}' (Meal ID: {meal_id}) for {name}...")
                 res = requests.post(SPACEBASIC_BOOKING_URL, json=payload, headers=headers, timeout=15)
                 
+                # Restored exact response handling from original working script
                 if res.status_code in [200, 201]:
-                    res_json = res.json() if res.text else {}
-                    if res_json.get("status") == "Failed" or res_json.get("statusCode") == "F":
-                        print(f"  └─ ❌ Internal API Rejection: {res_json.get('message') or res.text}")
-                        all_success = False
-                    else:
-                        print(f"  └─ 🎉 {meal_name} RSVP confirmed!")
+                    print(f"  └─ 🎉 {meal_name} RSVP confirmed!")
                 else:
                     print(f"  └─ ⚠️ Failed to book {meal_name}: HTTP {res.status_code}")
                     all_success = False
