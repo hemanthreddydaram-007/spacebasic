@@ -75,7 +75,7 @@ with st.expander("📹 How to get your Token & User ID (Video Guide & Steps)", e
     5. Under **Request Headers**, copy the full `Authorization` value (starts with `Bearer eyJ...`).
     6. Under the URL query parameters, find your `userId` (e.g. `123456`).
     """)
-    # If you have a video link/file, replace the URL below:
+    # If you have a video link, uncomment below:
     # st.video("https://www.youtube.com/watch?v=YOUR_VIDEO_ID")
 
 st.markdown("---")
