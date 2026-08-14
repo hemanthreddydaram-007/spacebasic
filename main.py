@@ -4,7 +4,7 @@ import requests
 import pytz
 from datetime import datetime, timedelta
 from supabase import create_client, Client
-from security import decrypt_token
+from security import decrypt_value
 
 # ==========================================
 # ENVIRONMENT VARIABLES & CONFIGURATION
@@ -166,13 +166,11 @@ def select_preferred_meals(meals, lunch_pref, dinner_pref, skip_days):
 # BOOKING PROCESSING LOGIC
 # ==========================================
 def process_user_booking(user, max_retries=3, delay=3):
-    name = user.get("name", "Unknown")
-    user_id = str(user.get("user_id") or user.get("userid") or "")
+    # Decrypt all encrypted columns in memory
+    name = decrypt_value(user.get("name", "Unknown"))
+    user_id = decrypt_value(user.get("user_id") or user.get("userid") or "")
     tenant_id = str(user.get("tenant_id") or "143")
-    raw_token_encrypted = str(user.get("token") or user.get("auth_token") or "")
-    
-    # Decrypt token dynamically
-    raw_token = decrypt_token(raw_token_encrypted)
+    raw_token = decrypt_value(user.get("token") or user.get("auth_token") or "")
 
     skip_days = user.get("skip_days", {})
     lunch_pref = user.get("lunch_preference", "Non Veg")
@@ -183,7 +181,7 @@ def process_user_booking(user, max_retries=3, delay=3):
     print(f"==========================================")
 
     if not user_id or user_id == "None" or not raw_token or len(raw_token) < 10:
-        print(f"⚠️ Skipping {name}: Invalid credentials or token decryption failed.")
+        print(f"⚠️ Skipping {name}: Invalid credentials or decryption failed.")
         return False
 
     if should_skip_tomorrow(skip_days):
