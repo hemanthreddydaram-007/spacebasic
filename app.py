@@ -65,18 +65,21 @@ supabase = init_supabase()
 st.title("🍱 SpaceBasic Mess Autopilot")
 st.caption("Configure your automated daily mess RSVP preferences securely.")
 
-with st.expander("📹 How to get your Token & User ID (Video Guide & Steps)", expanded=False):
+with st.expander("📹 Step-by-Step Guide & Tutorial Video", expanded=False):
     st.markdown("""
-    **Follow these simple steps:**
-    1. Log into SpaceBasic in your browser (Chrome/Edge).
-    2. Press `F12` or Right Click $\\rightarrow$ **Inspect** $\\rightarrow$ Go to the **Network** tab.
-    3. Click on any meal or refresh the mess menu page.
-    4. Click on the `mealsmenu` request.
-    5. Under **Request Headers**, copy the full `Authorization` value (starts with `Bearer eyJ...`).
-    6. Under the URL query parameters, find your `userId` (e.g. `123456`).
+    **Quick Instructions:**
+    1. Open SpaceBasic in your browser (Chrome / Edge / Brave).
+    2. Press `F12` (or Right Click $\\rightarrow$ **Inspect**) and open the **Network** tab.
+    3. Refresh the mess page or click any meal item.
+    4. Find the request named `mealsmenu` (or `rsvpmeal`).
+    5. Under **Request Headers**, copy the `Authorization` header (`Bearer eyJ...`).
+    6. Copy your `userId` (found in the request URL or payload).
     """)
-    # If you have a video link, uncomment below:
-    # st.video("https://www.youtube.com/watch?v=YOUR_VIDEO_ID")
+    
+    try:
+        st.video("Screen Recording 2026-08-08 151423.mp4")
+    except Exception as e:
+        st.warning(f"Could not load tutorial video: {e}")
 
 st.markdown("---")
 
@@ -92,6 +95,11 @@ with st.form("fresh_user_form"):
         user_id = st.text_input("SpaceBasic User ID", placeholder="e.g. 123456")
     with col2:
         tenant_id = st.text_input("Tenant ID", value="143")
+        telegram_id = st.text_input(
+            "Telegram Chat ID (Optional)",
+            placeholder="e.g. 123456789",
+            help="Start @userinfobot on Telegram to get your Chat ID for booking alerts."
+        )
 
     token_input = st.text_input(
         "Authorization Token (Bearer Token)",
@@ -146,6 +154,7 @@ if submit:
                 "user_id": str(user_id).strip(),
                 "tenant_id": str(tenant_id).strip(),
                 "token": encrypted_token_str,
+                "telegram_id": telegram_id.strip() if telegram_id else None,
                 "lunch_preference": lunch_pref,
                 "dinner_preference": dinner_pref,
                 "skip_days": skip_config
