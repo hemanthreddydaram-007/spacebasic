@@ -1,11 +1,9 @@
 import os
+import hashlib
 from cryptography.fernet import Fernet
 
 def get_cipher():
-    """
-    Retrieves the Fernet cipher instance using ENCRYPTION_KEY 
-    from environment variables (GitHub Actions) or Streamlit secrets.
-    """
+    """Retrieves Fernet cipher using key from environment or Streamlit secrets."""
     key = os.getenv("ENCRYPTION_KEY")
     
     if not key:
@@ -20,29 +18,25 @@ def get_cipher():
 
     return Fernet(key.encode() if isinstance(key, str) else key)
 
-def encrypt_token(raw_token: str) -> str:
-    """Encrypts a plaintext authorization token before saving to database."""
-    if not raw_token:
+def encrypt_value(raw_val: str) -> str:
+    """Encrypts any plaintext string (token, name, user_id)."""
+    if not raw_val:
         return ""
-    clean_token = raw_token.strip()
+    clean_val = str(raw_val).strip()
     cipher = get_cipher()
-    return cipher.encrypt(clean_token.encode()).decode()
+    return cipher.encrypt(clean_val.encode()).decode()
 
-def decrypt_token(encrypted_token: str) -> str:
-    """
-    Decrypts a ciphertext token back to plaintext in memory for runtime execution.
-    Maintains backward compatibility for unencrypted legacy tokens.
-    """
-    if not encrypted_token:
+def decrypt_value(encrypted_val: str) -> str:
+    """Decrypts ciphertext string back to plaintext."""
+    if not encrypted_val:
         return ""
-    
-    # If the token is already plain Bearer / JWT string (legacy)
-    if encrypted_token.startswith("Bearer ") or encrypted_token.startswith("eyJ"):
-        return encrypted_token
-
     try:
         cipher = get_cipher()
-        return cipher.decrypt(encrypted_token.encode()).decode()
-    except Exception as e:
-        print(f"❌ Token decryption failed: {e}")
-        return ""
+        return cipher.decrypt(str(encrypted_val).encode()).decode()
+    except Exception:
+        # Backward compatibility if already plain
+        return str(encrypted_val)
+
+def hash_id(user_id: str) -> str:
+    """Generates a consistent SHA-256 hash for database row identification."""
+    return hashlib.sha256(str(user_id).strip().encode()).hexdigest()
