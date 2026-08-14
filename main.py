@@ -50,7 +50,7 @@ def get_active_users(max_retries=3, delay=5):
 # HELPER & SKIP FILTER FUNCTIONS
 # ==========================================
 def should_skip_tomorrow(skip_days):
-    """Checks if TOMORROW (the target booking date) in IST is set for a full day skip."""
+    """Checks if TOMORROW in IST is set for a full day skip."""
     if not isinstance(skip_days, dict):
         return False
         
@@ -70,7 +70,7 @@ def should_skip_tomorrow(skip_days):
     return False
 
 def is_meal_skipped_tomorrow(skip_days, meal_type):
-    """Checks if a specific meal type (breakfast/lunch/dinner) is set to skip for tomorrow."""
+    """Checks if a specific meal type is set to skip for tomorrow."""
     if not isinstance(skip_days, dict):
         return False
         
@@ -166,7 +166,7 @@ def select_preferred_meals(meals, lunch_pref, dinner_pref, skip_days):
 # BOOKING PROCESSING LOGIC
 # ==========================================
 def process_user_booking(user, max_retries=3, delay=3):
-    # Decrypt all encrypted columns in memory
+    # Decrypt encrypted fields into memory
     name = decrypt_value(user.get("name", "Unknown"))
     user_id = decrypt_value(user.get("user_id") or user.get("userid") or "")
     tenant_id = str(user.get("tenant_id") or "143")
@@ -209,7 +209,7 @@ def process_user_booking(user, max_retries=3, delay=3):
                 print(f"⚠️ No bookable meals found for {name} on {tomorrow_date}.")
                 return False
 
-            # Filter meals based on preferences and tomorrow's skip schedule
+            # Filter meals based on preferences and skip schedule
             target_meals = select_preferred_meals(all_meals, lunch_pref, dinner_pref, skip_days)
             
             if not target_meals:
