@@ -225,7 +225,6 @@ def process_user_booking(user, max_retries=3, delay=3):
                 meal_id = meal["id"]
                 meal_name = meal["name"]
                 
-                # Payload matching exact working schema
                 payload = {
                     "mealId": int(meal_id),
                     "userId": user_id,
@@ -237,7 +236,6 @@ def process_user_booking(user, max_retries=3, delay=3):
                 print(f"🚀 Booking '{meal_name}' (Meal ID: {meal_id}) for {name}...")
                 res = requests.post(SPACEBASIC_BOOKING_URL, json=payload, headers=headers, timeout=15)
                 
-                # Restored exact response handling from original working script
                 if res.status_code in [200, 201]:
                     print(f"  └─ 🎉 {meal_name} RSVP confirmed!")
                 else:
