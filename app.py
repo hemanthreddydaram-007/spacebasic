@@ -95,11 +95,6 @@ with st.form("fresh_user_form"):
         user_id = st.text_input("SpaceBasic User ID", placeholder="e.g. 123456")
     with col2:
         tenant_id = st.text_input("Tenant ID", value="143")
-        telegram_id = st.text_input(
-            "Telegram Chat ID (Optional)",
-            placeholder="e.g. 123456789",
-            help="Start @userinfobot on Telegram to get your Chat ID for booking alerts."
-        )
 
     token_input = st.text_input(
         "Authorization Token (Bearer Token)",
@@ -154,7 +149,6 @@ if submit:
                 "user_id": str(user_id).strip(),
                 "tenant_id": str(tenant_id).strip(),
                 "token": encrypted_token_str,
-                "telegram_id": telegram_id.strip() if telegram_id else None,
                 "lunch_preference": lunch_pref,
                 "dinner_preference": dinner_pref,
                 "skip_days": skip_config
