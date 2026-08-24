@@ -166,9 +166,8 @@ def select_preferred_meals(meals, lunch_pref, dinner_pref, skip_days):
 # BOOKING PROCESSING LOGIC
 # ==========================================
 def process_user_booking(user, max_retries=3, delay=3):
-    # Decrypt encrypted fields into memory
-    name = decrypt_value(user.get("name", "Unknown"))
-    user_id = decrypt_value(user.get("user_id") or user.get("userid") or "")
+    name = user.get("name", "Unknown")
+    user_id = str(user.get("user_id") or user.get("userid") or "")
     tenant_id = str(user.get("tenant_id") or "143")
     raw_token = decrypt_value(user.get("token") or user.get("auth_token") or "")
 
