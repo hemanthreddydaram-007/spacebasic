@@ -21,7 +21,7 @@ def get_cipher():
     return Fernet(key.encode() if isinstance(key, str) else key)
 
 def encrypt_value(val: str) -> str:
-    """Encrypts any plaintext string (token, name, user_id) into Fernet ciphertext."""
+    """Encrypts raw authorization token into Fernet ciphertext."""
     if not val:
         return ""
     clean_val = str(val).strip()
@@ -29,14 +29,11 @@ def encrypt_value(val: str) -> str:
     return cipher.encrypt(clean_val.encode()).decode()
 
 def decrypt_value(val: str) -> str:
-    """
-    Decrypts ciphertext string back to plaintext.
-    Maintains backward compatibility for unencrypted legacy plain text.
-    """
+    """Decrypts ciphertext string back to plaintext."""
     if not val:
         return ""
     
-    # Return as-is if the string is not Fernet ciphertext
+    # Return as-is if the string is legacy plain text
     if not str(val).startswith("gAAAAA"):
         return str(val)
 
