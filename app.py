@@ -12,7 +12,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# Dark Glassmorphism Theme
+# Dark Glassmorphism CSS
 st.markdown("""
 <style>
     .stApp {
@@ -60,7 +60,7 @@ def init_supabase() -> Client:
 supabase = init_supabase()
 
 # ==========================================
-# HEADER & TUTORIAL VIDEO
+# HEADER & TUTORIAL SECTION
 # ==========================================
 st.title("🍱 SpaceBasic Mess Autopilot")
 st.caption("Configure your automated daily mess RSVP preferences securely.")
@@ -84,10 +84,10 @@ with st.expander("📹 Step-by-Step Guide & Tutorial Video", expanded=False):
 st.markdown("---")
 
 # ==========================================
-# REGISTRATION / PREFERENCES FORM
+# FRESH USER REGISTRATION FORM
 # ==========================================
-with st.form("user_registration_form"):
-    st.subheader("👤 Account Configuration (Full End-to-End Encryption)")
+with st.form("fresh_user_form"):
+    st.subheader("👤 Account Configuration")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -134,21 +134,19 @@ with st.form("user_registration_form"):
         if day_skips_list:
             skip_config[day] = day_skips_list
 
-    submit = st.form_submit_button("🔒 Save Preferences & Encrypt All Data")
+    submit = st.form_submit_button("🔒 Save Preferences & Encrypt Token")
 
 if submit:
     if not name_input or not user_id_input or not token_input:
         st.error("Please fill in all required fields (Name, User ID, and Authorization Token).")
     else:
         try:
-            # Encrypt sensitive user data
-            encrypted_name = encrypt_value(name_input)
-            encrypted_user_id = encrypt_value(user_id_input)
+            # Token is encrypted; Name and User ID remain clear for database management
             encrypted_token = encrypt_value(token_input)
 
             payload = {
-                "name": encrypted_name,
-                "user_id": encrypted_user_id,
+                "name": name_input.strip(),
+                "user_id": str(user_id_input).strip(),
                 "tenant_id": str(tenant_id).strip(),
                 "token": encrypted_token,
                 "lunch_preference": lunch_pref,
@@ -157,6 +155,6 @@ if submit:
             }
 
             supabase.table("users").insert(payload).execute()
-            st.success("🎉 Account saved! Name, User ID, and Token are fully encrypted in Supabase.")
+            st.success("🎉 Account saved successfully with encrypted token protection!")
         except Exception as err:
             st.error(f"❌ Failed to save preferences to database: {err}")
