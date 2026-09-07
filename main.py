@@ -17,7 +17,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 BASE_URL = "https://api.spacebasic.com"
 
 def get_target_date_info():
-    # Targets the next calendar day for meal allocations
+    # Targets tomorrow's date for next-day meal allocations
     target_dt = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1)
     date_str = target_dt.strftime("%Y-%m-%d")
     day_name = target_dt.strftime("%A").lower()
@@ -26,13 +26,13 @@ def get_target_date_info():
 def resolve_authentication(user):
     auth_type = user.get("auth_type", "password")
 
-    # Path 1: Persistent Session / Bearer Token (Option B)
+    # Branch 1: Persistent Session / Bearer Token (Option B)
     if auth_type == "token" and user.get("auth_token"):
         print(f"[{user.get('email')}] Authenticating via stored persistent session token.")
         try:
             raw_token = decrypt_value(user["auth_token"]).strip()
         except Exception as dec_err:
-            raise Exception(f"Session token decryption failed (stale or mismatched Fernet key): {dec_err}")
+            raise Exception(f"Session token decryption failed (stale Fernet key): {dec_err}")
 
         if not raw_token:
             raise Exception("Decrypted session token was empty.")
@@ -40,20 +40,25 @@ def resolve_authentication(user):
             raw_token = raw_token.replace("Bearer ", "").strip()
         return raw_token
 
-    # Path 2: Standard SpaceBasic Email + Password Endpoint (Option A)
+    # Branch 2: Real SpaceBasic Email Login Endpoint (Option A)
     if user.get("password"):
-        print(f"[{user.get('email')}] Authenticating via SpaceBasic login endpoint.")
+        print(f"[{user.get('email')}] Authenticating via SpaceBasic /authenticate/email endpoint.")
         try:
             raw_password = decrypt_value(user["password"]).strip()
         except Exception as dec_err:
-            raise Exception(f"Password decryption failed (stale or mismatched Fernet key): {dec_err}")
+            raise Exception(f"Password decryption failed (stale Fernet key): {dec_err}")
 
         if not raw_password:
             raise Exception("Decrypted password was empty. Re-register on the web portal.")
 
-        login_url = f"{BASE_URL}/api/v1/authenticate"
+        # Updated to the real endpoint verified via DevTools
+        login_url = f"{BASE_URL}/authenticate/email"
 
-        # Explicit headers to avoid leaking stale ambient auth headers/cookies
+        payload = {
+            "username": user["email"].strip(),
+            "password": raw_password
+        }
+
         clean_headers = {
             "Content-Type": "application/json",
             "Accept": "application/json, text/plain, */*",
@@ -62,34 +67,15 @@ def resolve_authentication(user):
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
 
-        # Parse tenant ID into integer if numeric
-        tenant_val = user.get("tenant_id", "143")
-        try:
-            tenant_int = int(tenant_val)
-        except Exception:
-            tenant_int = tenant_val
-
-        # SpaceBasic login payload with both email and username compatibility
-        payload = {
-            "email": user["email"].strip().lower(),
-            "username": user["email"].strip().lower(),
-            "password": raw_password,
-            "tenant_id": tenant_int
-        }
-
         resp = requests.post(login_url, json=payload, headers=clean_headers, timeout=20)
 
         if resp.status_code in (200, 201):
             data = resp.json()
-            token = (
-                data.get("token") or 
-                data.get("data", {}).get("token") or 
-                data.get("jwt") or 
-                data.get("access_token")
-            )
+            # Verified keys from network response
+            token = data.get("jwt") or data.get("accessToken")
             if token:
                 return token.replace("Bearer ", "").strip()
-            raise Exception(f"Login succeeded but token payload was missing: {resp.text}")
+            raise Exception(f"Login succeeded but token missing in payload: {resp.text}")
 
         raise Exception(f"Login failed: HTTP {resp.status_code} - {resp.text}")
 
