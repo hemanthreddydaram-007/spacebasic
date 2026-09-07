@@ -7,208 +7,184 @@ from security import encrypt_value
 # PAGE CONFIGURATION
 # ==========================================
 st.set_page_config(
-    page_title="Mess Conquers • SpaceBasic Autopilot",
+    page_title="SYSTEM • HUNTER QUEST LOG",
     page_icon="⚔️",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
 # ==========================================
-# ANIMATED CYBER-NEON CSS ENGINE
+# SOLO LEVELING BLUE-SYSTEM CSS
 # ==========================================
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap');
 
     * {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Rajdhani', sans-serif;
     }
 
-    /* Ambient Animated Mesh Background */
+    /* System Void Dimension */
     .stApp {
-        background-color: #06070c;
+        background-color: #030712;
         background-image: 
-            radial-gradient(at 10% 20%, rgba(124, 58, 237, 0.22) 0px, transparent 40%),
-            radial-gradient(at 90% 15%, rgba(236, 72, 153, 0.2) 0px, transparent 40%),
-            radial-gradient(at 50% 85%, rgba(14, 165, 233, 0.18) 0px, transparent 50%);
-        background-attachment: fixed;
-        color: #f8fafc;
+            radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.2) 0%, transparent 60%),
+            linear-gradient(rgba(3, 7, 18, 0.85) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(3, 7, 18, 0.85) 1px, transparent 1px);
+        background-size: 100% 100%, 30px 30px, 30px 30px;
+        color: #e0f2fe;
     }
 
-    /* Animated Aurora Hero Badge */
-    @keyframes pulseGlow {
-        0%, 100% { box-shadow: 0 0 15px rgba(168, 85, 247, 0.35); transform: scale(1); }
-        50% { box-shadow: 0 0 25px rgba(236, 72, 153, 0.55); transform: scale(1.02); }
-    }
-
-    .hero-badge {
+    /* System Notification Window Badge */
+    .system-badge {
+        font-family: 'Orbitron', monospace;
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 6px 14px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(168, 85, 247, 0.4);
-        border-radius: 9999px;
-        font-size: 0.78rem;
+        padding: 5px 14px;
+        background: rgba(14, 165, 233, 0.12);
+        border: 1px solid #38bdf8;
+        border-radius: 4px;
+        font-size: 0.72rem;
         font-weight: 700;
-        color: #e9d5ff;
+        color: #38bdf8;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+        margin-bottom: 0.8rem;
+    }
+
+    /* Solo Leveling Blue Window Title */
+    .system-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 2.2rem;
+        font-weight: 900;
         letter-spacing: 0.08em;
         text-transform: uppercase;
-        margin-bottom: 12px;
-        backdrop-filter: blur(12px);
-        animation: pulseGlow 4s infinite ease-in-out;
+        color: #ffffff;
+        text-shadow: 0 0 10px rgba(56, 189, 248, 0.8), 0 0 25px rgba(14, 165, 233, 0.6);
+        margin-bottom: 0.2rem;
     }
 
-    /* Shimmering Brand Title */
-    @keyframes titleGradient {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-
-    .brand-title {
-        font-family: 'Space Grotesk', sans-serif;
-        font-size: 2.75rem;
-        font-weight: 800;
-        letter-spacing: -0.04em;
-        line-height: 1.1;
-        margin-bottom: 6px;
-        background: linear-gradient(90deg, #ffffff, #c084fc, #38bdf8, #f472b6, #ffffff);
-        background-size: 300% 300%;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: titleGradient 8s ease infinite;
-    }
-
-    /* Glass Container with Floating Entry */
-    @keyframes slideUpFade {
-        from { opacity: 0; transform: translateY(14px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    div[data-testid="stForm"], .glass-card {
-        background: rgba(15, 18, 30, 0.6) !important;
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 20px !important;
-        padding: 1.8rem !important;
-        box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6);
-        animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    /* Tabs Bar */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background: rgba(255, 255, 255, 0.03);
-        padding: 6px;
-        border-radius: 14px;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-
-    .stTabs [data-baseweb="tab"] {
-        height: 42px;
-        border-radius: 10px;
-        color: #94a3b8;
+    .system-subtitle {
+        font-family: 'Rajdhani', sans-serif;
+        color: #7dd3fc;
+        font-size: 1rem;
         font-weight: 600;
-        border: none !important;
-        transition: all 0.25s ease;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 1.5rem;
     }
 
-    .stTabs [aria-selected="true"] {
-        background: rgba(255, 255, 255, 0.1) !important;
-        color: #ffffff !important;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-
-    /* Input Fields */
-    .stTextInput input, .stSelectbox select {
-        background: rgba(255, 255, 255, 0.04) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 12px !important;
-        color: #f8fafc !important;
-        padding: 12px 14px !important;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .stTextInput input:focus {
-        border-color: #c084fc !important;
-        box-shadow: 0 0 0 4px rgba(192, 132, 252, 0.25) !important;
-        transform: translateY(-1px);
-    }
-
-    /* Vibrant Buttons with Animated Glow */
-    .stButton>button {
-        background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%) !important;
-        background-size: 200% 200%;
-        color: #ffffff !important;
-        font-weight: 700 !important;
-        border: none !important;
-        border-radius: 12px !important;
-        padding: 0.75rem 1.4rem !important;
-        letter-spacing: 0.02em;
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        box-shadow: 0 8px 24px -4px rgba(168, 85, 247, 0.5) !important;
-    }
-
-    .stButton>button:hover {
-        transform: translateY(-2px) scale(1.01);
-        box-shadow: 0 14px 30px -4px rgba(236, 72, 153, 0.65) !important;
-        filter: brightness(1.1);
-    }
-
-    .stButton>button:active {
-        transform: translateY(0);
-    }
-
-    /* Live Animated Radar Dot */
-    @keyframes radarPing {
-        0% { transform: scale(0.95); opacity: 0.8; }
-        50% { transform: scale(1.4); opacity: 0; }
-        100% { transform: scale(0.95); opacity: 0; }
-    }
-
-    .radar-dot {
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        display: inline-block;
+    /* System Window Panel */
+    div[data-testid="stForm"], .system-panel {
+        background: rgba(7, 23, 48, 0.7) !important;
+        border: 1.5px solid #0284c7 !important;
+        border-radius: 6px !important;
+        padding: 1.8rem !important;
+        box-shadow: inset 0 0 25px rgba(14, 165, 233, 0.15), 0 0 35px rgba(2, 132, 199, 0.35) !important;
         position: relative;
     }
 
-    .radar-dot::after {
-        content: '';
+    /* Corner accents for System UI */
+    div[data-testid="stForm"]::before {
+        content: "[ SYSTEM QUEST: DAILY RATION ]";
+        font-family: 'Orbitron', monospace;
+        font-size: 0.65rem;
+        color: #38bdf8;
+        letter-spacing: 0.2em;
         position: absolute;
-        inset: -2px;
-        border-radius: 50%;
-        border: 2px solid inherit;
-        animation: radarPing 1.8s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+        top: -10px;
+        left: 18px;
+        background: #030712;
+        padding: 0 8px;
+        border-left: 2px solid #38bdf8;
+        border-right: 2px solid #38bdf8;
     }
 
-    .dot-green { background: #10b981; }
-    .dot-green::after { border-color: #10b981; }
-    .dot-amber { background: #f59e0b; }
-    .dot-amber::after { border-color: #f59e0b; }
-
-    /* Custom Live Status Cards */
-    .status-card-active {
-        padding: 1.2rem 1.4rem;
-        background: radial-gradient(circle at top left, rgba(16, 185, 129, 0.16), rgba(15, 23, 42, 0.6));
-        border: 1px solid rgba(16, 185, 129, 0.35);
-        border-radius: 16px;
-        color: #6ee7b7;
-        margin-bottom: 1.2rem;
-        animation: slideUpFade 0.5s ease;
+    /* Tabs Styling */
+    .stTabs [data-baseweb="tab-list"] {
+        background: rgba(3, 15, 38, 0.8);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        border-radius: 4px;
+        padding: 4px;
+        gap: 6px;
     }
 
-    .status-card-paused {
-        padding: 1.2rem 1.4rem;
-        background: radial-gradient(circle at top left, rgba(245, 158, 11, 0.16), rgba(15, 23, 42, 0.6));
-        border: 1px solid rgba(245, 158, 11, 0.35);
-        border-radius: 16px;
-        color: #fcd34d;
+    .stTabs [data-baseweb="tab"] {
+        font-family: 'Orbitron', monospace;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: #64748b;
+        border-radius: 2px;
+        border: none !important;
+        transition: all 0.2s ease;
+    }
+
+    .stTabs [aria-selected="true"] {
+        background: rgba(14, 165, 233, 0.25) !important;
+        color: #38bdf8 !important;
+        border: 1px solid #38bdf8 !important;
+        box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
+    }
+
+    /* Inputs styled as System Param Fields */
+    .stTextInput input, .stSelectbox select {
+        background: rgba(3, 15, 38, 0.8) !important;
+        border: 1px solid #0369a1 !important;
+        border-radius: 3px !important;
+        color: #e0f2fe !important;
+        font-family: 'Rajdhani', sans-serif !important;
+        font-size: 1.05rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.05em;
+    }
+
+    .stTextInput input:focus {
+        border-color: #38bdf8 !important;
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.6) !important;
+    }
+
+    /* Blue System Buttons */
+    .stButton>button {
+        font-family: 'Orbitron', monospace !important;
+        background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%) !important;
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        font-size: 0.82rem !important;
+        letter-spacing: 0.12em !important;
+        text-transform: uppercase !important;
+        border: 1px solid #38bdf8 !important;
+        border-radius: 3px !important;
+        padding: 0.75rem 1.4rem !important;
+        box-shadow: 0 0 18px rgba(14, 165, 233, 0.5) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .stButton>button:hover {
+        background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%) !important;
+        box-shadow: 0 0 28px rgba(56, 189, 248, 0.85) !important;
+        transform: translateY(-1px);
+    }
+
+    /* Status Windows */
+    .quest-active {
+        background: rgba(6, 44, 40, 0.6);
+        border: 1.5px solid #10b981;
+        border-radius: 4px;
+        padding: 1.2rem;
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
         margin-bottom: 1.2rem;
-        animation: slideUpFade 0.5s ease;
+    }
+
+    .quest-paused {
+        background: rgba(45, 20, 10, 0.6);
+        border: 1.5px solid #f59e0b;
+        border-radius: 4px;
+        padding: 1.2rem;
+        box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+        margin-bottom: 1.2rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -220,7 +196,7 @@ SUPABASE_URL = st.secrets.get("SUPABASE_URL") or os.getenv("SUPABASE_URL")
 SUPABASE_KEY = st.secrets.get("SUPABASE_KEY") or os.getenv("SUPABASE_KEY")
 
 if not SUPABASE_URL or not SUPABASE_KEY:
-    st.error("🔒 Security Config Missing: SUPABASE_URL and SUPABASE_KEY must be set in secrets!")
+    st.error("SYSTEM MALFUNCTION: Supabase secrets missing from dimension core.")
     st.stop()
 
 @st.cache_resource
@@ -230,24 +206,24 @@ def init_supabase() -> Client:
 supabase = init_supabase()
 
 # ==========================================
-# HERO SECTION
+# SYSTEM HEADER
 # ==========================================
-st.markdown('<div class="hero-badge">⚔️ SpaceBasic Autopilot • 6:00 PM Daily</div>', unsafe_allow_html=True)
-st.markdown('<div class="brand-title">Mess Conquers.</div>', unsafe_allow_html=True)
-st.markdown('<p style="color: #94a3b8; margin-bottom: 2rem; font-size: 0.98rem;">Automate dinner, conquer mornings. Zero missed bookings on campus.</p>', unsafe_allow_html=True)
+st.markdown('<div class="system-badge">[ SYSTEM ALERT: MISSION ACTIVE ]</div>', unsafe_allow_html=True)
+st.markdown('<div class="system-title">QUEST: MESS CONQUER</div>', unsafe_allow_html=True)
+st.markdown('<div class="system-subtitle">Target Execution Window: 18:00:00 IST Sharp</div>', unsafe_allow_html=True)
 
-tab_manage, tab_register = st.tabs(["⚡ Fast Switch & Status", "🛡️ Setup & Dietary Preferences"])
+tab_manage, tab_register = st.tabs(["[ CURRENT HUNTER STATUS ]", "[ STAT ALLOCATION & SETUP ]"])
 
 # ==========================================
-# TAB 1: PAUSE / RESUME AUTOPILOT
+# TAB 1: HUNTER STATUS (PAUSE / RESUME)
 # ==========================================
 with tab_manage:
-    st.markdown("#### ✈️ Vacation Toggle")
-    st.caption("Heading home or skipping hostel food? Pause auto-booking with a single tap.")
+    st.markdown("##### 📍 HUNTER IDENTIFICATION")
+    st.caption("Input your SpaceBasic credentials ID to inspect quest deployment state.")
 
     search_email = st.text_input(
-        "Registered SpaceBasic Email",
-        placeholder="student@example.com",
+        "REGISTERED IDENTIFIER (EMAIL)",
+        placeholder="hunter@system.com",
         key="status_email_box"
     ).strip().lower()
 
@@ -257,86 +233,86 @@ with tab_manage:
             
             if res.data and len(res.data) > 0:
                 user_record = res.data[0]
-                user_name = user_record.get("name", "Student")
+                user_name = user_record.get("name", "Hunter").upper()
                 is_active = user_record.get("is_active", True)
 
                 st.write("")
                 if is_active:
                     st.markdown(f"""
-                    <div class="status-card-active">
-                        <div style="font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 10px;">
-                            <span class="radar-dot dot-green"></span> {user_name} is ON AUTOPILOT
+                    <div class="quest-active">
+                        <div style="font-family: 'Orbitron'; font-size: 1rem; font-weight: 700; color: #6ee7b7; letter-spacing: 0.1em;">
+                            STATUS: AWAKENED • {user_name}
                         </div>
-                        <p style="margin: 6px 0 0 0; color: #a7f3d0; font-size: 0.9rem;">
-                            Your meals will be booked automatically every day at <b>6:00:00 PM IST</b>.
+                        <p style="margin: 8px 0 0 0; color: #a7f3d0; font-size: 0.95rem;">
+                            Autopilot routine engaged. Daily ration claim will fire at <b>18:00:00 IST</b>.
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
 
-                    if st.button("🏖️ Heading Home (Pause Auto-Booking)"):
+                    if st.button("REST MODE: RETURN TO SAFE ZONE (PAUSE)"):
                         supabase.table("users").update({"is_active": False}).eq("email", search_email).execute()
                         st.rerun()
                 else:
                     st.markdown(f"""
-                    <div class="status-card-paused">
-                        <div style="font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 10px;">
-                            <span class="radar-dot dot-amber"></span> {user_name} is PAUSED
+                    <div class="quest-paused">
+                        <div style="font-family: 'Orbitron'; font-size: 1rem; font-weight: 700; color: #fcd34d; letter-spacing: 0.1em;">
+                            STATUS: DORMANT • {user_name}
                         </div>
-                        <p style="margin: 6px 0 0 0; color: #fde68a; font-size: 0.9rem;">
-                            Auto-booking is paused. The daily runner will bypass this account.
+                        <p style="margin: 8px 0 0 0; color: #fde68a; font-size: 0.95rem;">
+                            Hunter is in rest mode. System execution routines will bypass this identifier.
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
 
-                    if st.button("🎒 Back on Campus (Resume Auto-Booking)"):
+                    if st.button("AWAKEN: RE-ENTER DUNGEON (RESUME AUTOPILOT)"):
                         supabase.table("users").update({"is_active": True}).eq("email", search_email).execute()
                         st.rerun()
             else:
-                st.info("No profile registered under this email. Switch to **Setup** tab to register.")
+                st.info("No registered hunter profile found with this identifier. Allocate your stats in the next tab.")
         except Exception as e:
-            st.error(f"Error fetching account status: {e}")
+            st.error(f"System scan error: {e}")
 
 # ==========================================
-# TAB 2: REGISTER / UPDATE DETAILS
+# TAB 2: ALLOCATION & PROFILE SETUP
 # ==========================================
 with tab_register:
-    st.markdown("#### ⚙️ Profile & Food Order Priority")
-    st.caption("Credentials are encrypted with Fernet AES-128 before syncing to Supabase.")
+    st.markdown("##### ⚙️ HUNTER REGISTRATION & RATION RULES")
+    st.caption("All raw access keys are sealed via Fernet AES-128 encryption before storage.")
     
     with st.form("account_form"):
         col1, col2 = st.columns(2)
         with col1:
-            name_input = st.text_input("Full Name", placeholder="Alex Kumar")
-            email_input = st.text_input("SpaceBasic Email", placeholder="student@example.com")
+            name_input = st.text_input("HUNTER CODENAME", placeholder="Sung Jin-Woo")
+            email_input = st.text_input("SPACEBASIC IDENTIFIER (EMAIL)", placeholder="hunter@domain.com")
         with col2:
-            tenant_id = st.text_input("Tenant ID", value="143")
+            tenant_id = st.text_input("GATE TENANT ID", value="143")
             password_input = st.text_input(
-                "SpaceBasic Password",
+                "DUNGEON PASSKEY (PASSWORD)",
                 placeholder="••••••••",
                 type="password"
             )
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("#### 🍱 Meal Preference Fallback")
+        st.markdown("##### 🥩 RATION TYPE PRIORITY")
         col_p1, col_p2 = st.columns(2)
         with col_p1:
-            lunch_pref = st.selectbox("Lunch Hierarchy", ["Non Veg", "Egg", "Veg"], index=0)
+            lunch_pref = st.selectbox("LUNCH PRIORITY ORDER", ["Non Veg", "Egg", "Veg"], index=0)
         with col_p2:
-            dinner_pref = st.selectbox("Dinner Hierarchy", ["Non Veg", "Egg", "Veg"], index=0)
+            dinner_pref = st.selectbox("DINNER PRIORITY ORDER", ["Non Veg", "Egg", "Veg"], index=0)
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("#### 🚫 Scheduled Weekly Skips")
-        st.caption("Select meals you want the autopilot to skip automatically:")
+        st.markdown("##### 🛡️ REST DAYS (SKIP AUTO-CLAIM)")
+        st.caption("Select scheduled days to bypass meal claims automatically:")
 
         days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
         skip_config = {}
 
         for day in days:
-            st.write(f"**{day.capitalize()}**")
+            st.write(f"**{day.upper()}**")
             c1, c2, c3 = st.columns(3)
-            b_skip = c1.checkbox("Breakfast", key=f"{day}_b")
-            l_skip = c2.checkbox("Lunch", key=f"{day}_l")
-            d_skip = c3.checkbox("Dinner", key=f"{day}_d")
+            b_skip = c1.checkbox("Skip Breakfast", key=f"{day}_b")
+            l_skip = c2.checkbox("Skip Lunch", key=f"{day}_l")
+            d_skip = c3.checkbox("Skip Dinner", key=f"{day}_d")
             
             day_skips_list = []
             if b_skip: day_skips_list.append("breakfast")
@@ -347,11 +323,11 @@ with tab_register:
                 skip_config[day] = day_skips_list
 
         st.markdown("<br>", unsafe_allow_html=True)
-        submit = st.form_submit_button("⚔️ Arm Mess Conquers")
+        submit = st.form_submit_button("ACCEPT SYSTEM CONTRACT")
 
     if submit:
         if not name_input or not email_input or not password_input:
-            st.error("Please enter your Name, Email, and Password.")
+            st.error("Parameters incomplete: Hunter Codename, Identifier, and Dungeon Passkey required.")
         else:
             try:
                 encrypted_password = encrypt_value(password_input)
@@ -368,6 +344,6 @@ with tab_register:
                 }
 
                 supabase.table("users").upsert(payload, on_conflict="email").execute()
-                st.success("⚔️ Profile locked in! Mess Conquers is active for 6:00 PM IST.")
+                st.success("SYSTEM UPDATE: Hunter status synchronized. Contract locked for 18:00:00 IST execution.")
             except Exception as err:
-                st.error(f"Failed to sync credentials: {err}")
+                st.error(f"System synchronization failure: {err}")
