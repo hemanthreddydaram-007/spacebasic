@@ -14,7 +14,7 @@ st.set_page_config(
 )
 
 # ==========================================
-# SOLO LEVELING BLUE-SYSTEM CSS
+# SOLO LEVELING BLUE-SYSTEM CSS + BACKGROUND ART
 # ==========================================
 st.markdown("""
 <style>
@@ -24,14 +24,16 @@ st.markdown("""
         font-family: 'Rajdhani', sans-serif;
     }
 
-    /* System Void Dimension */
+    /* System Void Dimension + Faint Jin-Woo Silhouette Background */
     .stApp {
         background-color: #030712;
         background-image: 
-            radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.2) 0%, transparent 60%),
-            linear-gradient(rgba(3, 7, 18, 0.85) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(3, 7, 18, 0.85) 1px, transparent 1px);
-        background-size: 100% 100%, 30px 30px, 30px 30px;
+            radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.22) 0%, transparent 65%),
+            linear-gradient(rgba(3, 7, 18, 0.92), rgba(3, 7, 18, 0.92)),
+            url('https://images.alphacoders.com/134/1349540.png');
+        background-size: 100% 100%, 100% 100%, cover;
+        background-position: center;
+        background-attachment: fixed;
         color: #e0f2fe;
     }
 
@@ -50,19 +52,19 @@ st.markdown("""
         color: #38bdf8;
         letter-spacing: 0.18em;
         text-transform: uppercase;
-        box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+        box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
         margin-bottom: 0.8rem;
     }
 
     /* Solo Leveling Blue Window Title */
     .system-title {
         font-family: 'Orbitron', monospace;
-        font-size: 2.2rem;
+        font-size: 2.3rem;
         font-weight: 900;
         letter-spacing: 0.08em;
         text-transform: uppercase;
         color: #ffffff;
-        text-shadow: 0 0 10px rgba(56, 189, 248, 0.8), 0 0 25px rgba(14, 165, 233, 0.6);
+        text-shadow: 0 0 12px rgba(56, 189, 248, 0.85), 0 0 30px rgba(14, 165, 233, 0.65);
         margin-bottom: 0.2rem;
     }
 
@@ -78,11 +80,13 @@ st.markdown("""
 
     /* System Window Panel */
     div[data-testid="stForm"], .system-panel {
-        background: rgba(7, 23, 48, 0.7) !important;
+        background: rgba(7, 23, 48, 0.75) !important;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
         border: 1.5px solid #0284c7 !important;
         border-radius: 6px !important;
         padding: 1.8rem !important;
-        box-shadow: inset 0 0 25px rgba(14, 165, 233, 0.15), 0 0 35px rgba(2, 132, 199, 0.35) !important;
+        box-shadow: inset 0 0 25px rgba(14, 165, 233, 0.15), 0 0 35px rgba(2, 132, 199, 0.4) !important;
         position: relative;
     }
 
@@ -104,10 +108,10 @@ st.markdown("""
 
     /* Tabs Styling */
     .stTabs [data-baseweb="tab-list"] {
-        background: rgba(3, 15, 38, 0.8);
+        background: rgba(3, 15, 38, 0.85);
         border: 1px solid rgba(56, 189, 248, 0.3);
         border-radius: 4px;
-        padding: 4px;
+        padding: 5px;
         gap: 6px;
     }
 
@@ -117,7 +121,7 @@ st.markdown("""
         font-weight: 700;
         letter-spacing: 0.08em;
         color: #64748b;
-        border-radius: 2px;
+        border-radius: 3px;
         border: none !important;
         transition: all 0.2s ease;
     }
@@ -126,14 +130,14 @@ st.markdown("""
         background: rgba(14, 165, 233, 0.25) !important;
         color: #38bdf8 !important;
         border: 1px solid #38bdf8 !important;
-        box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
+        box-shadow: 0 0 14px rgba(56, 189, 248, 0.45);
     }
 
     /* Inputs styled as System Param Fields */
     .stTextInput input, .stSelectbox select {
-        background: rgba(3, 15, 38, 0.8) !important;
+        background: rgba(3, 15, 38, 0.85) !important;
         border: 1px solid #0369a1 !important;
-        border-radius: 3px !important;
+        border-radius: 4px !important;
         color: #e0f2fe !important;
         font-family: 'Rajdhani', sans-serif !important;
         font-size: 1.05rem !important;
@@ -143,7 +147,7 @@ st.markdown("""
 
     .stTextInput input:focus {
         border-color: #38bdf8 !important;
-        box-shadow: 0 0 12px rgba(56, 189, 248, 0.6) !important;
+        box-shadow: 0 0 14px rgba(56, 189, 248, 0.65) !important;
     }
 
     /* Blue System Buttons */
@@ -152,11 +156,11 @@ st.markdown("""
         background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%) !important;
         color: #ffffff !important;
         font-weight: 700 !important;
-        font-size: 0.82rem !important;
+        font-size: 0.85rem !important;
         letter-spacing: 0.12em !important;
         text-transform: uppercase !important;
         border: 1px solid #38bdf8 !important;
-        border-radius: 3px !important;
+        border-radius: 4px !important;
         padding: 0.75rem 1.4rem !important;
         box-shadow: 0 0 18px rgba(14, 165, 233, 0.5) !important;
         transition: all 0.2s ease !important;
@@ -164,26 +168,26 @@ st.markdown("""
 
     .stButton>button:hover {
         background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%) !important;
-        box-shadow: 0 0 28px rgba(56, 189, 248, 0.85) !important;
+        box-shadow: 0 0 30px rgba(56, 189, 248, 0.9) !important;
         transform: translateY(-1px);
     }
 
     /* Status Windows */
     .quest-active {
-        background: rgba(6, 44, 40, 0.6);
+        background: rgba(6, 44, 40, 0.65);
         border: 1.5px solid #10b981;
         border-radius: 4px;
         padding: 1.2rem;
-        box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
         margin-bottom: 1.2rem;
     }
 
     .quest-paused {
-        background: rgba(45, 20, 10, 0.6);
+        background: rgba(45, 20, 10, 0.65);
         border: 1.5px solid #f59e0b;
         border-radius: 4px;
         padding: 1.2rem;
-        box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+        box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
         margin-bottom: 1.2rem;
     }
 </style>
@@ -196,7 +200,7 @@ SUPABASE_URL = st.secrets.get("SUPABASE_URL") or os.getenv("SUPABASE_URL")
 SUPABASE_KEY = st.secrets.get("SUPABASE_KEY") or os.getenv("SUPABASE_KEY")
 
 if not SUPABASE_URL or not SUPABASE_KEY:
-    st.error("SYSTEM MALFUNCTION: Supabase secrets missing from dimension core.")
+    st.error("SYSTEM MALFUNCTION: Supabase credentials missing from dimension core.")
     st.stop()
 
 @st.cache_resource
@@ -206,8 +210,14 @@ def init_supabase() -> Client:
 supabase = init_supabase()
 
 # ==========================================
-# SYSTEM HEADER
+# HERO SECTION & SYSTEM BANNER
 # ==========================================
+st.markdown("""
+    <div style="border: 1.5px solid #0284c7; border-radius: 6px; overflow: hidden; margin-bottom: 1.2rem; box-shadow: 0 0 25px rgba(14, 165, 233, 0.35);">
+        <img src="https://images.alphacoders.com/134/1349540.png" style="width: 100%; height: 200px; object-fit: cover; filter: brightness(0.85) contrast(1.15);" />
+    </div>
+""", unsafe_allow_html=True)
+
 st.markdown('<div class="system-badge">[ SYSTEM ALERT: MISSION ACTIVE ]</div>', unsafe_allow_html=True)
 st.markdown('<div class="system-title">QUEST: MESS CONQUER</div>', unsafe_allow_html=True)
 st.markdown('<div class="system-subtitle">Target Execution Window: 18:00:00 IST Sharp</div>', unsafe_allow_html=True)
@@ -219,7 +229,7 @@ tab_manage, tab_register = st.tabs(["[ CURRENT HUNTER STATUS ]", "[ STAT ALLOCAT
 # ==========================================
 with tab_manage:
     st.markdown("##### 📍 HUNTER IDENTIFICATION")
-    st.caption("Input your SpaceBasic credentials ID to inspect quest deployment state.")
+    st.caption("Input your SpaceBasic identifier to inspect automated reservation status.")
 
     search_email = st.text_input(
         "REGISTERED IDENTIFIER (EMAIL)",
@@ -277,7 +287,7 @@ with tab_manage:
 # ==========================================
 with tab_register:
     st.markdown("##### ⚙️ HUNTER REGISTRATION & RATION RULES")
-    st.caption("All raw access keys are sealed via Fernet AES-128 encryption before storage.")
+    st.caption("All raw credentials are encrypted via Fernet AES-128 before storage in database core.")
     
     with st.form("account_form"):
         col1, col2 = st.columns(2)
