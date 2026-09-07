@@ -14,7 +14,7 @@ st.set_page_config(
 )
 
 # ==========================================
-# SOLO LEVELING BLUE-SYSTEM CSS + BACKGROUND ART
+# SOLO LEVELING BLUE-SYSTEM CSS
 # ==========================================
 st.markdown("""
 <style>
@@ -24,16 +24,13 @@ st.markdown("""
         font-family: 'Rajdhani', sans-serif;
     }
 
-    /* System Void Dimension + Faint Jin-Woo Silhouette Background */
+    /* System Void Dimension (Reliable Pure CSS Mesh Background) */
     .stApp {
         background-color: #030712;
         background-image: 
             radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.22) 0%, transparent 65%),
-            linear-gradient(rgba(3, 7, 18, 0.92), rgba(3, 7, 18, 0.92)),
-            url('https://images.alphacoders.com/134/1349540.png');
-        background-size: 100% 100%, 100% 100%, cover;
-        background-position: center;
-        background-attachment: fixed;
+            linear-gradient(rgba(3, 7, 18, 0.95), rgba(3, 7, 18, 0.95));
+        background-size: 100% 100%;
         color: #e0f2fe;
     }
 
@@ -214,7 +211,7 @@ supabase = init_supabase()
 # ==========================================
 st.markdown("""
     <div style="border: 1.5px solid #0284c7; border-radius: 6px; overflow: hidden; margin-bottom: 1.2rem; box-shadow: 0 0 25px rgba(14, 165, 233, 0.35);">
-        <img src="https://images.alphacoders.com/134/1349540.png" style="width: 100%; height: 210px; object-fit: cover; filter: brightness(0.9) contrast(1.15);" />
+        <img src="https://wallpapercave.com/wp/wp13426179.jpg" style="width: 100%; height: 210px; object-fit: cover; filter: brightness(0.9) contrast(1.15);" />
     </div>
 """, unsafe_allow_html=True)
 
