@@ -436,7 +436,7 @@ THEMES = {
         "primary": "#10b981",
         "secondary": "#0284c7",
         "accent": "#eab308",
-        "bg_radial": "rgba(168, 85, 247, 0.25)",
+        "bg_radial": "rgba(16, 185, 129, 0.25)",
         "bg_base": "#020906",
         "font_family": "'Orbitron', monospace",
         "body_font": "'Rajdhani', sans-serif",
@@ -785,37 +785,28 @@ if top_col2.button("🔄 Swap Realm"):
     st.rerun()
 
 # ==========================================
-# MOTION BANNER
+# MOTION BANNER (PURE CSS HOLOGRAPHIC BANNER)
 # ==========================================
-banner_file = None
-for fname in ["sung-jinwoo.png", "sung-jinwoo.jpg", "sung-jinwoo.jpeg", "jinwoo.png"]:
-    if os.path.exists(fname):
-        banner_file = fname
-        break
-
 st.markdown('<div class="animated-banner-box">', unsafe_allow_html=True)
-if banner_file and st.session_state["theme"] == "Solo Leveling":
-    st.image(banner_file, use_container_width=True)
-else:
-    st.markdown(f"""
-        <div style="
-            width: 100%;
-            height: 160px;
-            background: radial-gradient(circle at 50% 30%, {cfg['bg_radial']} 0%, {cfg['bg_base']} 80%),
-                        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0px, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 4px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        ">
-            <div style="font-family: {cfg['font_family']}; font-size: 1.5rem; font-weight: 900; letter-spacing: 0.25em; color: #ffffff; text-shadow: 0 0 14px {cfg['primary']};">
-                {cfg['banner_tag']}
-            </div>
-            <div style="font-size: 0.85rem; font-weight: 700; letter-spacing: 0.2em; color: {cfg['primary']}; margin-top: 6px;">
-                {cfg['banner_sub']}
-            </div>
+st.markdown(f"""
+    <div style="
+        width: 100%;
+        height: 160px;
+        background: radial-gradient(circle at 50% 30%, {cfg['bg_radial']} 0%, {cfg['bg_base']} 80%),
+                    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0px, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 4px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    ">
+        <div style="font-family: {cfg['font_family']}; font-size: 1.5rem; font-weight: 900; letter-spacing: 0.25em; color: #ffffff; text-shadow: 0 0 14px {cfg['primary']};">
+            {cfg['banner_tag']}
         </div>
-    """, unsafe_allow_html=True)
+        <div style="font-size: 0.85rem; font-weight: 700; letter-spacing: 0.2em; color: {cfg['primary']}; margin-top: 6px;">
+            {cfg['banner_sub']}
+        </div>
+    </div>
+""", unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown(f'<div class="system-title">{cfg["title"]}</div>', unsafe_allow_html=True)
