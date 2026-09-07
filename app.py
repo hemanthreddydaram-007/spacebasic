@@ -14,7 +14,7 @@ st.set_page_config(
 )
 
 # ==========================================
-# SOLO LEVELING BLUE-SYSTEM CSS
+# MOTION-ANIMATED SYSTEM CSS
 # ==========================================
 st.markdown("""
 <style>
@@ -24,24 +24,114 @@ st.markdown("""
         font-family: 'Rajdhani', sans-serif;
     }
 
-    /* System Void Dimension */
+    /* Ambient Pulsing Background */
+    @keyframes backgroundPulse {
+        0%, 100% {
+            background-color: #030712;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.28) 0%, transparent 70%),
+                linear-gradient(rgba(3, 7, 18, 0.95), rgba(3, 7, 18, 0.95));
+        }
+        50% {
+            background-color: #050d1e;
+            background-image: 
+                radial-gradient(circle at 50% 10%, rgba(56, 189, 248, 0.38) 0%, transparent 75%),
+                linear-gradient(rgba(3, 7, 18, 0.92), rgba(3, 7, 18, 0.92));
+        }
+    }
+
     .stApp {
-        background-color: #030712;
-        background-image: 
-            radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.22) 0%, transparent 65%),
-            linear-gradient(rgba(3, 7, 18, 0.95), rgba(3, 7, 18, 0.95));
+        animation: backgroundPulse 8s infinite alternate ease-in-out;
         background-size: 100% 100%;
         color: #e0f2fe;
     }
 
-    /* System Notification Window Badge */
+    /* Holographic Title Shimmer */
+    @keyframes systemGlow {
+        0%, 100% {
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.7), 0 0 25px rgba(14, 165, 233, 0.5);
+            letter-spacing: 0.08em;
+        }
+        50% {
+            text-shadow: 0 0 18px rgba(56, 189, 248, 1), 0 0 40px rgba(14, 165, 233, 0.85);
+            letter-spacing: 0.10em;
+        }
+    }
+
+    .system-title {
+        font-family: 'Orbitron', monospace;
+        font-size: 2.3rem;
+        font-weight: 900;
+        text-transform: uppercase;
+        color: #ffffff;
+        animation: systemGlow 3s infinite ease-in-out;
+        margin-bottom: 0.2rem;
+    }
+
+    /* Radar Scan Line & Container Glow for Banner */
+    @keyframes bannerBreathing {
+        0%, 100% {
+            border-color: #0284c7;
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.35);
+        }
+        50% {
+            border-color: #38bdf8;
+            box-shadow: 0 0 35px rgba(56, 189, 248, 0.7), inset 0 0 15px rgba(14, 165, 233, 0.3);
+        }
+    }
+
+    @keyframes scanLineMotion {
+        0% { transform: translateY(-100%); }
+        100% { transform: translateY(1000%); }
+    }
+
+    .animated-banner-box {
+        position: relative;
+        overflow: hidden;
+        border-radius: 8px;
+        border: 1.5px solid #0284c7;
+        margin-bottom: 1.4rem;
+        animation: bannerBreathing 4s infinite ease-in-out;
+    }
+
+    .animated-banner-box::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 25px;
+        background: linear-gradient(180deg, transparent, rgba(56, 189, 248, 0.4), transparent);
+        opacity: 0.7;
+        animation: scanLineMotion 3.5s linear infinite;
+        pointer-events: none;
+    }
+
+    div[data-testid="stImage"] > img {
+        border-radius: 8px;
+        object-fit: cover;
+        max-height: 230px;
+        width: 100%;
+        transition: transform 0.5s ease;
+    }
+
+    .animated-banner-box:hover img {
+        transform: scale(1.03);
+    }
+
+    /* Badge Pulse */
+    @keyframes badgePing {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
+        50% { transform: scale(1.02); box-shadow: 0 0 20px rgba(56, 189, 248, 0.8); }
+    }
+
     .system-badge {
         font-family: 'Orbitron', monospace;
         display: inline-flex;
         align-items: center;
         gap: 8px;
         padding: 5px 14px;
-        background: rgba(14, 165, 233, 0.12);
+        background: rgba(14, 165, 233, 0.15);
         border: 1px solid #38bdf8;
         border-radius: 4px;
         font-size: 0.72rem;
@@ -49,20 +139,8 @@ st.markdown("""
         color: #38bdf8;
         letter-spacing: 0.18em;
         text-transform: uppercase;
-        box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
+        animation: badgePing 2.5s infinite ease-in-out;
         margin-bottom: 0.8rem;
-    }
-
-    /* Solo Leveling Blue Window Title */
-    .system-title {
-        font-family: 'Orbitron', monospace;
-        font-size: 2.3rem;
-        font-weight: 900;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: #ffffff;
-        text-shadow: 0 0 12px rgba(56, 189, 248, 0.85), 0 0 30px rgba(14, 165, 233, 0.65);
-        margin-bottom: 0.2rem;
     }
 
     .system-subtitle {
@@ -75,9 +153,14 @@ st.markdown("""
         margin-bottom: 1.5rem;
     }
 
-    /* System Window Panel */
+    /* Window Form Animations */
+    @keyframes panelEntry {
+        from { opacity: 0; transform: translateY(12px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
     div[data-testid="stForm"], .system-panel {
-        background: rgba(7, 23, 48, 0.75) !important;
+        background: rgba(7, 23, 48, 0.78) !important;
         backdrop-filter: blur(14px);
         -webkit-backdrop-filter: blur(14px);
         border: 1.5px solid #0284c7 !important;
@@ -85,9 +168,9 @@ st.markdown("""
         padding: 1.8rem !important;
         box-shadow: inset 0 0 25px rgba(14, 165, 233, 0.15), 0 0 35px rgba(2, 132, 199, 0.4) !important;
         position: relative;
+        animation: panelEntry 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* Corner accents for System UI */
     div[data-testid="stForm"]::before {
         content: "[ SYSTEM QUEST: DAILY RATION ]";
         font-family: 'Orbitron', monospace;
@@ -103,51 +186,7 @@ st.markdown("""
         border-right: 2px solid #38bdf8;
     }
 
-    /* Tabs Styling */
-    .stTabs [data-baseweb="tab-list"] {
-        background: rgba(3, 15, 38, 0.85);
-        border: 1px solid rgba(56, 189, 248, 0.3);
-        border-radius: 4px;
-        padding: 5px;
-        gap: 6px;
-    }
-
-    .stTabs [data-baseweb="tab"] {
-        font-family: 'Orbitron', monospace;
-        font-size: 0.78rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        color: #64748b;
-        border-radius: 3px;
-        border: none !important;
-        transition: all 0.2s ease;
-    }
-
-    .stTabs [aria-selected="true"] {
-        background: rgba(14, 165, 233, 0.25) !important;
-        color: #38bdf8 !important;
-        border: 1px solid #38bdf8 !important;
-        box-shadow: 0 0 14px rgba(56, 189, 248, 0.45);
-    }
-
-    /* Inputs styled as System Param Fields */
-    .stTextInput input, .stSelectbox select {
-        background: rgba(3, 15, 38, 0.85) !important;
-        border: 1px solid #0369a1 !important;
-        border-radius: 4px !important;
-        color: #e0f2fe !important;
-        font-family: 'Rajdhani', sans-serif !important;
-        font-size: 1.05rem !important;
-        font-weight: 600 !important;
-        letter-spacing: 0.05em;
-    }
-
-    .stTextInput input:focus {
-        border-color: #38bdf8 !important;
-        box-shadow: 0 0 14px rgba(56, 189, 248, 0.65) !important;
-    }
-
-    /* Blue System Buttons */
+    /* Floating Interactive Buttons */
     .stButton>button {
         font-family: 'Orbitron', monospace !important;
         background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%) !important;
@@ -159,24 +198,57 @@ st.markdown("""
         border: 1px solid #38bdf8 !important;
         border-radius: 4px !important;
         padding: 0.75rem 1.4rem !important;
-        box-shadow: 0 0 18px rgba(14, 165, 233, 0.5) !important;
-        transition: all 0.2s ease !important;
+        box-shadow: 0 0 16px rgba(14, 165, 233, 0.5) !important;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
     }
 
     .stButton>button:hover {
         background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%) !important;
-        box-shadow: 0 0 30px rgba(56, 189, 248, 0.9) !important;
+        box-shadow: 0 0 28px rgba(56, 189, 248, 0.95), inset 0 0 12px rgba(255, 255, 255, 0.4) !important;
+        transform: translateY(-2px) scale(1.01);
+    }
+
+    .stButton>button:active {
+        transform: translateY(0px) scale(0.99);
+    }
+
+    /* Input Glow on Focus */
+    .stTextInput input, .stSelectbox select {
+        background: rgba(3, 15, 38, 0.85) !important;
+        border: 1px solid #0369a1 !important;
+        border-radius: 4px !important;
+        color: #e0f2fe !important;
+        font-family: 'Rajdhani', sans-serif !important;
+        font-size: 1.05rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.05em;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .stTextInput input:focus {
+        border-color: #38bdf8 !important;
+        box-shadow: 0 0 16px rgba(56, 189, 248, 0.75) !important;
         transform: translateY(-1px);
     }
 
-    /* Status Windows */
+    /* Live Pulsing Status Cards */
+    @keyframes statusGlowGreen {
+        0%, 100% { box-shadow: 0 0 18px rgba(16, 185, 129, 0.3); }
+        50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.6); }
+    }
+
+    @keyframes statusGlowAmber {
+        0%, 100% { box-shadow: 0 0 18px rgba(245, 158, 11, 0.3); }
+        50% { box-shadow: 0 0 30px rgba(245, 158, 11, 0.6); }
+    }
+
     .quest-active {
         background: rgba(6, 44, 40, 0.65);
         border: 1.5px solid #10b981;
         border-radius: 4px;
         padding: 1.2rem;
-        box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
         margin-bottom: 1.2rem;
+        animation: statusGlowGreen 3s infinite ease-in-out;
     }
 
     .quest-paused {
@@ -184,8 +256,8 @@ st.markdown("""
         border: 1.5px solid #f59e0b;
         border-radius: 4px;
         padding: 1.2rem;
-        box-shadow: 0 0 20px rgba(245, 158, 11, 0.35);
         margin-bottom: 1.2rem;
+        animation: statusGlowAmber 3s infinite ease-in-out;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -207,62 +279,36 @@ def init_supabase() -> Client:
 supabase = init_supabase()
 
 # ==========================================
-# HERO SECTION & SYSTEM BANNER (SELF-CONTAINED)
+# MOTION-ANIMATED HERO BANNER
 # ==========================================
-if os.path.exists("jinwoo.png"):
-    st.image("jinwoo.png", use_container_width=True)
+banner_file = None
+for filename in ["sung-jinwoo.png", "sung-jinwoo.jpg", "sung-jinwoo.jpeg", "jinwoo.png"]:
+    if os.path.exists(filename):
+        banner_file = filename
+        break
+
+st.markdown('<div class="animated-banner-box">', unsafe_allow_html=True)
+if banner_file:
+    st.image(banner_file, use_container_width=True)
 else:
+    # High-intensity SVG fallback banner with live laser scan
     st.markdown("""
         <div style="
-            position: relative;
             width: 100%;
-            height: 180px;
-            border-radius: 8px;
-            border: 1.5px solid #0284c7;
+            height: 190px;
             background: radial-gradient(circle at 50% 30%, rgba(14, 165, 233, 0.35) 0%, rgba(3, 7, 18, 0.95) 75%),
                         repeating-linear-gradient(0deg, rgba(56, 189, 248, 0.05) 0px, rgba(56, 189, 248, 0.05) 1px, transparent 1px, transparent 4px);
-            box-shadow: 0 0 25px rgba(14, 165, 233, 0.4), inset 0 0 30px rgba(2, 132, 199, 0.25);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-            margin-bottom: 1.5rem;
         ">
-            <div style="
-                font-family: 'Orbitron', monospace;
-                font-size: 2.6rem;
-                filter: drop-shadow(0 0 16px #38bdf8);
-                margin-bottom: 6px;
-            ">⚔️ 👁️‍🗨️ ⚔️</div>
-            <div style="
-                font-family: 'Orbitron', monospace;
-                font-size: 1.35rem;
-                font-weight: 900;
-                letter-spacing: 0.35em;
-                color: #ffffff;
-                text-shadow: 0 0 10px #38bdf8, 0 0 22px #0284c7;
-            ">SUNG JIN-WOO</div>
-            <div style="
-                font-family: 'Rajdhani', sans-serif;
-                font-size: 0.88rem;
-                font-weight: 700;
-                letter-spacing: 0.25em;
-                color: #7dd3fc;
-                text-transform: uppercase;
-                margin-top: 4px;
-            ">[ SHADOW MONARCH • SYSTEM INTERFACE ]</div>
-            <div style="
-                position: absolute;
-                bottom: 8px;
-                right: 14px;
-                font-family: 'Orbitron', monospace;
-                font-size: 0.62rem;
-                color: rgba(56, 189, 248, 0.7);
-                letter-spacing: 0.15em;
-            ">STATUS: AWAKENED</div>
+            <div style="font-family: 'Orbitron', monospace; font-size: 2.8rem; filter: drop-shadow(0 0 16px #38bdf8);">⚔️ 👁️‍🗨️ ⚔️</div>
+            <div style="font-family: 'Orbitron', monospace; font-size: 1.35rem; font-weight: 900; letter-spacing: 0.35em; color: #ffffff; text-shadow: 0 0 12px #38bdf8;">SUNG JIN-WOO</div>
+            <div style="font-family: 'Rajdhani', sans-serif; font-size: 0.88rem; font-weight: 700; letter-spacing: 0.25em; color: #7dd3fc;">[ SHADOW MONARCH • SYSTEM INTERFACE ]</div>
         </div>
     """, unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown('<div class="system-badge">[ SYSTEM ALERT: MISSION ACTIVE ]</div>', unsafe_allow_html=True)
 st.markdown('<div class="system-title">QUEST: MESS CONQUER</div>', unsafe_allow_html=True)
