@@ -7,7 +7,7 @@ from security import encrypt_value
 # PAGE CONFIGURATION
 # ==========================================
 st.set_page_config(
-    page_title="mess master• SpaceBasic Autopilot",
+    page_title="mess conquers• SpaceBasic Autopilot",
     page_icon="🍱",
     layout="centered",
     initial_sidebar_state="collapsed"
@@ -184,7 +184,7 @@ supabase = init_supabase()
 # HERO HEADER
 # ==========================================
 st.markdown('<div class="hero-badge">⚡ Auto-Pilot • 6:00 PM Daily</div>', unsafe_allow_html=True)
-st.markdown('<div class="hero-title">NomNom.</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-title">mess conquers.</div>', unsafe_allow_html=True)
 st.markdown('<div class="hero-subtitle">Automated SpaceBasic meal booking. Never miss dinner again.</div>', unsafe_allow_html=True)
 
 tab_manage, tab_register = st.tabs(["✨ Status Switch", "⚙️ Preferences & Setup"])
