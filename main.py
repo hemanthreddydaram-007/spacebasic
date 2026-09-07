@@ -26,7 +26,7 @@ def get_target_date_info():
 def resolve_authentication(user):
     auth_type = user.get("auth_type", "password")
 
-    # Branch 1: Persistent Session / Bearer Token (Option B)
+    # Path 1: Persistent Session / Bearer Token (Option B)
     if auth_type == "token" and user.get("auth_token"):
         print(f"[{user.get('email')}] Authenticating via stored persistent session token.")
         try:
@@ -40,7 +40,7 @@ def resolve_authentication(user):
             raw_token = raw_token.replace("Bearer ", "").strip()
         return raw_token
 
-    # Branch 2: Standard SpaceBasic Email + Password Endpoint (Option A)
+    # Path 2: Standard SpaceBasic Email + Password Endpoint (Option A)
     if user.get("password"):
         print(f"[{user.get('email')}] Authenticating via SpaceBasic login endpoint.")
         try:
@@ -52,17 +52,29 @@ def resolve_authentication(user):
             raise Exception("Decrypted password was empty. Re-register on the web portal.")
 
         login_url = f"{BASE_URL}/api/v1/authenticate"
-        payload = {
-            "email": user["email"],
-            "password": raw_password,
-            "tenant_id": str(user.get("tenant_id", "143"))
-        }
 
-        # Clear, independent headers with zero authorization headers attached
+        # Explicit headers to avoid leaking stale ambient auth headers/cookies
         clean_headers = {
             "Content-Type": "application/json",
-            "Accept": "application/json",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+            "Accept": "application/json, text/plain, */*",
+            "Origin": "https://web.spacebasic.com",
+            "Referer": "https://web.spacebasic.com/",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        }
+
+        # Parse tenant ID into integer if numeric
+        tenant_val = user.get("tenant_id", "143")
+        try:
+            tenant_int = int(tenant_val)
+        except Exception:
+            tenant_int = tenant_val
+
+        # SpaceBasic login payload with both email and username compatibility
+        payload = {
+            "email": user["email"].strip().lower(),
+            "username": user["email"].strip().lower(),
+            "password": raw_password,
+            "tenant_id": tenant_int
         }
 
         resp = requests.post(login_url, json=payload, headers=clean_headers, timeout=20)
