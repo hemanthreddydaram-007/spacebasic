@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+import streamlit.components.v1 as components
 from supabase import create_client, Client
 from security import encrypt_value
 
@@ -12,6 +13,62 @@ st.set_page_config(
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+
+# ==========================================
+# FLOATING SYSTEM PARTICLE ENGINE (CANVAS)
+# ==========================================
+components.html("""
+<canvas id="systemParticles" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0;"></canvas>
+<script>
+    const canvas = document.getElementById('systemParticles');
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+
+    const particles = [];
+    const particleCount = 45;
+
+    for (let i = 0; i < particleCount; i++) {
+        particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            radius: Math.random() * 2 + 0.8,
+            speedY: Math.random() * 1.2 + 0.3,
+            speedX: (Math.random() - 0.5) * 0.4,
+            alpha: Math.random() * 0.7 + 0.2
+        });
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        particles.forEach(p => {
+            p.y -= p.speedY;
+            p.x += p.speedX;
+
+            if (p.y < 0) {
+                p.y = height + 10;
+                p.x = Math.random() * width;
+            }
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(56, 189, 248, ${p.alpha})`;
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = '#0284c7';
+            ctx.fill();
+        });
+
+        requestAnimationFrame(animate);
+    }
+    animate();
+</script>
+""", height=0)
 
 # ==========================================
 # INTERACTIVE MOTION ANIMATION CSS ENGINE
