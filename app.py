@@ -85,7 +85,7 @@ with tab_manage:
 
                 st.markdown("---")
                 if is_active:
-                    st.success(f"🟢 **Status for {user_name}: ACTIVE**\n\nThe bot will book your meals automatically every morning.")
+                    st.success(f"🟢 **Status for {user_name}: ACTIVE**\n\nThe bot will book your meals automatically every evening at 6:00 PM IST.")
                     if st.button("🏠 I am Going Home (Pause Auto-Booking)"):
                         supabase.table("users").update({"is_active": False}).eq("email", search_email).execute()
                         st.warning("⏸️ Auto-booking has been paused! The bot will skip booking your meals.")
@@ -94,7 +94,7 @@ with tab_manage:
                     st.warning(f"⏸️ **Status for {user_name}: PAUSED**\n\nDaily automated bookings are currently turned OFF for your account.")
                     if st.button("🎒 I am Back at Campus (Resume Auto-Booking)"):
                         supabase.table("users").update({"is_active": True}).eq("email", search_email).execute()
-                        st.success("🟢 Auto-booking is now ACTIVE again! Your meals will be reserved starting tomorrow morning.")
+                        st.success("🟢 Auto-booking is now ACTIVE again! Your meals will be reserved at 6:00 PM IST today.")
                         st.rerun()
             else:
                 st.info("No account found with this email. Please register in the next tab.")
