@@ -307,7 +307,7 @@ THEMES = {
 }
 
 # ==========================================
-# THEME GATEKEEPER SELECTOR MODAL
+# THEME GATEKEEPER SELECTOR
 # ==========================================
 if "theme" not in st.session_state:
     st.markdown("""
@@ -337,11 +337,7 @@ if "theme" not in st.session_state:
     """, unsafe_allow_html=True)
     
     st.write("")
-    choice = st.selectbox(
-        "SELECT YOUR INTERFACE REALM",
-        list(THEMES.keys()),
-        index=0
-    )
+    choice = st.selectbox("SELECT YOUR INTERFACE REALM", list(THEMES.keys()), index=0)
     
     if st.button("INITIALIZE INTERFACE →", use_container_width=True):
         st.session_state["theme"] = choice
@@ -352,7 +348,7 @@ if "theme" not in st.session_state:
 cfg = THEMES[st.session_state["theme"]]
 
 # ==========================================
-# FLOATING CANVAS PARTICLES ENGINE
+# FLOATING PARTICLES CANVAS
 # ==========================================
 components.html(f"""
 <canvas id="systemParticles" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0;"></canvas>
@@ -692,7 +688,7 @@ def init_supabase() -> Client:
 supabase = init_supabase()
 
 # ==========================================
-# TOP THEME CHANGER BAR
+# REALM SELECTOR
 # ==========================================
 top_col1, top_col2 = st.columns([3, 1])
 top_col1.markdown(f'<div class="system-badge">{cfg["badge"]}</div>', unsafe_allow_html=True)
@@ -701,7 +697,7 @@ if top_col2.button("🔄 Swap Realm"):
     st.rerun()
 
 # ==========================================
-# MOTION BANNER
+# HEADER BANNER
 # ==========================================
 st.markdown(f"""
 <div class="motion-banner-box">
@@ -720,7 +716,7 @@ st.markdown(f'<div style="color: {cfg["text_secondary"]}; font-size: 1rem; margi
 tab_status, tab_config = st.tabs([cfg["tab1_title"], cfg["tab2_title"]])
 
 # ==========================================
-# TAB 1: STATUS INSPECTION & REST MODE
+# TAB 1: STATUS INSPECTION & VACATION MODE
 # ==========================================
 with tab_status:
     st.markdown(f"##### {cfg['tab1_header']}")
@@ -780,7 +776,7 @@ with tab_status:
             st.error(f"Telemetry query error: {e}")
 
 # ==========================================
-# TAB 2: PROFILE REGISTRATION & PREFERENCES
+# TAB 2: PROFILE REGISTRATION & CONTRACT
 # ==========================================
 with tab_config:
     st.markdown(f"##### {cfg['tab2_header']}")
@@ -788,6 +784,7 @@ with tab_config:
 
     st.markdown("#### 1. HOW DO YOU LOG INTO SPACEBASIC?")
     
+    # Placed outside st.form so selecting an option triggers instant rerender
     login_method = st.radio(
         "SELECT YOUR LOGIN METHOD",
         [
