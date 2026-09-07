@@ -5,17 +5,17 @@ from supabase import create_client, Client
 from security import encrypt_value
 
 # ==========================================
-# PAGE CONFIGURATION
+# SYSTEM CORE CONFIGURATION
 # ==========================================
 st.set_page_config(
-    page_title="MESS CONQUERS • SYSTEM CONSOLE",
+    page_title="SYSTEM • HUNTER COMMAND CONSOLE",
     page_icon="⚔️",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
 # ==========================================
-# FLOATING SYSTEM PARTICLE ENGINE (CANVAS)
+# FLOATING MANA PARTICLE ENGINE (CANVAS)
 # ==========================================
 components.html("""
 <canvas id="systemParticles" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0;"></canvas>
@@ -81,7 +81,7 @@ st.markdown("""
         font-family: 'Rajdhani', sans-serif;
     }
 
-    /* Ambient Pulsing Background */
+    /* Dungeon Void Ambient Background */
     @keyframes backgroundPulse {
         0%, 100% {
             background-color: #030712;
@@ -103,7 +103,7 @@ st.markdown("""
         color: #e0f2fe;
     }
 
-    /* Holographic Title Shimmer */
+    /* System Window Header Glow */
     @keyframes systemGlow {
         0%, 100% {
             text-shadow: 0 0 10px rgba(56, 189, 248, 0.7), 0 0 25px rgba(14, 165, 233, 0.5);
@@ -125,7 +125,7 @@ st.markdown("""
         margin-bottom: 0.2rem;
     }
 
-    /* Radar Scan Line & Container Glow for Banner */
+    /* Radar Scan Line & Container Glow for Gate Banner */
     @keyframes bannerBreathing {
         0%, 100% {
             border-color: #0284c7;
@@ -176,7 +176,7 @@ st.markdown("""
         transform: scale(1.03);
     }
 
-    /* Badge Pulse */
+    /* Monarch Seal Badge Pulse */
     @keyframes badgePing {
         0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
         50% { transform: scale(1.02); box-shadow: 0 0 20px rgba(56, 189, 248, 0.8); }
@@ -210,7 +210,7 @@ st.markdown("""
         margin-bottom: 1.5rem;
     }
 
-    /* Window Form Animations */
+    /* System Quest Window Form */
     @keyframes panelEntry {
         from { opacity: 0; transform: translateY(12px); }
         to { opacity: 1; transform: translateY(0); }
@@ -229,7 +229,7 @@ st.markdown("""
     }
 
     div[data-testid="stForm"]::before {
-        content: "[ SYSTEM PROTOCOL: HUNTER SETUP ]";
+        content: "[ SYSTEM QUEST: HUNTER CONTRACT INSCRIBED ]";
         font-family: 'Orbitron', monospace;
         font-size: 0.65rem;
         color: #38bdf8;
@@ -243,7 +243,7 @@ st.markdown("""
         border-right: 2px solid #38bdf8;
     }
 
-    /* Tabs Animation & Transitions */
+    /* System Window Tabs Navigation */
     .stTabs [data-baseweb="tab-list"] {
         background: rgba(3, 15, 38, 0.85);
         border: 1px solid rgba(56, 189, 248, 0.3);
@@ -278,7 +278,7 @@ st.markdown("""
         transform: translateY(-1px);
     }
 
-    /* Reactive Interactive Motion Buttons */
+    /* Mana-Infused Interactive Action Buttons */
     .stButton>button {
         font-family: 'Orbitron', monospace !important;
         background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%) !important;
@@ -305,7 +305,7 @@ st.markdown("""
         box-shadow: 0 0 10px rgba(56, 189, 248, 0.5) !important;
     }
 
-    /* Motion Interactive Input Fields */
+    /* Hunter Parameter Input Nodes */
     .stTextInput input, .stSelectbox select {
         background: rgba(3, 15, 38, 0.85) !important;
         border: 1px solid #0369a1 !important;
@@ -330,7 +330,7 @@ st.markdown("""
         transform: translateY(-2px);
     }
 
-    /* Interactive Checkbox Motion */
+    /* Gate Skip Matrix Nodes */
     div[data-testid="stCheckbox"] {
         padding: 4px 6px;
         border-radius: 4px;
@@ -353,7 +353,7 @@ st.markdown("""
         color: #38bdf8 !important;
     }
 
-    /* Live Pulsing Status Cards */
+    /* Hunter Deployment State Cards */
     @keyframes statusGlowGreen {
         0%, 100% { box-shadow: 0 0 18px rgba(16, 185, 129, 0.3); }
         50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.6); }
@@ -395,13 +395,13 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# SUPABASE INITIALIZATION
+# SUPABASE CORE INITIALIZATION
 # ==========================================
 SUPABASE_URL = st.secrets.get("SUPABASE_URL") or os.getenv("SUPABASE_URL")
 SUPABASE_KEY = st.secrets.get("SUPABASE_KEY") or os.getenv("SUPABASE_KEY")
 
 if not SUPABASE_URL or not SUPABASE_KEY:
-    st.error("SYSTEM MALFUNCTION: Supabase credentials missing from dimension core.")
+    st.error("SYSTEM ANOMALY: Monarch Core connection credentials missing from dimension matrix.")
     st.stop()
 
 @st.cache_resource
@@ -411,7 +411,7 @@ def init_supabase() -> Client:
 supabase = init_supabase()
 
 # ==========================================
-# MOTION-ANIMATED HERO BANNER
+# MOTION-ANIMATED MONARCH BANNER
 # ==========================================
 banner_file = None
 for filename in ["sung-jinwoo.png", "sung-jinwoo.jpg", "sung-jinwoo.jpeg", "jinwoo.png"]:
@@ -441,22 +441,25 @@ else:
     """, unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-st.markdown('<div class="system-badge">[ SYSTEM ALERT: AUTOMATION ENGINE ARMED ]</div>', unsafe_allow_html=True)
-st.markdown('<div class="system-title">MESS CONQUERS</div>', unsafe_allow_html=True)
-st.markdown('<div class="system-subtitle">Target Execution Window: 18:00:00 IST Sharp</div>', unsafe_allow_html=True)
+st.markdown('<div class="system-badge">[ SYSTEM ANNOUNCEMENT: AUTOMATED PROTOCOL ENGAGED ]</div>', unsafe_allow_html=True)
+st.markdown('<div class="system-title">QUEST: MESS CONQUER</div>', unsafe_allow_html=True)
+st.markdown('<div class="system-subtitle">Dungeon Gate Infiltration Window: 18:00:00 IST Sharp</div>', unsafe_allow_html=True)
 
-tab_manage, tab_register = st.tabs(["[ ⚡ HUNTER STATUS & REST MODE ]", "[ 🛠️ HUNTER SETUP & MEAL PREFERENCES ]"])
+tab_manage, tab_register = st.tabs([
+    "[ ⚡ HUNTER STATUS & REST GATE ]", 
+    "[ 🛠️ HUNTER REGISTRATION & STAT ALLOCATION ]"
+])
 
 # ==========================================
-# TAB 1: HUNTER STATUS & REST MODE
+# TAB 1: HUNTER STATUS & REST GATE
 # ==========================================
 with tab_manage:
-    st.markdown("##### 📍 HUNTER SYSTEM DEPLOYMENT")
-    st.caption("Inspect active automated booking status or enter rest mode during campus leave.")
+    st.markdown("##### 📍 GUILD TELEMETRY & STATUS INSPECTION")
+    st.caption("Inspect active automated quest extraction or enter rest mode during campus leave.")
 
     search_email = st.text_input(
-        "HUNTER IDENTIFIER (EMAIL)",
-        placeholder="hunter@system.com",
+        "HUNTER SOUL SIGNATURE (REGISTERED EMAIL)",
+        placeholder="shadow_monarch@system.com",
         key="status_email_box"
     ).strip().lower()
 
@@ -477,12 +480,12 @@ with tab_manage:
                             STATUS: AWAKENED • HUNTER {user_name}
                         </div>
                         <p style="margin: 8px 0 0 0; color: #a7f3d0; font-size: 0.95rem;">
-                            Autopilot routine engaged. Next ration booking sequence triggers automatically at <b>18:00:00 IST</b>.
+                            Shadow extraction routine armed. Next daily ration conquest fires precisely at <b>18:00:00 IST</b>.
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
 
-                    if st.button("🏖️ ENTER REST MODE: PAUSE AUTO-BOOKING"):
+                    if st.button("🏖️ RETURN TO SAFE ZONE (ENTER REST MODE)"):
                         supabase.table("users").update({"is_active": False}).eq("email", search_email).execute()
                         st.rerun()
                 else:
@@ -492,60 +495,60 @@ with tab_manage:
                             STATUS: DORMANT • HUNTER {user_name}
                         </div>
                         <p style="margin: 8px 0 0 0; color: #fde68a; font-size: 0.95rem;">
-                            Rest mode active. Daily execution cycles will bypass this Hunter profile.
+                            Hunter is resting in the safe zone. The 18:00:00 IST automated raid script will bypass this profile.
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
 
-                    if st.button("⚔️ AWAKEN: RESUME AUTO-BOOKING"):
+                    if st.button("⚔️ RE-ENTER THE DUNGEON (AWAKEN HUNTER)"):
                         supabase.table("users").update({"is_active": True}).eq("email", search_email).execute()
                         st.rerun()
             else:
-                st.info("No Hunter profile located under this identifier. Switch to **Hunter Setup & Meal Preferences** to register.")
+                st.info("No Hunter profile located with this Soul Signature. Shift to **Hunter Registration & Stat Allocation** to inscribe your contract.")
         except Exception as e:
-            st.error(f"System scan error: {e}")
+            st.error(f"System scan anomaly: {e}")
 
 # ==========================================
-# TAB 2: HUNTER SETUP & MEAL PREFERENCES
+# TAB 2: HUNTER REGISTRATION & STAT ALLOCATION
 # ==========================================
 with tab_register:
-    st.markdown("##### ⚙️ HUNTER REGISTRATION & CONTRACT PARAMETERS")
-    st.caption("All passkeys are encrypted via Fernet AES-128 before syncing to database storage.")
+    st.markdown("##### ⚙️ HUNTER GUILD CONTRACT & STAT REGISTRATION")
+    st.caption("All Dungeon Passkeys are sealed via AES-128 cryptographic shielding before being stored in the core database.")
     
     with st.form("account_form"):
         col1, col2 = st.columns(2)
         with col1:
-            name_input = st.text_input("HUNTER NAME", placeholder="Sung Jin-Woo")
-            email_input = st.text_input("SPACEBASIC IDENTIFIER (EMAIL)", placeholder="hunter@domain.com")
+            name_input = st.text_input("HUNTER CODENAME", placeholder="Sung Jin-Woo")
+            email_input = st.text_input("HUNTER SOUL SIGNATURE (EMAIL)", placeholder="hunter@domain.com")
         with col2:
-            tenant_id = st.text_input("GATE TENANT ID", value="143")
+            tenant_id = st.text_input("DUNGEON SECTOR ID (TENANT)", value="143")
             password_input = st.text_input(
-                "DUNGEON PASSKEY (PASSWORD)",
+                "GATE PASSKEY (PASSWORD)",
                 placeholder="••••••••",
                 type="password"
             )
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("##### 🍱 RATION PRIORITY HIERARCHY")
+        st.markdown("##### 🥩 RATION ACQUISITION PRIORITY")
         col_p1, col_p2 = st.columns(2)
         with col_p1:
-            lunch_pref = st.selectbox("LUNCH PRIORITY ORDER", ["Non Veg", "Egg", "Veg"], index=0)
+            lunch_pref = st.selectbox("MIDDAY RAID RATION HIERARCHY", ["Non Veg", "Egg", "Veg"], index=0)
         with col_p2:
-            dinner_pref = st.selectbox("DINNER PRIORITY ORDER", ["Non Veg", "Egg", "Veg"], index=0)
+            dinner_pref = st.selectbox("NIGHTFALL RAID RATION HIERARCHY", ["Non Veg", "Egg", "Veg"], index=0)
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("##### 🚫 SCHEDULED REST DAYS (SKIP DAYS)")
-        st.caption("Select weekly days to automatically skip automated meal claims:")
+        st.markdown("##### 🛡️ DUNGEON REST SCHEDULE (GATE SKIPS)")
+        st.caption("Select designated days where the automated raid team must bypass meal claims:")
 
         days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
         skip_config = {}
 
         for day in days:
-            st.write(f"**{day.upper()}**")
+            st.write(f"**{day.upper()} GATE CYCLE**")
             c1, c2, c3 = st.columns(3)
-            b_skip = c1.checkbox("Skip Breakfast", key=f"{day}_b")
-            l_skip = c2.checkbox("Skip Lunch", key=f"{day}_l")
-            d_skip = c3.checkbox("Skip Dinner", key=f"{day}_d")
+            b_skip = c1.checkbox("Skip Dawn Ration (Breakfast)", key=f"{day}_b")
+            l_skip = c2.checkbox("Skip Midday Ration (Lunch)", key=f"{day}_l")
+            d_skip = c3.checkbox("Skip Dusk Ration (Dinner)", key=f"{day}_d")
             
             day_skips_list = []
             if b_skip: day_skips_list.append("breakfast")
@@ -556,11 +559,11 @@ with tab_register:
                 skip_config[day] = day_skips_list
 
         st.markdown("<br>", unsafe_allow_html=True)
-        submit = st.form_submit_button("⚔️ ACCEPT CONTRACT & AWAKEN")
+        submit = st.form_submit_button("⚔️ ACCEPT CONTRACT & AWAKEN HUNTER")
 
     if submit:
         if not name_input or not email_input or not password_input:
-            st.error("Missing required parameters: Hunter Name, SpaceBasic Identifier, and Passkey required.")
+            st.error("SYSTEM ERROR: Hunter Codename, Soul Signature, and Gate Passkey are strictly required to seal this contract.")
         else:
             try:
                 encrypted_password = encrypt_value(password_input)
@@ -577,6 +580,6 @@ with tab_register:
                 }
 
                 supabase.table("users").upsert(payload, on_conflict="email").execute()
-                st.success("SYSTEM CONTRACT LOCKED: Hunter status synchronized and armed for 18:00:00 IST execution.")
+                st.success("CONTRACT SEALED: Hunter credentials encrypted and synced into the Monarch Core. Armed for 18:00:00 IST extraction.")
             except Exception as err:
                 st.error(f"System synchronization failure: {err}")
