@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # ==========================================
-# THEME & HIGH-CONTRAST PALETTES
+# THEME & VOCABULARY DICTIONARY
 # ==========================================
 THEMES = {
     "Solo Leveling": {
@@ -368,14 +368,14 @@ components.html(f"""
     }});
 
     const particles = [];
-    for (let i = 0; i < 35; i++) {{
+    for (let i = 0; i < 48; i++) {{
         particles.push({{
             x: Math.random() * width,
             y: Math.random() * height,
-            radius: Math.random() * 2 + 0.8,
-            speedY: Math.random() * 0.9 + 0.3,
-            speedX: (Math.random() - 0.5) * 0.3,
-            alpha: Math.random() * 0.5 + 0.2
+            radius: Math.random() * 2.2 + 0.8,
+            speedY: Math.random() * 1.3 + 0.4,
+            speedX: (Math.random() - 0.5) * 0.45,
+            alpha: Math.random() * 0.65 + 0.25
         }});
     }}
 
@@ -391,7 +391,7 @@ components.html(f"""
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
             ctx.fillStyle = `rgba({cfg["particle_color"]}, ${{p.alpha}})`;
-            ctx.shadowBlur = 6;
+            ctx.shadowBlur = 8;
             ctx.shadowColor = '{cfg["primary"]}';
             ctx.fill();
         }});
@@ -402,7 +402,7 @@ components.html(f"""
 """, height=0)
 
 # ==========================================
-# CRISP, HIGH-CONTRAST CSS ENGINE
+# MOTION ANIMATION & HIGH-CONTRAST CSS
 # ==========================================
 st.markdown(f"""
 <style>
@@ -412,19 +412,55 @@ st.markdown(f"""
         font-family: {cfg['body_font']};
     }}
 
+    /* Ambient Motion Background */
+    @keyframes ambientPulse {{
+        0%, 100% {{
+            background-color: {cfg['bg_base']};
+            background-image: radial-gradient(circle at 50% 0%, {cfg['primary']}22 0%, transparent 70%);
+        }}
+        50% {{
+            background-color: {cfg['bg_base']};
+            background-image: radial-gradient(circle at 50% 12%, {cfg['primary']}38 0%, transparent 80%);
+        }}
+    }}
+
     .stApp {{
-        background-color: {cfg['bg_base']};
+        animation: ambientPulse 8s infinite alternate ease-in-out;
         color: {cfg['text_primary']};
+    }}
+
+    /* System Title Motion Glow */
+    @keyframes titleGlow {{
+        0%, 100% {{
+            text-shadow: 0 0 10px {cfg['primary']}aa, 0 0 20px {cfg['secondary']}66;
+            letter-spacing: 0.05em;
+        }}
+        50% {{
+            text-shadow: 0 0 20px {cfg['primary']}, 0 0 35px {cfg['secondary']};
+            letter-spacing: 0.07em;
+        }}
     }}
 
     .system-title {{
         font-family: {cfg['font_family']};
         font-size: 2.2rem;
         font-weight: 900;
-        letter-spacing: 0.05em;
         text-transform: uppercase;
         color: #ffffff;
+        animation: titleGlow 3.5s infinite ease-in-out;
         margin-bottom: 0.2rem;
+    }}
+
+    /* Badge Pulse Animation */
+    @keyframes badgePing {{
+        0%, 100% {{
+            transform: scale(1);
+            box-shadow: 0 0 10px {cfg['primary']}44;
+        }}
+        50% {{
+            transform: scale(1.02);
+            box-shadow: 0 0 22px {cfg['primary']}99;
+        }}
     }}
 
     .system-badge {{
@@ -440,16 +476,55 @@ st.markdown(f"""
         font-weight: 800;
         color: {cfg['primary']};
         letter-spacing: 0.12em;
+        animation: badgePing 2.5s infinite ease-in-out;
         margin-bottom: 0.8rem;
     }}
 
-    .solid-banner-box {{
+    /* Holographic Banner Scan Line & Motion Border */
+    @keyframes bannerGlow {{
+        0%, 100% {{
+            border-color: {cfg['border_color']};
+            box-shadow: 0 0 15px {cfg['primary']}33;
+        }}
+        50% {{
+            border-color: {cfg['primary']};
+            box-shadow: 0 0 30px {cfg['primary']}77, inset 0 0 15px {cfg['primary']}33;
+        }}
+    }}
+
+    @keyframes scanLineMotion {{
+        0% {{ transform: translateY(-100%); }}
+        100% {{ transform: translateY(900%); }}
+    }}
+
+    .motion-banner-box {{
+        position: relative;
+        overflow: hidden;
         background: {cfg['panel_bg']};
         border: 1.5px solid {cfg['border_color']};
         border-radius: 8px;
-        padding: 2.2rem 1rem;
+        padding: 2.4rem 1rem;
         text-align: center;
         margin-bottom: 1.4rem;
+        animation: bannerGlow 4s infinite ease-in-out;
+    }}
+
+    .motion-banner-box::after {{
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 25px;
+        background: linear-gradient(180deg, transparent, {cfg['primary']}55, transparent);
+        animation: scanLineMotion 3.2s linear infinite;
+        pointer-events: none;
+    }}
+
+    /* Entry Transition for Forms */
+    @keyframes formEntrance {{
+        from {{ opacity: 0; transform: translateY(12px); }}
+        to {{ opacity: 1; transform: translateY(0); }}
     }}
 
     div[data-testid="stForm"], .system-panel {{
@@ -457,9 +532,11 @@ st.markdown(f"""
         border: 1.5px solid {cfg['border_color']} !important;
         border-radius: 8px !important;
         padding: 1.8rem !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7) !important;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7) !important;
+        animation: formEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }}
 
+    /* Inputs with Hover and Focus Transitions */
     .stTextInput input, .stTextArea textarea, .stSelectbox select {{
         background-color: {cfg['input_bg']} !important;
         border: 1.5px solid {cfg['border_color']} !important;
@@ -467,13 +544,56 @@ st.markdown(f"""
         font-size: 1.05rem !important;
         font-weight: 600 !important;
         border-radius: 6px !important;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }}
+
+    .stTextInput input:hover, .stTextArea textarea:hover, .stSelectbox select:hover {{
+        border-color: {cfg['primary']} !important;
+        box-shadow: 0 0 10px {cfg['primary']}44 !important;
+        transform: translateY(-1px);
     }}
 
     .stTextInput input:focus, .stTextArea textarea:focus {{
         border-color: {cfg['primary']} !important;
-        box-shadow: 0 0 8px {cfg['primary']} !important;
+        box-shadow: 0 0 16px {cfg['primary']}88 !important;
+        transform: translateY(-2px);
     }}
 
+    /* Interactive Buttons */
+    .stButton>button {{
+        font-family: {cfg['font_family']} !important;
+        background: linear-gradient(180deg, {cfg['primary']} 0%, {cfg['secondary']} 100%) !important;
+        color: #ffffff !important;
+        font-weight: 800 !important;
+        border: 1.5px solid {cfg['primary']} !important;
+        border-radius: 6px !important;
+        padding: 0.75rem 1.4rem !important;
+        box-shadow: 0 0 16px {cfg['primary']}55 !important;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }}
+
+    .stButton>button:hover {{
+        box-shadow: 0 0 28px {cfg['primary']}, inset 0 0 10px rgba(255, 255, 255, 0.3) !important;
+        transform: translateY(-3px) scale(1.02);
+    }}
+
+    .stButton>button:active {{
+        transform: translateY(1px) scale(0.98) !important;
+    }}
+
+    /* Checkbox Hover Action */
+    div[data-testid="stCheckbox"] {{
+        padding: 4px 6px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }}
+
+    div[data-testid="stCheckbox"]:hover {{
+        background: {cfg['primary']}15;
+        transform: translateX(4px);
+    }}
+
+    /* Labels styling */
     div[data-testid="stWidgetLabel"] label p {{
         font-size: 0.95rem !important;
         font-weight: 700 !important;
@@ -482,23 +602,7 @@ st.markdown(f"""
         text-transform: uppercase !important;
     }}
 
-    .stButton>button {{
-        font-family: {cfg['font_family']} !important;
-        background-color: {cfg['secondary']} !important;
-        color: #ffffff !important;
-        font-weight: 800 !important;
-        border: 1.5px solid {cfg['primary']} !important;
-        border-radius: 6px !important;
-        padding: 0.7rem 1.4rem !important;
-        transition: transform 0.15s ease, background-color 0.15s ease !important;
-    }}
-
-    .stButton>button:hover {{
-        background-color: {cfg['primary']} !important;
-        color: #000000 !important;
-        transform: translateY(-2px);
-    }}
-
+    /* Tabs styling */
     .stTabs [data-baseweb="tab-list"] {{
         background: {cfg['panel_bg']};
         border: 1px solid {cfg['border_color']};
@@ -513,12 +617,19 @@ st.markdown(f"""
         color: #94a3b8;
         font-weight: 700;
         border-radius: 4px;
+        transition: all 0.25s ease !important;
+    }}
+
+    .stTabs [data-baseweb="tab"]:hover {{
+        color: {cfg['primary']} !important;
+        transform: translateY(-2px);
     }}
 
     .stTabs [aria-selected="true"] {{
         background: {cfg['input_bg']} !important;
         color: {cfg['primary']} !important;
         border: 1px solid {cfg['primary']} !important;
+        box-shadow: 0 0 14px {cfg['primary']}44 !important;
     }}
 
     .guide-box {{
@@ -531,6 +642,18 @@ st.markdown(f"""
         color: {cfg['text_secondary']};
         font-size: 0.95rem;
         line-height: 1.5;
+        box-shadow: inset 0 0 15px {cfg['primary']}15;
+    }}
+
+    /* Status Telemetry Cards */
+    @keyframes greenGlow {{
+        0%, 100% {{ box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }}
+        50% {{ box-shadow: 0 0 28px rgba(16, 185, 129, 0.65); }}
+    }}
+
+    @keyframes amberGlow {{
+        0%, 100% {{ box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); }}
+        50% {{ box-shadow: 0 0 28px rgba(245, 158, 11, 0.65); }}
     }}
 
     .status-card-active {{
@@ -539,6 +662,12 @@ st.markdown(f"""
         border-radius: 6px;
         padding: 1.2rem;
         margin-bottom: 1.2rem;
+        animation: greenGlow 3s infinite ease-in-out;
+        transition: transform 0.25s ease;
+    }}
+
+    .status-card-active:hover {{
+        transform: scale(1.01);
     }}
 
     .status-card-paused {{
@@ -547,6 +676,12 @@ st.markdown(f"""
         border-radius: 6px;
         padding: 1.2rem;
         margin-bottom: 1.2rem;
+        animation: amberGlow 3s infinite ease-in-out;
+        transition: transform 0.25s ease;
+    }}
+
+    .status-card-paused:hover {{
+        transform: scale(1.01);
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -577,11 +712,11 @@ if top_col2.button("🔄 Swap Realm"):
     st.rerun()
 
 # ==========================================
-# SOLID BANNER
+# MOTION BANNER
 # ==========================================
 st.markdown(f"""
-<div class="solid-banner-box">
-    <div style="font-family: {cfg['font_family']}; font-size: 1.6rem; font-weight: 900; letter-spacing: 0.2em; color: #ffffff;">
+<div class="motion-banner-box">
+    <div style="font-family: {cfg['font_family']}; font-size: 1.7rem; font-weight: 900; letter-spacing: 0.2em; color: #ffffff;">
         {cfg['banner_tag']}
     </div>
     <div style="font-size: 0.9rem; font-weight: 700; letter-spacing: 0.15em; color: {cfg['primary']}; margin-top: 6px;">
@@ -603,8 +738,8 @@ with tab_status:
     st.caption(cfg["tab1_caption"])
 
     search_id = st.text_input(
-        "REGISTERED SPACEBASIC LOGIN IDENTIFIER (EMAIL OR PHONE)",
-        placeholder="student@example.com or 9876543210",
+        "REGISTERED IDENTIFIER (EMAIL OR SPACEBASIC USER ID)",
+        placeholder="student@example.com or SB-10492",
         key="status_lookup_box"
     ).strip().lower()
 
@@ -664,12 +799,12 @@ with tab_config:
 
     st.markdown("#### 1. HOW DO YOU LOG INTO SPACEBASIC?")
     
-    # OUTSIDE st.form so selecting an option triggers an instant UI update
+    # Placed OUTSIDE st.form so selecting an option triggers an instant UI update
     login_method = st.radio(
         "SELECT YOUR LOGIN METHOD",
         [
             "Option A: SpaceBasic Email & Password",
-            "Option B: Phone Number + OTP (Session Token)"
+            "Option B: SpaceBasic User ID + Session Token"
         ],
         index=0,
         key="login_method_selector"
@@ -704,20 +839,24 @@ with tab_config:
         else:
             st.markdown(f"""
             <div class="guide-box">
-                <b style="color: {cfg['primary']};">PHONE NUMBER + OTP (SESSION TOKEN) PATH:</b><br>
-                Since background runners cannot receive SMS OTPs at 5:30 PM, you must provide your <b>Authorization Session Token</b> once.<br><br>
+                <b style="color: {cfg['primary']};">USER ID + SESSION TOKEN (OTP-FREE) PATH:</b><br>
+                Since automated runners cannot prompt for an SMS OTP at 5:30 PM, supply your <b>Authorization Session Token</b> and <b>User ID</b>.<br><br>
                 <b>Steps to get your Authorization Token:</b><br>
-                1. Open your college's SpaceBasic web portal on Chrome/Brave/Edge on a laptop or desktop.<br>
-                2. Press <code>F12</code> (or right-click $\\rightarrow$ Inspect) and select the <b>Network</b> tab.<br>
-                3. Log in using your registered Phone Number + OTP.<br>
-                4. In the Network tab list, click any request (e.g., <code>profile</code>, <code>dashboard</code>, or <code>book</code>).<br>
+                1. Open your college SpaceBasic web portal on Chrome/Brave/Edge on a laptop.<br>
+                2. Press <code>F12</code> (or right-click $\\rightarrow$ Inspect) and open the <b>Network</b> tab.<br>
+                3. Log in using your phone number and OTP.<br>
+                4. In the Network tab list, click any request (such as <code>profile</code>, <code>dashboard</code>, or <code>book</code>).<br>
                 5. Under <b>Request Headers</b>, find <code>Authorization</code> and copy the entire string (e.g., <code>Bearer eyJhbG...</code>).
             </div>
             """, unsafe_allow_html=True)
 
             col_b1, col_b2 = st.columns([1, 1])
             with col_b1:
-                identifier_input = st.text_input("REGISTERED 10-DIGIT MOBILE NUMBER", placeholder="9876543210")
+                identifier_input = st.text_input(
+                    "SPACEBASIC USER ID",
+                    placeholder="e.g., SB-10492 or roll number",
+                    help="Found in your SpaceBasic profile or URL after logging in."
+                )
             with col_b2:
                 secret_input = st.text_area(
                     "SPACEBASIC AUTHORIZATION / BEARER TOKEN",
@@ -760,7 +899,7 @@ with tab_config:
 
     if submit:
         if not name_input or not identifier_input or not secret_input:
-            st.error("Parameters incomplete: Please enter Name, Login Identifier (Email or Phone), and your Password or Session Token.")
+            st.error("Parameters incomplete: Please enter Name, Login Identifier (Email or User ID), and Password or Session Token.")
         else:
             try:
                 cleaned_secret = secret_input.strip().replace("Bearer ", "")
