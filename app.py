@@ -15,7 +15,7 @@ st.set_page_config(
 )
 
 # ==========================================
-# THEME & VOCABULARY DICTIONARY (TOP 10 POPULAR ANIMES + DEFAULT)
+# THEME & VOCABULARY DICTIONARY
 # ==========================================
 THEMES = {
     "Solo Leveling": {
@@ -30,18 +30,19 @@ THEMES = {
         "badge": "[ SYSTEM ALERT: MONARCH CORE ARMED ]",
         "subtitle": "Dungeon Gate Infiltration Window: 17:30:00 IST Sharp (5:30 PM)",
         "role_title": "HUNTER",
-        "identity_label": "HUNTER SOUL SIGNATURE (EMAIL)",
+        "identity_label": "HUNTER SOUL SIGNATURE (EMAIL / PHONE ID)",
         "identity_placeholder": "sung_jinwoo@hunterassociation.com",
         "name_label": "HUNTER CODENAME",
         "name_placeholder": "Sung Jin-Woo",
         "pass_label": "DUNGEON PASSKEY (PASSWORD)",
+        "token_label": "MONARCH ESSENCE CIPHER (SESSION / BEARER TOKEN)",
         "tenant_label": "DUNGEON SECTOR ID (TENANT)",
         "tab1_title": "[ ⚡ HUNTER STATUS & REST GATE ]",
         "tab2_title": "[ 🛠️ HUNTER REGISTRATION & STAT ALLOCATION ]",
         "tab1_header": "📍 GUILD TELEMETRY & HUNTER RADAR",
         "tab1_caption": "Inspect active automated quest extraction or enter rest mode during campus leave.",
         "tab2_header": "⚙️ HUNTER GUILD CONTRACT & STAT REGISTRATION",
-        "tab2_caption": "All Dungeon Passkeys are sealed via AES-128 cryptographic shielding.",
+        "tab2_caption": "All credentials and session ciphers are sealed via AES-128 cryptographic shielding.",
         "ration_section": "🥩 RATION ACQUISITION PRIORITY",
         "lunch_label": "MIDDAY RAID RATION HIERARCHY",
         "dinner_label": "NIGHTFALL RAID RATION HIERARCHY",
@@ -75,11 +76,12 @@ THEMES = {
         "badge": "🍥 [ HIDDEN LEAF MISSION PROTOCOL ]",
         "subtitle": "Chakra Infiltration Window: 17:30:00 IST Sharp (5:30 PM)",
         "role_title": "SHINOBI",
-        "identity_label": "SHINOBI REGISTRATION ID (EMAIL)",
+        "identity_label": "SHINOBI REGISTRATION ID (EMAIL / PHONE ID)",
         "identity_placeholder": "naruto.uzumaki@konohagakure.org",
         "name_label": "SHINOBI ALIAS / CLAN NAME",
         "name_placeholder": "Naruto Uzumaki",
         "pass_label": "SECRET JUTSU CIPHER (PASSWORD)",
+        "token_label": "CHAKRA SIGNATURE SEAL (SESSION TOKEN)",
         "tenant_label": "VILLAGE SECTOR CODE (TENANT)",
         "tab1_title": "[ 🍥 MISSION STATUS & RECOVERY ]",
         "tab2_title": "[ 📜 SHINOBI ARCHIVE & RATION JUTSU ]",
@@ -120,11 +122,12 @@ THEMES = {
         "badge": "☠️ [ GRAND LINE LOG POSE LOCKED ]",
         "subtitle": "Galleon Galley Infiltration Time: 17:30:00 IST Sharp (5:30 PM)",
         "role_title": "PIRATE",
-        "identity_label": "BOUNTY POSTER ALIAS (EMAIL)",
+        "identity_label": "BOUNTY POSTER ALIAS (EMAIL / PHONE ID)",
         "identity_placeholder": "monkey_d_luffy@strawhatpirates.com",
         "name_label": "CAPTAIN / CREW CODENAME",
         "name_placeholder": "Monkey D. Luffy",
         "pass_label": "TREASURE CHEST CIPHER (PASSWORD)",
+        "token_label": "VIVRE CARD ESSENCE (SESSION TOKEN)",
         "tenant_label": "PIRATE FLEET CODE (TENANT)",
         "tab1_title": "[ ⚓ FLEET LOG & DOCKING MODE ]",
         "tab2_title": "[ 🍖 CREW REGISTRATION & BANQUET RULES ]",
@@ -165,11 +168,12 @@ THEMES = {
         "badge": "⚔️ [ DEMON SLAYER CORPS DISPATCH ]",
         "subtitle": "Nichirin Blade Strike Target: 17:30:00 IST Sharp (5:30 PM)",
         "role_title": "SLAYER",
-        "identity_label": "KASUGAI CROW ADDRESS (EMAIL)",
+        "identity_label": "KASUGAI CROW ADDRESS (EMAIL / PHONE ID)",
         "identity_placeholder": "tanjiro.kamado@slayercorps.jp",
         "name_label": "SLAYER RANK CODENAME",
         "name_placeholder": "Tanjiro Kamado",
         "pass_label": "BREATHING TECHNIQUE CIPHER (PASSWORD)",
+        "token_label": "CORPS WISTERIA CREST (SESSION TOKEN)",
         "tenant_label": "WISTERIA ESTATE CODE (TENANT)",
         "tab1_title": "[ 🏮 SLAYER TELEMETRY & REHABILITATION ]",
         "tab2_title": "[ 🗡️ CORPS CONTRACT & RATION FORM ]",
@@ -210,11 +214,12 @@ THEMES = {
         "badge": "👁️ [ SPECIAL GRADE CURSED SEAL ]",
         "subtitle": "Sure-Hit Booking Activation: 17:30:00 IST Sharp (5:30 PM)",
         "role_title": "SORCERER",
-        "identity_label": "CURSED ENERGY SIGNATURE (EMAIL)",
+        "identity_label": "CURSED ENERGY SIGNATURE (EMAIL / PHONE ID)",
         "identity_placeholder": "satoru.gojo@jujutsutech.edu",
         "name_label": "JUJUTSU SORCERER IDENTIFIER",
         "name_placeholder": "Satoru Gojo",
         "pass_label": "INHERITED CURSED PASSKEY (PASSWORD)",
+        "token_label": "SUKUNA FINGER RESONANCE (SESSION TOKEN)",
         "tenant_label": "BARRIER SECTOR ID (TENANT)",
         "tab1_title": "[ 👁️ DOMAIN STATUS & SEALED BARRIER ]",
         "tab2_title": "[ 🗝️ CURSED CONTRACT & MEAL TECHNIQUE ]",
@@ -255,11 +260,12 @@ THEMES = {
         "badge": "🛡️ [ SCOUT REGIMENT DEPLOYMENT ]",
         "subtitle": "Wall Reconnaissance Strike Time: 17:30:00 IST Sharp (5:30 PM)",
         "role_title": "SOLDIER",
-        "identity_label": "REGIMENT CADET SERIAL (EMAIL)",
+        "identity_label": "REGIMENT CADET SERIAL (EMAIL / PHONE ID)",
         "identity_placeholder": "eren.yeager@scoutregiment.paradis",
         "name_label": "CADET FULL NAME",
         "name_placeholder": "Eren Yeager",
         "pass_label": "MILITARY LOCK CIPHER (PASSWORD)",
+        "token_label": "BASEMENT KEY REARGUARD CIPHER (SESSION TOKEN)",
         "tenant_label": "DISTRICT WALL CODE (TENANT)",
         "tab1_title": "[ 🛡️ SCOUT TELEMETRY & INTERIOR RETREAT ]",
         "tab2_title": "[ ⚔️ CADET CONTRACT & RATION ALLOCATION ]",
@@ -300,11 +306,12 @@ THEMES = {
         "badge": "⚡ [ GOTEI 13 REISHI DISPATCH ]",
         "subtitle": "Senkaimon Infiltration Window: 17:30:00 IST Sharp (5:30 PM)",
         "role_title": "REAPER",
-        "identity_label": "SOUL REAPER REIRAKU (EMAIL)",
+        "identity_label": "SOUL REAPER REIRAKU (EMAIL / PHONE ID)",
         "identity_placeholder": "ichigo.kurosaki@gotei13.soul",
         "name_label": "SHINIGAMI SQUAD CODENAME",
         "name_placeholder": "Ichigo Kurosaki",
         "pass_label": "ZANPAKUTO RELEASE CIPHER (PASSWORD)",
+        "token_label": "SHINIGAMI SUBSTITUTE BADGE (SESSION TOKEN)",
         "tenant_label": "SEIREITEI SQUAD DIVISION (TENANT)",
         "tab1_title": "[ ⚡ REISHI STATUS & WORLD OF LIVING ]",
         "tab2_title": "[ 🗡️ SQUAD CONTRACT & PROVISION KIDO ]",
@@ -345,11 +352,12 @@ THEMES = {
         "badge": "🐉 [ CAPSULE CORP RADAR ARMED ]",
         "subtitle": "Kame House Delivery Target: 17:30:00 IST Sharp (5:30 PM)",
         "role_title": "WARRIOR",
-        "identity_label": "SCOUTER KI FREQUENCY (EMAIL)",
+        "identity_label": "SCOUTER KI FREQUENCY (EMAIL / PHONE ID)",
         "identity_placeholder": "son.goku@capsulecorp.dbz",
         "name_label": "Z-FIGHTER SAIYAN NAME",
         "name_placeholder": "Son Goku",
         "pass_label": "SUPER SAIYAN PASSKEY (PASSWORD)",
+        "token_label": "CAPSULE CORP DIRECT FREQUENCY (SESSION TOKEN)",
         "tenant_label": "UNIVERSE 7 ARENA CODE (TENANT)",
         "tab1_title": "[ 🐉 SCOUTER RADAR & GRAVITY ROOM ]",
         "tab2_title": "[ 🥩 SAIYAN FEAST & RATION STATS ]",
@@ -390,11 +398,12 @@ THEMES = {
         "badge": "📓 [ SHINIGAMI EYE CONTRACT ACTIVE ]",
         "subtitle": "Notebook Inscription Deadline: 17:30:00 IST Sharp (5:30 PM)",
         "role_title": "INVESTIGATOR",
-        "identity_label": "TASK FORCE SECURE ALIAS (EMAIL)",
+        "identity_label": "TASK FORCE SECURE ALIAS (EMAIL / PHONE ID)",
         "identity_placeholder": "light.yagami@kirasworld.jp",
         "name_label": "TRUE NAME WRITTEN IN NOTE",
         "name_placeholder": "Light Yagami",
         "pass_label": "L'S ENCRYPTED CIPHER (PASSWORD)",
+        "token_label": "WATARI ENCRYPTED TERMINAL TOKEN (SESSION TOKEN)",
         "tenant_label": "HEADQUARTERS TASK ID (TENANT)",
         "tab1_title": "[ 📓 NOTEBOOK SURVEILLANCE & REST ]",
         "tab2_title": "[ 🖋️ DEATH NOTE CONTRACT & RULES ]",
@@ -427,7 +436,7 @@ THEMES = {
         "primary": "#10b981",
         "secondary": "#0284c7",
         "accent": "#eab308",
-        "bg_radial": "rgba(16, 185, 129, 0.25)",
+        "bg_radial": "rgba(168, 85, 247, 0.25)",
         "bg_base": "#020906",
         "font_family": "'Orbitron', monospace",
         "body_font": "'Rajdhani', sans-serif",
@@ -435,11 +444,12 @@ THEMES = {
         "badge": "💥 [ HERO ALLIANCE REGISTRY ENGAGED ]",
         "subtitle": "Lunch Rush Speed Claim Window: 17:30:00 IST Sharp (5:30 PM)",
         "role_title": "HERO",
-        "identity_label": "PRO HERO LICENSE ID (EMAIL)",
+        "identity_label": "PRO HERO LICENSE ID (EMAIL / PHONE ID)",
         "identity_placeholder": "deku.midoriya@ua-high.edu",
         "name_label": "PRO HERO ALIAS",
         "name_placeholder": "Deku",
         "pass_label": "ONE FOR ALL ACCESS PASSKEY (PASSWORD)",
+        "token_label": "SUPPORT ITEM QUIRK TOKEN (SESSION TOKEN)",
         "tenant_label": "CLASS 1-A DORM SECTOR (TENANT)",
         "tab1_title": "[ 💥 QUIRK MONITOR & DORM REST ]",
         "tab2_title": "[ 🦸 HERO REGISTRATION & DIET PLAN ]",
@@ -480,18 +490,19 @@ THEMES = {
         "badge": "⚡ [ AUTOMATED CLOUD DISPATCH ACTIVE ]",
         "subtitle": "Daily Execution Scheduled: 17:30:00 IST Sharp (5:30 PM)",
         "role_title": "STUDENT",
-        "identity_label": "REGISTERED SPACEBASIC EMAIL",
+        "identity_label": "REGISTERED SPACEBASIC IDENTIFIER (EMAIL / PHONE)",
         "identity_placeholder": "student@example.com",
         "name_label": "STUDENT FULL NAME",
         "name_placeholder": "Alex Kumar",
         "pass_label": "SPACEBASIC PASSWORD",
+        "token_label": "SPACEBASIC SESSION / BEARER TOKEN (OPTIONAL)",
         "tenant_label": "CAMPUS TENANT ID",
         "tab1_title": "[ ⚡ SERVICE STATUS & VACATION MODE ]",
         "tab2_title": "[ 🛠️ ACCOUNT SETUP & PREFERENCES ]",
         "tab1_header": "📍 BOOKING STATUS & SERVICE OVERVIEW",
         "tab1_caption": "Check your automated booking status or pause the service during holidays.",
         "tab2_header": "⚙️ STUDENT CREDENTIALS & MEAL PREFERENCES",
-        "tab2_caption": "Passwords are encrypted using AES-128 before syncing to Supabase.",
+        "tab2_caption": "Passwords and tokens are encrypted using AES-128 before syncing to Supabase.",
         "ration_section": "🍱 MEAL TYPE PREFERENCE",
         "lunch_label": "LUNCH PREFERENCE ORDER",
         "dinner_label": "DINNER PREFERENCE ORDER",
@@ -507,7 +518,7 @@ THEMES = {
         "active_desc": "Autopilot is active. Tomorrow's meals will be booked automatically at 17:30:00 IST (5:30 PM).",
         "paused_title": "STATUS: SERVICE PAUSED",
         "paused_desc": "Auto-booking is paused. The daily runner will bypass this account at 17:30:00 IST.",
-        "not_found": "No account found with this email. Switch to tab 2 to register.",
+        "not_found": "No account found with this identifier. Switch to tab 2 to register.",
         "success_msg": "CONFIGURATION SAVED: Your account is synchronized and armed for 17:30:00 IST execution.",
         "particle_color": "99, 102, 241",
         "banner_tag": "AUTOMATION CONSOLE",
@@ -543,7 +554,7 @@ if "theme" not in st.session_state:
     </style>
     <div class="intro-box">
         <div class="intro-title">MESS CONQUERS</div>
-        <p style="color: #94a3b8; font-size: 1.05rem;">Choose from the Top 10 Anime Realms or Enterprise Mode:</p>
+        <p style="color: #94a3b8; font-size: 1.05rem;">Choose from the Top 10 Anime Realms or Standard Mode:</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -716,14 +727,14 @@ st.markdown(f"""
         transform: translateY(-2px);
     }}
 
-    .stTextInput input, .stSelectbox select {{
+    .stTextInput input, .stTextArea textarea, .stSelectbox select {{
         background: rgba(255, 255, 255, 0.04) !important;
         border: 1px solid {cfg['secondary']} !important;
         color: #f8fafc !important;
         font-size: 1rem !important;
     }}
 
-    .stTextInput input:focus {{
+    .stTextInput input:focus, .stTextArea textarea:focus {{
         border-color: {cfg['primary']} !important;
         box-shadow: 0 0 18px {cfg['primary']} !important;
     }}
@@ -776,26 +787,35 @@ if top_col2.button("🔄 Swap Realm"):
 # ==========================================
 # MOTION BANNER
 # ==========================================
+banner_file = None
+for fname in ["sung-jinwoo.png", "sung-jinwoo.jpg", "sung-jinwoo.jpeg", "jinwoo.png"]:
+    if os.path.exists(fname):
+        banner_file = fname
+        break
+
 st.markdown('<div class="animated-banner-box">', unsafe_allow_html=True)
-st.markdown(f"""
-    <div style="
-        width: 100%;
-        height: 160px;
-        background: radial-gradient(circle at 50% 30%, {cfg['bg_radial']} 0%, {cfg['bg_base']} 80%),
-                    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0px, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 4px);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    ">
-        <div style="font-family: {cfg['font_family']}; font-size: 1.5rem; font-weight: 900; letter-spacing: 0.25em; color: #ffffff; text-shadow: 0 0 14px {cfg['primary']};">
-            {cfg['banner_tag']}
+if banner_file and st.session_state["theme"] == "Solo Leveling":
+    st.image(banner_file, use_container_width=True)
+else:
+    st.markdown(f"""
+        <div style="
+            width: 100%;
+            height: 160px;
+            background: radial-gradient(circle at 50% 30%, {cfg['bg_radial']} 0%, {cfg['bg_base']} 80%),
+                        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.03) 0px, rgba(255, 255, 255, 0.03) 1px, transparent 1px, transparent 4px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        ">
+            <div style="font-family: {cfg['font_family']}; font-size: 1.5rem; font-weight: 900; letter-spacing: 0.25em; color: #ffffff; text-shadow: 0 0 14px {cfg['primary']};">
+                {cfg['banner_tag']}
+            </div>
+            <div style="font-size: 0.85rem; font-weight: 700; letter-spacing: 0.2em; color: {cfg['primary']}; margin-top: 6px;">
+                {cfg['banner_sub']}
+            </div>
         </div>
-        <div style="font-size: 0.85rem; font-weight: 700; letter-spacing: 0.2em; color: {cfg['primary']}; margin-top: 6px;">
-            {cfg['banner_sub']}
-        </div>
-    </div>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown(f'<div class="system-title">{cfg["title"]}</div>', unsafe_allow_html=True)
@@ -824,6 +844,7 @@ with tab_status:
                 user_rec = res.data[0]
                 user_name = user_rec.get("name", cfg["role_title"]).upper()
                 is_active = user_rec.get("is_active", True)
+                auth_type_stored = user_rec.get("auth_type", "password").upper()
 
                 st.write("")
                 if is_active:
@@ -833,7 +854,8 @@ with tab_status:
                             {cfg['active_title']} • {cfg['role_title']} {user_name}
                         </div>
                         <p style="margin: 8px 0 0 0; color: #a7f3d0; font-size: 0.95rem;">
-                            {cfg['active_desc']}
+                            {cfg['active_desc']}<br>
+                            <span style="font-size: 0.8rem; opacity: 0.85;">AUTHENTICATION MODE: {auth_type_stored}</span>
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
@@ -875,10 +897,22 @@ with tab_config:
             email_input = st.text_input(cfg["identity_label"], placeholder=cfg["identity_placeholder"])
         with col2:
             tenant_id = st.text_input(cfg["tenant_label"], value="143")
-            password_input = st.text_input(
+            auth_mode = st.selectbox(
+                "GATE AUTHENTICATION PROTOCOL",
+                ["Standard Password", "Session Auth Token (Phone / OTP Users)"]
+            )
+
+        if auth_mode == "Standard Password":
+            cred_value = st.text_input(
                 cfg["pass_label"],
                 placeholder="••••••••",
                 type="password"
+            )
+        else:
+            cred_value = st.text_area(
+                cfg["token_label"],
+                placeholder="Paste Bearer eyJhbGciOi...",
+                help="Obtain from browser DevTools (F12) -> Network Tab -> Authorization header upon logging in."
             )
 
         st.markdown("<br>", unsafe_allow_html=True)
@@ -915,22 +949,30 @@ with tab_config:
         submit = st.form_submit_button(cfg["submit_btn"])
 
     if submit:
-        if not name_input or not email_input or not password_input:
-            st.error("Parameters incomplete: Codename, Soul Signature/Email, and Passkey are strictly required.")
+        if not name_input or not email_input or not cred_value:
+            st.error("Parameters incomplete: Codename, Soul Signature/Email, and Authentication Details are required.")
         else:
             try:
-                encrypted_password = encrypt_value(password_input)
+                cleaned_cred = cred_value.strip().replace("Bearer ", "")
+                encrypted_cred = encrypt_value(cleaned_cred)
 
                 payload = {
                     "name": name_input.strip(),
                     "email": email_input.strip().lower(),
-                    "password": encrypted_password,
                     "tenant_id": str(tenant_id).strip(),
+                    "auth_type": "password" if auth_mode == "Standard Password" else "token",
                     "lunch_preference": lunch_pref,
                     "dinner_preference": dinner_pref,
                     "skip_days": skip_config,
                     "is_active": True
                 }
+
+                if auth_mode == "Standard Password":
+                    payload["password"] = encrypted_cred
+                    payload["auth_token"] = None
+                else:
+                    payload["auth_token"] = encrypted_cred
+                    payload["password"] = None
 
                 supabase.table("users").upsert(payload, on_conflict="email").execute()
                 st.success(cfg["success_msg"])
