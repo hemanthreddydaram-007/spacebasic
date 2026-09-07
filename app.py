@@ -49,7 +49,7 @@ SUPABASE_URL = st.secrets.get("SUPABASE_URL") or os.getenv("SUPABASE_URL")
 SUPABASE_KEY = st.secrets.get("SUPABASE_KEY") or os.getenv("SUPABASE_KEY")
 
 if not SUPABASE_URL or not SUPABASE_KEY:
-    st.error("🔒 Configuration Error: SUPABASE_URL and SUPABASE_KEY must be configured in secrets!")
+    st.error("🔒 Security Config Missing: SUPABASE_URL and SUPABASE_KEY must be set in secrets!")
     st.stop()
 
 @st.cache_resource
@@ -59,78 +59,118 @@ def init_supabase() -> Client:
 supabase = init_supabase()
 
 st.title("🍱 SpaceBasic Mess Autopilot")
-st.caption("Automatic Session Generation: No manual Bearer tokens or User IDs required.")
+st.caption("Automatic daily meal reservations with self-service schedule controls.")
 
 st.markdown("---")
 
+tab_manage, tab_register = st.tabs(["🏠 Manage Status (Pause / Resume)", "👤 Register / Update Details"])
+
 # ==========================================
-# REGISTRATION FORM
+# TAB 1: PAUSE / RESUME AUTOPILOT
 # ==========================================
-with st.form("account_form"):
-    st.subheader("👤 SpaceBasic Account Login")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        name_input = st.text_input("Full Name", placeholder="e.g. Alex Kumar")
-        email_input = st.text_input("SpaceBasic Registered Email", placeholder="student@example.com")
-    with col2:
-        tenant_id = st.text_input("Tenant ID", value="143")
-        password_input = st.text_input(
-            "SpaceBasic Password",
-            placeholder="••••••••",
-            type="password",
-            help="Your password is encrypted with AES-128 before saving."
-        )
+with tab_manage:
+    st.subheader("Pause or Resume Auto-Booking")
+    st.write("Going home or taking leave? Pause your bookings with one click.")
 
-    st.markdown("---")
-    st.subheader("🥗 Dietary Preferences")
-    col_pref1, col_pref2 = st.columns(2)
-    with col_pref1:
-        lunch_pref = st.selectbox("Lunch Preference", ["Non Veg", "Egg", "Veg"], index=0)
-    with col_pref2:
-        dinner_pref = st.selectbox("Dinner Preference", ["Non Veg", "Egg", "Veg"], index=0)
+    search_email = st.text_input("Enter your registered SpaceBasic Email", placeholder="student@example.com").strip().lower()
 
-    st.markdown("---")
-    st.subheader("📅 Skip Days Schedule")
-    days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
-    
-    skip_config = {}
-    for day in days:
-        st.write(f"**{day.capitalize()}**")
-        c1, c2, c3 = st.columns(3)
-        b_skip = c1.checkbox("Skip Breakfast", key=f"{day}_b")
-        l_skip = c2.checkbox("Skip Lunch", key=f"{day}_l")
-        d_skip = c3.checkbox("Skip Dinner", key=f"{day}_d")
-        
-        day_skips_list = []
-        if b_skip: day_skips_list.append("breakfast")
-        if l_skip: day_skips_list.append("lunch")
-        if d_skip: day_skips_list.append("dinner")
-        
-        if day_skips_list:
-            skip_config[day] = day_skips_list
-
-    submit = st.form_submit_button("🔒 Save Account & Enable Autopilot")
-
-if submit:
-    if not name_input or not email_input or not password_input:
-        st.error("Please fill in Name, Email, and Password.")
-    else:
+    if search_email:
         try:
-            # Encrypt password before sending to database
-            encrypted_password = encrypt_value(password_input)
+            res = supabase.table("users").select("*").eq("email", search_email).execute()
+            
+            if res.data and len(res.data) > 0:
+                user_record = res.data[0]
+                user_name = user_record.get("name", "Student")
+                is_active = user_record.get("is_active", True)
 
-            payload = {
-                "name": name_input.strip(),
-                "email": email_input.strip().lower(),
-                "password": encrypted_password,
-                "tenant_id": str(tenant_id).strip(),
-                "lunch_preference": lunch_pref,
-                "dinner_preference": dinner_pref,
-                "skip_days": skip_config
-            }
+                st.markdown("---")
+                if is_active:
+                    st.success(f"🟢 **Status for {user_name}: ACTIVE**\n\nThe bot will book your meals automatically every morning.")
+                    if st.button("🏠 I am Going Home (Pause Auto-Booking)"):
+                        supabase.table("users").update({"is_active": False}).eq("email", search_email).execute()
+                        st.warning("⏸️ Auto-booking has been paused! The bot will skip booking your meals.")
+                        st.rerun()
+                else:
+                    st.warning(f"⏸️ **Status for {user_name}: PAUSED**\n\nDaily automated bookings are currently turned OFF for your account.")
+                    if st.button("🎒 I am Back at Campus (Resume Auto-Booking)"):
+                        supabase.table("users").update({"is_active": True}).eq("email", search_email).execute()
+                        st.success("🟢 Auto-booking is now ACTIVE again! Your meals will be reserved starting tomorrow morning.")
+                        st.rerun()
+            else:
+                st.info("No account found with this email. Please register in the next tab.")
+        except Exception as e:
+            st.error(f"Error fetching account status: {e}")
 
-            supabase.table("users").insert(payload).execute()
-            st.success("🎉 Account saved! The system will log in and book meals automatically.")
-        except Exception as err:
-            st.error(f"❌ Failed to save account: {err}")
+# ==========================================
+# TAB 2: REGISTER / UPDATE DETAILS
+# ==========================================
+with tab_register:
+    st.subheader("Account Registration & Meal Preferences")
+    
+    with st.form("account_form"):
+        col1, col2 = st.columns(2)
+        with col1:
+            name_input = st.text_input("Full Name", placeholder="e.g. Alex Kumar")
+            email_input = st.text_input("SpaceBasic Registered Email", placeholder="student@example.com")
+        with col2:
+            tenant_id = st.text_input("Tenant ID", value="143")
+            password_input = st.text_input(
+                "SpaceBasic Password",
+                placeholder="••••••••",
+                type="password",
+                help="Your password is encrypted with Fernet AES-128 before saving."
+            )
+
+        st.markdown("---")
+        st.subheader("🥗 Dietary Preferences")
+        col_pref1, col_pref2 = st.columns(2)
+        with col_pref1:
+            lunch_pref = st.selectbox("Lunch Preference", ["Non Veg", "Egg", "Veg"], index=0)
+        with col_pref2:
+            dinner_pref = st.selectbox("Dinner Preference", ["Non Veg", "Egg", "Veg"], index=0)
+
+        st.markdown("---")
+        st.subheader("📅 Weekly Skip Days")
+        days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+        
+        skip_config = {}
+        for day in days:
+            st.write(f"**{day.capitalize()}**")
+            c1, c2, c3 = st.columns(3)
+            b_skip = c1.checkbox("Skip Breakfast", key=f"{day}_b")
+            l_skip = c2.checkbox("Skip Lunch", key=f"{day}_l")
+            d_skip = c3.checkbox("Skip Dinner", key=f"{day}_d")
+            
+            day_skips_list = []
+            if b_skip: day_skips_list.append("breakfast")
+            if l_skip: day_skips_list.append("lunch")
+            if d_skip: day_skips_list.append("dinner")
+            
+            if day_skips_list:
+                skip_config[day] = day_skips_list
+
+        submit = st.form_submit_button("🔒 Save Account Details")
+
+    if submit:
+        if not name_input or not email_input or not password_input:
+            st.error("Please fill in Name, Email, and Password.")
+        else:
+            try:
+                encrypted_password = encrypt_value(password_input)
+
+                payload = {
+                    "name": name_input.strip(),
+                    "email": email_input.strip().lower(),
+                    "password": encrypted_password,
+                    "tenant_id": str(tenant_id).strip(),
+                    "lunch_preference": lunch_pref,
+                    "dinner_preference": dinner_pref,
+                    "skip_days": skip_config,
+                    "is_active": True
+                }
+
+                # Upsert into users table based on unique email
+                supabase.table("users").upsert(payload, on_conflict="email").execute()
+                st.success("🎉 Account saved successfully! Auto-booking is enabled.")
+            except Exception as err:
+                st.error(f"❌ Failed to save account: {err}")
