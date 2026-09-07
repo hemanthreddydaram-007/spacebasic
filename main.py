@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 import pytz
 from datetime import datetime, timedelta
@@ -17,6 +18,31 @@ if not SUPABASE_KEY:
     print("❌ Error: SUPABASE_KEY environment variable is missing!")
     exit(1)
 
+# ==========================================
+# TIME SYNC & SLEEP BUFFER FUNCTION
+# ==========================================
+def wait_until_exact_time(target_hour=18, target_minute=0, target_second=0):
+    """
+    Holds execution until precisely target_hour:target_minute:target_second IST.
+    Defaults to 18:00:00 (6:00:00 PM IST).
+    Skips waiting if started manually or if target time has already elapsed.
+    """
+    ist = pytz.timezone("Asia/Kolkata")
+    now = datetime.now(ist)
+    target = now.replace(hour=target_hour, minute=target_minute, second=target_second, microsecond=0)
+    
+    seconds_to_wait = (target - now).total_seconds()
+
+    # Wait only if runner starts within a 20-minute window ahead of target time
+    if 0 < seconds_to_wait <= 1200:
+        print(f"🕒 Current time: {now.strftime('%H:%M:%S')} IST")
+        print(f"🎯 Target booking time: {target_hour:02d}:{target_minute:02d}:{target_second:02d} IST")
+        print(f"⏳ Holding execution for {int(seconds_to_wait)} seconds...")
+        time.sleep(seconds_to_wait)
+        print(f"⚡ Reached {datetime.now(ist).strftime('%H:%M:%S')} IST! Firing booking requests now.\n")
+    else:
+        print(f"⚡ Running immediately at {now.strftime('%H:%M:%S')} IST without delay.\n")
+
 def get_supabase_client() -> Client:
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -30,7 +56,6 @@ def get_active_users():
         return []
 
 def login_spacebasic(email, raw_password):
-    """Logs into SpaceBasic via the authenticating API and returns (token, user_id)."""
     headers = {
         "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
@@ -165,7 +190,7 @@ def process_user(user):
 
     # 2. Decrypt password and perform automatic login
     raw_password = decrypt_value(encrypted_pw)
-    print(f"🔑 Authenticating with SpaceBasic API...")
+    print("🔑 Authenticating with SpaceBasic API...")
     token, user_id = login_spacebasic(email, raw_password)
 
     if not token or not user_id:
@@ -197,7 +222,7 @@ def process_user(user):
         target_meals = select_preferred_meals(all_meals, lunch_pref, dinner_pref, skip_days)
 
         if not target_meals:
-            print(f"⏭️ No meals to book for tomorrow (skipped or none available).")
+            print("⏭️ No meals to book for tomorrow (skipped or none available).")
             return True
 
         print(f"💡 Selected {len(target_meals)} meal(s) for tomorrow.")
@@ -224,6 +249,9 @@ def process_user(user):
         return False
 
 def main():
+    # Sync and wait until exactly 6:00:00 PM (18:00:00) IST
+    wait_until_exact_time(18, 0, 0)
+
     print("=" * 50)
     print("🤖 STARTING AUTOMATED MESS BOOKING PROCESS")
     print("=" * 50)
