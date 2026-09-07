@@ -214,7 +214,7 @@ supabase = init_supabase()
 # ==========================================
 st.markdown("""
     <div style="border: 1.5px solid #0284c7; border-radius: 6px; overflow: hidden; margin-bottom: 1.2rem; box-shadow: 0 0 25px rgba(14, 165, 233, 0.35);">
-        <img src="https://images.alphacoders.com/134/1349540.png" style="width: 100%; height: 200px; object-fit: cover; filter: brightness(0.85) contrast(1.15);" />
+        <img src="https://images.alphacoders.com/134/1349540.png" style="width: 100%; height: 210px; object-fit: cover; filter: brightness(0.9) contrast(1.15);" />
     </div>
 """, unsafe_allow_html=True)
 
