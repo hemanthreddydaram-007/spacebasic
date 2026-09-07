@@ -3,10 +3,13 @@ import streamlit as st
 from cryptography.fernet import Fernet
 
 def get_secret_key() -> str:
-    key = os.getenv("SECRET_KEY")
+    # Check environment variables
+    key = os.getenv("SECRET_KEY") or os.getenv("ENCRYPTION_KEY")
+    
+    # Check Streamlit secrets
     if not key:
         try:
-            key = st.secrets["SECRET_KEY"]
+            key = st.secrets.get("SECRET_KEY") or st.secrets.get("ENCRYPTION_KEY")
         except Exception:
             key = None
             
