@@ -659,19 +659,22 @@ with tab_config:
     st.markdown(f"##### {cfg['tab2_header']}")
     st.caption(cfg["tab2_caption"])
     
-    with st.form("universe_contract_form"):
-        st.markdown("#### 1. HOW DO YOU LOG INTO SPACEBASIC?")
-        
-        login_method = st.radio(
-            "SELECT YOUR LOGIN IDENTIFIER TYPE",
-            [
-                "Option A: SpaceBasic Email & Password",
-                "Option B: Phone Number & Password"
-            ],
-            index=0
-        )
+    st.markdown("#### 1. HOW DO YOU LOG INTO SPACEBASIC?")
+    
+    # Placed OUTSIDE st.form so selecting an option triggers an instant UI update
+    login_method = st.radio(
+        "SELECT YOUR LOGIN IDENTIFIER TYPE",
+        [
+            "Option A: SpaceBasic Email & Password",
+            "Option B: Phone Number & Password"
+        ],
+        index=0,
+        key="login_method_selector"
+    )
 
-        st.markdown("<hr style='border: 0.5px solid #334155; margin: 1.2rem 0;'>", unsafe_allow_html=True)
+    st.markdown("<hr style='border: 0.5px solid #334155; margin: 1.2rem 0;'>", unsafe_allow_html=True)
+
+    with st.form("universe_contract_form"):
         st.markdown("#### 2. CREDENTIALS & IDENTIFIER")
 
         col1, col2 = st.columns(2)
@@ -698,8 +701,8 @@ with tab_config:
             st.markdown(f"""
             <div class="guide-box">
                 <b style="color: {cfg['primary']};">PHONE NUMBER + PASSWORD LOGIN:</b><br>
-                If you normally use OTP or mobile login, enter your registered 10-digit phone number and your SpaceBasic account password.<br>
-                <i>(Note: If you don't remember your password, you can set/reset it via "Forgot Password" on the SpaceBasic portal.)</i>
+                Enter your registered 10-digit mobile number and your SpaceBasic account password.<br>
+                <i>(Note: If you don't know your password, use "Forgot Password" on the SpaceBasic website to set one.)</i>
             </div>
             """, unsafe_allow_html=True)
 
