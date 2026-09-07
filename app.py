@@ -7,14 +7,14 @@ from security import encrypt_value
 # PAGE CONFIGURATION
 # ==========================================
 st.set_page_config(
-    page_title="SYSTEM • HUNTER QUEST LOG",
+    page_title="MESS CONQUERS • SYSTEM CONSOLE",
     page_icon="⚔️",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
 # ==========================================
-# MOTION-ANIMATED SYSTEM CSS
+# INTERACTIVE MOTION ANIMATION CSS ENGINE
 # ==========================================
 st.markdown("""
 <style>
@@ -172,7 +172,7 @@ st.markdown("""
     }
 
     div[data-testid="stForm"]::before {
-        content: "[ SYSTEM QUEST: DAILY RATION ]";
+        content: "[ SYSTEM WORKFLOW: AUTOMATION PROTOCOL ]";
         font-family: 'Orbitron', monospace;
         font-size: 0.65rem;
         color: #38bdf8;
@@ -186,7 +186,42 @@ st.markdown("""
         border-right: 2px solid #38bdf8;
     }
 
-    /* Floating Interactive Buttons */
+    /* Tabs Animation & Transitions */
+    .stTabs [data-baseweb="tab-list"] {
+        background: rgba(3, 15, 38, 0.85);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        border-radius: 6px;
+        padding: 6px;
+        gap: 8px;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        font-family: 'Orbitron', monospace;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: #64748b;
+        border-radius: 4px;
+        border: 1px solid transparent !important;
+        padding: 8px 18px !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    .stTabs [data-baseweb="tab"]:hover {
+        color: #38bdf8 !important;
+        background: rgba(14, 165, 233, 0.1) !important;
+        transform: translateY(-2px);
+    }
+
+    .stTabs [aria-selected="true"] {
+        background: rgba(14, 165, 233, 0.25) !important;
+        color: #38bdf8 !important;
+        border: 1px solid #38bdf8 !important;
+        box-shadow: 0 0 16px rgba(56, 189, 248, 0.5) !important;
+        transform: translateY(-1px);
+    }
+
+    /* Reactive Interactive Motion Buttons */
     .stButton>button {
         font-family: 'Orbitron', monospace !important;
         background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%) !important;
@@ -204,15 +239,16 @@ st.markdown("""
 
     .stButton>button:hover {
         background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%) !important;
-        box-shadow: 0 0 28px rgba(56, 189, 248, 0.95), inset 0 0 12px rgba(255, 255, 255, 0.4) !important;
-        transform: translateY(-2px) scale(1.01);
+        box-shadow: 0 0 30px rgba(56, 189, 248, 0.95), inset 0 0 12px rgba(255, 255, 255, 0.4) !important;
+        transform: translateY(-3px) scale(1.02);
     }
 
     .stButton>button:active {
-        transform: translateY(0px) scale(0.99);
+        transform: translateY(1px) scale(0.97) !important;
+        box-shadow: 0 0 10px rgba(56, 189, 248, 0.5) !important;
     }
 
-    /* Input Glow on Focus */
+    /* Motion Interactive Input Fields */
     .stTextInput input, .stSelectbox select {
         background: rgba(3, 15, 38, 0.85) !important;
         border: 1px solid #0369a1 !important;
@@ -222,13 +258,42 @@ st.markdown("""
         font-size: 1.05rem !important;
         font-weight: 600 !important;
         letter-spacing: 0.05em;
-        transition: all 0.2s ease-in-out;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    .stTextInput input:hover, .stSelectbox select:hover {
+        border-color: #0284c7 !important;
+        box-shadow: 0 0 10px rgba(14, 165, 233, 0.35) !important;
+        transform: translateY(-1px);
     }
 
     .stTextInput input:focus {
         border-color: #38bdf8 !important;
-        box-shadow: 0 0 16px rgba(56, 189, 248, 0.75) !important;
-        transform: translateY(-1px);
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.8) !important;
+        transform: translateY(-2px);
+    }
+
+    /* Interactive Checkbox Motion */
+    div[data-testid="stCheckbox"] {
+        padding: 4px 6px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+
+    div[data-testid="stCheckbox"]:hover {
+        background: rgba(14, 165, 233, 0.08);
+        transform: translateX(4px);
+    }
+
+    div[data-testid="stCheckbox"] label p {
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.03em;
+        transition: color 0.2s ease;
+    }
+
+    div[data-testid="stCheckbox"]:hover label p {
+        color: #38bdf8 !important;
     }
 
     /* Live Pulsing Status Cards */
@@ -249,6 +314,11 @@ st.markdown("""
         padding: 1.2rem;
         margin-bottom: 1.2rem;
         animation: statusGlowGreen 3s infinite ease-in-out;
+        transition: transform 0.3s ease;
+    }
+
+    .quest-active:hover {
+        transform: scale(1.01);
     }
 
     .quest-paused {
@@ -258,6 +328,11 @@ st.markdown("""
         padding: 1.2rem;
         margin-bottom: 1.2rem;
         animation: statusGlowAmber 3s infinite ease-in-out;
+        transition: transform 0.3s ease;
+    }
+
+    .quest-paused:hover {
+        transform: scale(1.01);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -291,7 +366,6 @@ st.markdown('<div class="animated-banner-box">', unsafe_allow_html=True)
 if banner_file:
     st.image(banner_file, use_container_width=True)
 else:
-    # High-intensity SVG fallback banner with live laser scan
     st.markdown("""
         <div style="
             width: 100%;
@@ -310,22 +384,23 @@ else:
     """, unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-st.markdown('<div class="system-badge">[ SYSTEM ALERT: MISSION ACTIVE ]</div>', unsafe_allow_html=True)
-st.markdown('<div class="system-title">QUEST: MESS CONQUER</div>', unsafe_allow_html=True)
+st.markdown('<div class="system-badge">[ SYSTEM ALERT: AUTOMATION ENGINE ARMED ]</div>', unsafe_allow_html=True)
+st.markdown('<div class="system-title">MESS CONQUERS</div>', unsafe_allow_html=True)
 st.markdown('<div class="system-subtitle">Target Execution Window: 18:00:00 IST Sharp</div>', unsafe_allow_html=True)
 
-tab_manage, tab_register = st.tabs(["[ CURRENT HUNTER STATUS ]", "[ STAT ALLOCATION & SETUP ]"])
+# Functional, work-aligned tab labels
+tab_manage, tab_register = st.tabs(["[ ⚡ SERVICE STATUS & VACATION MODE ]", "[ 🛠️ ACCOUNT SETUP & MEAL PREFERENCES ]"])
 
 # ==========================================
-# TAB 1: HUNTER STATUS (PAUSE / RESUME)
+# TAB 1: SERVICE STATUS & VACATION MODE
 # ==========================================
 with tab_manage:
-    st.markdown("##### 📍 HUNTER IDENTIFICATION")
-    st.caption("Input your SpaceBasic identifier to inspect automated reservation status.")
+    st.markdown("##### 📍 MANAGE BOOKING AUTOPILOT")
+    st.caption("Check your booking service state or pause requests during trips and holidays.")
 
     search_email = st.text_input(
-        "REGISTERED IDENTIFIER (EMAIL)",
-        placeholder="hunter@system.com",
+        "REGISTERED SPACEBASIC EMAIL",
+        placeholder="student@example.com",
         key="status_email_box"
     ).strip().lower()
 
@@ -335,7 +410,7 @@ with tab_manage:
             
             if res.data and len(res.data) > 0:
                 user_record = res.data[0]
-                user_name = user_record.get("name", "Hunter").upper()
+                user_name = user_record.get("name", "Student").upper()
                 is_active = user_record.get("is_active", True)
 
                 st.write("")
@@ -343,59 +418,59 @@ with tab_manage:
                     st.markdown(f"""
                     <div class="quest-active">
                         <div style="font-family: 'Orbitron'; font-size: 1rem; font-weight: 700; color: #6ee7b7; letter-spacing: 0.1em;">
-                            STATUS: AWAKENED • {user_name}
+                            STATUS: RUNNING • {user_name}
                         </div>
                         <p style="margin: 8px 0 0 0; color: #a7f3d0; font-size: 0.95rem;">
-                            Autopilot routine engaged. Daily ration claim will fire at <b>18:00:00 IST</b>.
+                            Autopilot is active. Tomorrow's meals will be booked automatically at <b>18:00:00 IST</b>.
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
 
-                    if st.button("REST MODE: RETURN TO SAFE ZONE (PAUSE)"):
+                    if st.button("✈️ HEADING HOME: PAUSE AUTO-BOOKING"):
                         supabase.table("users").update({"is_active": False}).eq("email", search_email).execute()
                         st.rerun()
                 else:
                     st.markdown(f"""
                     <div class="quest-paused">
                         <div style="font-family: 'Orbitron'; font-size: 1rem; font-weight: 700; color: #fcd34d; letter-spacing: 0.1em;">
-                            STATUS: DORMANT • {user_name}
+                            STATUS: PAUSED • {user_name}
                         </div>
                         <p style="margin: 8px 0 0 0; color: #fde68a; font-size: 0.95rem;">
-                            Hunter is in rest mode. System execution routines will bypass this identifier.
+                            Auto-booking is paused. The daily runner will bypass this account.
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
 
-                    if st.button("AWAKEN: RE-ENTER DUNGEON (RESUME AUTOPILOT)"):
+                    if st.button("🎒 BACK ON CAMPUS: RESUME AUTO-BOOKING"):
                         supabase.table("users").update({"is_active": True}).eq("email", search_email).execute()
                         st.rerun()
             else:
-                st.info("No registered hunter profile found with this identifier. Allocate your stats in the next tab.")
+                st.info("No registered account found with this email. Switch to **Account Setup & Meal Preferences** to register.")
         except Exception as e:
             st.error(f"System scan error: {e}")
 
 # ==========================================
-# TAB 2: ALLOCATION & PROFILE SETUP
+# TAB 2: ACCOUNT SETUP & MEAL PREFERENCES
 # ==========================================
 with tab_register:
-    st.markdown("##### ⚙️ HUNTER REGISTRATION & RATION RULES")
-    st.caption("All raw credentials are encrypted via Fernet AES-128 before storage in database core.")
+    st.markdown("##### ⚙️ CREDENTIALS & AUTOMATED BOOKING RULES")
+    st.caption("Passwords are encrypted via Fernet AES-128 before syncing to Supabase.")
     
     with st.form("account_form"):
         col1, col2 = st.columns(2)
         with col1:
-            name_input = st.text_input("HUNTER CODENAME", placeholder="Sung Jin-Woo")
-            email_input = st.text_input("SPACEBASIC IDENTIFIER (EMAIL)", placeholder="hunter@domain.com")
+            name_input = st.text_input("FULL NAME", placeholder="Alex Kumar")
+            email_input = st.text_input("SPACEBASIC EMAIL", placeholder="student@example.com")
         with col2:
-            tenant_id = st.text_input("GATE TENANT ID", value="143")
+            tenant_id = st.text_input("TENANT ID", value="143")
             password_input = st.text_input(
-                "DUNGEON PASSKEY (PASSWORD)",
+                "SPACEBASIC PASSWORD",
                 placeholder="••••••••",
                 type="password"
             )
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("##### 🥩 RATION TYPE PRIORITY")
+        st.markdown("##### 🍱 MEAL PRIORITY HIERARCHY")
         col_p1, col_p2 = st.columns(2)
         with col_p1:
             lunch_pref = st.selectbox("LUNCH PRIORITY ORDER", ["Non Veg", "Egg", "Veg"], index=0)
@@ -403,8 +478,8 @@ with tab_register:
             dinner_pref = st.selectbox("DINNER PRIORITY ORDER", ["Non Veg", "Egg", "Veg"], index=0)
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("##### 🛡️ REST DAYS (SKIP AUTO-CLAIM)")
-        st.caption("Select scheduled days to bypass meal claims automatically:")
+        st.markdown("##### 🚫 RECURRING WEEKLY SKIPS")
+        st.caption("Select meals you want the automation script to bypass automatically:")
 
         days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
         skip_config = {}
@@ -425,11 +500,11 @@ with tab_register:
                 skip_config[day] = day_skips_list
 
         st.markdown("<br>", unsafe_allow_html=True)
-        submit = st.form_submit_button("ACCEPT SYSTEM CONTRACT")
+        submit = st.form_submit_button("🚀 SAVE PREFERENCES & ACTIVATE")
 
     if submit:
         if not name_input or not email_input or not password_input:
-            st.error("Parameters incomplete: Hunter Codename, Identifier, and Dungeon Passkey required.")
+            st.error("Missing required inputs: Full Name, SpaceBasic Email, and Password required.")
         else:
             try:
                 encrypted_password = encrypt_value(password_input)
@@ -446,6 +521,6 @@ with tab_register:
                 }
 
                 supabase.table("users").upsert(payload, on_conflict="email").execute()
-                st.success("SYSTEM UPDATE: Hunter status synchronized. Contract locked for 18:00:00 IST execution.")
+                st.success("CONFIGURATION SAVED: Your account is synchronized and armed for 18:00:00 IST execution.")
             except Exception as err:
                 st.error(f"System synchronization failure: {err}")
