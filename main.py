@@ -1,5 +1,4 @@
 import os
-import time
 import requests
 import pytz
 from datetime import datetime, timedelta
@@ -45,13 +44,9 @@ def login_spacebasic(email, raw_password):
         if res.status_code in [200, 201]:
             data = res.json()
             token = data.get("accessToken") or data.get("jwt")
-            # Extract user ID from response or from JWT payload fallback
-            user_id = None
-            if "session_id" in data:
-                # The auth response returns uid inside accounts or JWT
-                user_id = str(data.get("studentRoomSelectionId") or "")
+            user_id = str(data.get("studentRoomSelectionId") or "")
             
-            # Extract directly from JWT token payload without external libraries
+            # Extract directly from JWT token payload if missing
             if token and (not user_id or user_id == "0"):
                 import base64, json
                 try:
@@ -146,6 +141,7 @@ def process_user(user):
     email = user.get("email")
     encrypted_pw = user.get("password")
     tenant_id = str(user.get("tenant_id") or "143")
+    is_active = user.get("is_active", True)
     skip_days = user.get("skip_days", {})
     lunch_pref = user.get("lunch_preference", "Non Veg")
     dinner_pref = user.get("dinner_preference", "Non Veg")
@@ -153,6 +149,11 @@ def process_user(user):
     print(f"\n==========================================")
     print(f"👤 Processing User: {name} ({email})")
     print(f"==========================================")
+
+    # 1. Check if user paused auto-booking
+    if not is_active:
+        print(f"⏸️ Auto-booking is PAUSED by user. Skipping all operations for {name}.")
+        return True
 
     if not email or not encrypted_pw:
         print(f"⚠️ Missing email or password for {name}.")
@@ -162,7 +163,7 @@ def process_user(user):
         print(f"⏭️ Skipping all bookings for {name} tomorrow based on skip schedule.")
         return True
 
-    # 1. Decrypt password and perform automatic login
+    # 2. Decrypt password and perform automatic login
     raw_password = decrypt_value(encrypted_pw)
     print(f"🔑 Authenticating with SpaceBasic API...")
     token, user_id = login_spacebasic(email, raw_password)
@@ -173,7 +174,7 @@ def process_user(user):
 
     print(f"✅ Logged in successfully! SpaceBasic User ID: {user_id}")
 
-    # 2. Build authenticated booking headers
+    # 3. Query tomorrow's menu
     headers = {
         "Authorization": f"Bearer {token}",
         "User-ID": user_id,
