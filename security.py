@@ -3,10 +3,10 @@ import streamlit as st
 from cryptography.fernet import Fernet
 
 def get_secret_key() -> str:
-    # Check environment variables
+    # 1. Check OS Environment Variables (Local PC or GitHub Actions)
     key = os.getenv("SECRET_KEY") or os.getenv("ENCRYPTION_KEY")
     
-    # Check Streamlit secrets
+    # 2. Check Streamlit Secrets (Streamlit Cloud deployment)
     if not key:
         try:
             key = st.secrets.get("SECRET_KEY") or st.secrets.get("ENCRYPTION_KEY")
@@ -14,7 +14,7 @@ def get_secret_key() -> str:
             key = None
             
     if not key:
-        raise ValueError("SECRET_KEY is missing from environment or Streamlit secrets.")
+        raise ValueError("SECRET_KEY or ENCRYPTION_KEY is missing from environment or Streamlit secrets.")
     return key.strip()
 
 def encrypt_value(raw_value: str) -> str:
