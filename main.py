@@ -1,280 +1,136 @@
 import os
-import time
-import requests
-import pytz
-from datetime import datetime, timedelta
+import streamlit as st
 from supabase import create_client, Client
-from security import decrypt_value
+from security import encrypt_value
 
 # ==========================================
-# ENVIRONMENT VARIABLES & CONFIGURATION
+# PAGE CONFIGURATION & THEME
 # ==========================================
-SPACEBASIC_PUBLISHABLE_KEY = "sb_publishable_vw0I2KilIjFmtr1mm3Wl0A_sbbtaF1_"
-SUPABASE_URL = os.getenv("SUPABASE_URL", "https://ywljhdtygqzgvzrnognn.supabase.co")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+st.set_page_config(
+    page_title="SpaceBasic Mess Autopilot",
+    page_icon="🍱",
+    layout="centered"
+)
 
-if not SUPABASE_KEY:
-    print("❌ Error: SUPABASE_KEY environment variable is missing!")
-    exit(1)
-
-SPACEBASIC_BOOKING_URL = "https://api.spacebasic.com/api/v3/messmanager/rsvpmeal"
-SPACEBASIC_MENU_URL = "https://api.spacebasic.com/api/v3/messmanager/mealsmenu"
+st.markdown("""
+<style>
+    .stApp {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        color: #f8fafc;
+    }
+    div[data-testid="stForm"] {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 2rem;
+    }
+    .stButton>button {
+        background: linear-gradient(90deg, #6366f1 0%, #a855f7 100%);
+        color: white;
+        font-weight: 600;
+        border: none;
+        border-radius: 8px;
+        padding: 0.6rem 1.2rem;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+    .stButton>button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # ==========================================
-# SUPABASE UTILITIES
+# SUPABASE INITIALIZATION
 # ==========================================
-def get_supabase_client() -> Client:
-    """Creates a fresh Supabase client instance."""
+SUPABASE_URL = st.secrets.get("SUPABASE_URL") or os.getenv("SUPABASE_URL")
+SUPABASE_KEY = st.secrets.get("SUPABASE_KEY") or os.getenv("SUPABASE_KEY")
+
+if not SUPABASE_URL or not SUPABASE_KEY:
+    st.error("🔒 Configuration Error: SUPABASE_URL and SUPABASE_KEY must be configured in secrets!")
+    st.stop()
+
+@st.cache_resource
+def init_supabase() -> Client:
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
-def get_active_users(max_retries=3, delay=5):
-    """Fetches user records from Supabase with retry logic."""
-    for attempt in range(1, max_retries + 1):
-        try:
-            print(f"🔄 Connecting to Supabase (Attempt {attempt}/{max_retries})...")
-            supabase = get_supabase_client()
-            response = supabase.table("users").select("*").execute()
-            if response.data:
-                print(f"✅ Successfully retrieved {len(response.data)} user record(s).")
-                return response.data
-            else:
-                print("⚠️ Query succeeded, but no user records were found in database.")
-                return []
-        except Exception as e:
-            print(f"❌ Attempt {attempt} failed fetching users: {e}")
-            if attempt < max_retries:
-                time.sleep(delay)
-    return []
+supabase = init_supabase()
+
+st.title("🍱 SpaceBasic Mess Autopilot")
+st.caption("Automatic Session Generation: No manual Bearer tokens or User IDs required.")
+
+st.markdown("---")
 
 # ==========================================
-# HELPER & SKIP FILTER FUNCTIONS
+# REGISTRATION FORM
 # ==========================================
-def should_skip_tomorrow(skip_days):
-    """Checks if TOMORROW in IST is set for a full day skip."""
-    if not isinstance(skip_days, dict):
-        return False
-        
-    ist = pytz.timezone("Asia/Kolkata")
-    tomorrow_name = (datetime.now(ist) + timedelta(days=1)).strftime("%A").lower()
+with st.form("account_form"):
+    st.subheader("👤 SpaceBasic Account Login")
     
-    day_skips = skip_days.get(tomorrow_name, [])
-    
-    if day_skips is True:
-        return True
-        
-    if isinstance(day_skips, list):
-        skips_lower = [str(item).lower() for item in day_skips]
-        if "breakfast" in skips_lower and "lunch" in skips_lower and "dinner" in skips_lower:
-            return True
-            
-    return False
+    col1, col2 = st.columns(2)
+    with col1:
+        name_input = st.text_input("Full Name", placeholder="e.g. Alex Kumar")
+        email_input = st.text_input("SpaceBasic Registered Email", placeholder="student@example.com")
+    with col2:
+        tenant_id = st.text_input("Tenant ID", value="143")
+        password_input = st.text_input(
+            "SpaceBasic Password",
+            placeholder="••••••••",
+            type="password",
+            help="Your password is encrypted with AES-128 before saving."
+        )
 
-def is_meal_skipped_tomorrow(skip_days, meal_type):
-    """Checks if a specific meal type is set to skip for tomorrow."""
-    if not isinstance(skip_days, dict):
-        return False
-        
-    ist = pytz.timezone("Asia/Kolkata")
-    tomorrow_name = (datetime.now(ist) + timedelta(days=1)).strftime("%A").lower()
-    
-    day_skips = skip_days.get(tomorrow_name, [])
-    
-    if day_skips is True:
-        return True
-        
-    if isinstance(day_skips, list):
-        skips_lower = [str(item).lower() for item in day_skips]
-        if meal_type.lower() in skips_lower:
-            return True
-            
-    return False
+    st.markdown("---")
+    st.subheader("🥗 Dietary Preferences")
+    col_pref1, col_pref2 = st.columns(2)
+    with col_pref1:
+        lunch_pref = st.selectbox("Lunch Preference", ["Non Veg", "Egg", "Veg"], index=0)
+    with col_pref2:
+        dinner_pref = st.selectbox("Dinner Preference", ["Non Veg", "Egg", "Veg"], index=0)
 
-def extract_all_meals_from_data(data):
-    """Parses SpaceBasic menu response array and extracts all bookable meal items."""
-    meals_to_book = []
-    if isinstance(data, dict):
-        result = data.get("result", {})
-        meals = result.get("meals", []) if isinstance(result, dict) else []
-        for meal in meals:
-            if str(meal.get("allowBooking")) == "1":
-                meal_id = meal.get("mealId")
-                meal_name = meal.get("mealName", "Unknown Meal")
-                if meal_id:
-                    meals_to_book.append({"id": meal_id, "name": meal_name})
-    return meals_to_book
+    st.markdown("---")
+    st.subheader("📅 Skip Days Schedule")
+    days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+    
+    skip_config = {}
+    for day in days:
+        st.write(f"**{day.capitalize()}**")
+        c1, c2, c3 = st.columns(3)
+        b_skip = c1.checkbox("Skip Breakfast", key=f"{day}_b")
+        l_skip = c2.checkbox("Skip Lunch", key=f"{day}_l")
+        d_skip = c3.checkbox("Skip Dinner", key=f"{day}_d")
+        
+        day_skips_list = []
+        if b_skip: day_skips_list.append("breakfast")
+        if l_skip: day_skips_list.append("lunch")
+        if d_skip: day_skips_list.append("dinner")
+        
+        if day_skips_list:
+            skip_config[day] = day_skips_list
 
-def filter_by_preference(meal_list, preference):
-    """Filters a list of meal options based on dietary preference chain."""
-    pref = str(preference).lower()
-    if "non" in pref:
-        for meal in meal_list:
-            if "non" in meal["name"].lower(): return meal
-        for meal in meal_list:
-            if "egg" in meal["name"].lower(): return meal
-        for meal in meal_list:
-            if "veg" in meal["name"].lower(): return meal
-    elif "egg" in pref:
-        for meal in meal_list:
-            if "egg" in meal["name"].lower(): return meal
-        for meal in meal_list:
-            if "veg" in meal["name"].lower(): return meal
+    submit = st.form_submit_button("🔒 Save Account & Enable Autopilot")
+
+if submit:
+    if not name_input or not email_input or not password_input:
+        st.error("Please fill in Name, Email, and Password.")
     else:
-        for meal in meal_list:
-            if "veg" in meal["name"].lower() and "non" not in meal["name"].lower(): return meal
-    return meal_list[0] if meal_list else None
+        try:
+            # Encrypt password before sending to database
+            encrypted_password = encrypt_value(password_input)
 
-def select_preferred_meals(meals, lunch_pref, dinner_pref, skip_days):
-    """Selects preferred meals while omitting any explicitly skipped meal types for tomorrow."""
-    categorized = {"breakfast": [], "lunch": [], "dinner": []}
-    for meal in meals:
-        name = meal["name"].lower()
-        if "breakfast" in name:
-            categorized["breakfast"].append(meal)
-        elif "lunch" in name:
-            categorized["lunch"].append(meal)
-        elif "dinner" in name:
-            categorized["dinner"].append(meal)
-            
-    selected_meals = []
+            payload = {
+                "name": name_input.strip(),
+                "email": email_input.strip().lower(),
+                "password": encrypted_password,
+                "tenant_id": str(tenant_id).strip(),
+                "lunch_preference": lunch_pref,
+                "dinner_preference": dinner_pref,
+                "skip_days": skip_config
+            }
 
-    # 1. Breakfast check
-    if categorized["breakfast"]:
-        if is_meal_skipped_tomorrow(skip_days, "breakfast"):
-            print("  └─ ⏭️ Skipping Breakfast based on user schedule for tomorrow.")
-        else:
-            selected_meals.append(categorized["breakfast"][0])
-
-    # 2. Lunch check
-    if categorized["lunch"]:
-        if is_meal_skipped_tomorrow(skip_days, "lunch"):
-            print("  └─ ⏭️ Skipping Lunch based on user schedule for tomorrow.")
-        else:
-            sel = filter_by_preference(categorized["lunch"], lunch_pref)
-            if sel: selected_meals.append(sel)
-
-    # 3. Dinner check
-    if categorized["dinner"]:
-        if is_meal_skipped_tomorrow(skip_days, "dinner"):
-            print("  └─ ⏭️ Skipping Dinner based on user schedule for tomorrow.")
-        else:
-            sel = filter_by_preference(categorized["dinner"], dinner_pref)
-            if sel: selected_meals.append(sel)
-
-    return selected_meals
-
-# ==========================================
-# BOOKING PROCESSING LOGIC
-# ==========================================
-def process_user_booking(user, max_retries=3, delay=3):
-    name = user.get("name", "Unknown")
-    user_id = str(user.get("user_id") or user.get("userid") or "")
-    tenant_id = str(user.get("tenant_id") or "143")
-    raw_token = decrypt_value(user.get("token") or user.get("auth_token") or "")
-
-    skip_days = user.get("skip_days", {})
-    lunch_pref = user.get("lunch_preference", "Non Veg")
-    dinner_pref = user.get("dinner_preference", "Non Veg")
-
-    print(f"\n==========================================")
-    print(f"👤 Processing User: {name} (ID: {user_id or 'Missing'})")
-    print(f"==========================================")
-
-    if not user_id or user_id == "None" or not raw_token or len(raw_token) < 10:
-        print(f"⚠️ Skipping {name}: Invalid credentials or decryption failed.")
-        return False
-
-    if should_skip_tomorrow(skip_days):
-        print(f"⏭️ Skipping all bookings for {name} tomorrow based on 'skip_days' configuration.")
-        return True
-
-    token_header = raw_token if raw_token.startswith("Bearer ") else f"Bearer {raw_token}"
-    headers = {
-        "Authorization": token_header,
-        "User-ID": user_id,
-        "x-publishable-key": SPACEBASIC_PUBLISHABLE_KEY,
-        "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-    }
-
-    ist = pytz.timezone("Asia/Kolkata")
-    tomorrow_date = (datetime.now(ist) + timedelta(days=1)).strftime("%Y-%m-%d")
-    url = f"{SPACEBASIC_MENU_URL}?userId={user_id}&tenantId={tenant_id}&mealDate={tomorrow_date}"
-
-    try:
-        response = requests.get(url, headers=headers, timeout=10)
-        if response.status_code == 200:
-            all_meals = extract_all_meals_from_data(response.json())
-            if not all_meals:
-                print(f"⚠️ No bookable meals found for {name} on {tomorrow_date}.")
-                return False
-
-            # Filter meals based on preferences and skip schedule
-            target_meals = select_preferred_meals(all_meals, lunch_pref, dinner_pref, skip_days)
-            
-            if not target_meals:
-                print(f"⏭️ All available meals for {name} on {tomorrow_date} are marked as skipped.")
-                return True
-
-            print(f"💡 Selected {len(target_meals)} meal(s) for tomorrow.")
-
-            all_success = True
-            for meal in target_meals:
-                meal_id = meal["id"]
-                meal_name = meal["name"]
-                
-                payload = {
-                    "mealId": int(meal_id),
-                    "userId": user_id,
-                    "status": "1",
-                    "createdBy": user_id,
-                    "isSpecial": 0
-                }
-
-                print(f"🚀 Booking '{meal_name}' (Meal ID: {meal_id}) for {name}...")
-                res = requests.post(SPACEBASIC_BOOKING_URL, json=payload, headers=headers, timeout=15)
-                
-                if res.status_code in [200, 201]:
-                    print(f"  └─ 🎉 {meal_name} RSVP confirmed!")
-                else:
-                    print(f"  └─ ⚠️ Failed to book {meal_name}: HTTP {res.status_code}")
-                    all_success = False
-
-            return all_success
-        else:
-            print(f"⚠️ Failed to fetch menu: HTTP {response.status_code}")
-    except Exception as e:
-        print(f"❌ Error processing booking for {name}: {e}")
-
-    return False
-
-# ==========================================
-# MAIN EXECUTION
-# ==========================================
-def main():
-    print("=" * 50)
-    print("🤖 STARTING AUTOMATED MESS BOOKING PROCESS")
-    print("=" * 50)
-
-    users = get_active_users()
-    if not users:
-        print("🛑 Execution stopped: No active users retrieved from Supabase.")
-        return
-
-    print(f"📋 Found {len(users)} user(s) in Supabase to process.")
-    
-    success_count = 0
-    failure_count = 0
-
-    for user in users:
-        is_success = process_user_booking(user)
-        if is_success:
-            success_count += 1
-        else:
-            failure_count += 1
-
-    print("\n" + "=" * 50)
-    print(f"📊 SUMMARY: {success_count} Succeeded | {failure_count} Failed/Skipped")
-    print("=" * 50)
-
-if __name__ == "__main__":
-    main()
+            supabase.table("users").insert(payload).execute()
+            st.success("🎉 Account saved! The system will log in and book meals automatically.")
+        except Exception as err:
+            st.error(f"❌ Failed to save account: {err}")
