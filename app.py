@@ -39,7 +39,7 @@ THEMES = {
         "tab1_header": "📍 GUILD TELEMETRY & STATUS RADAR",
         "tab1_caption": "Inspect active automated quest extraction or enter rest mode during campus leave.",
         "tab2_header": "⚙️ HUNTER GUILD CONTRACT SETUP",
-        "tab2_caption": "All credentials and session tokens are encrypted using AES-128 before storage.",
+        "tab2_caption": "All passwords are encrypted using AES-128 before database storage.",
         "particle_color": "56, 189, 248",
         "banner_tag": "SUNG JIN-WOO",
         "banner_sub": "[ SHADOW MONARCH • SYSTEM INTERFACE ]"
@@ -299,7 +299,7 @@ THEMES = {
         "tab1_header": "📍 BOOKING STATUS & SERVICE OVERVIEW",
         "tab1_caption": "Check your automated booking status or pause the service during holidays.",
         "tab2_header": "⚙️ STUDENT CREDENTIALS & MEAL PREFERENCES",
-        "tab2_caption": "Passwords and tokens are encrypted using AES-128 before syncing to Supabase.",
+        "tab2_caption": "Passwords are encrypted using AES-128 before syncing to Supabase.",
         "particle_color": "129, 140, 248",
         "banner_tag": "AUTOMATION CONSOLE",
         "banner_sub": "[ HIGH-AVAILABILITY MEAL BOOKER ]"
@@ -417,7 +417,6 @@ st.markdown(f"""
         color: {cfg['text_primary']};
     }}
 
-    /* High-contrast crisp title */
     .system-title {{
         font-family: {cfg['font_family']};
         font-size: 2.2rem;
@@ -453,7 +452,6 @@ st.markdown(f"""
         margin-bottom: 1.4rem;
     }}
 
-    /* Solid panels with crisp borders instead of muddy blurs */
     div[data-testid="stForm"], .system-panel {{
         background-color: {cfg['panel_bg']} !important;
         border: 1.5px solid {cfg['border_color']} !important;
@@ -462,8 +460,7 @@ st.markdown(f"""
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7) !important;
     }}
 
-    /* Text inputs & textareas */
-    .stTextInput input, .stTextArea textarea, .stSelectbox select {{
+    .stTextInput input, .stSelectbox select {{
         background-color: {cfg['input_bg']} !important;
         border: 1.5px solid {cfg['border_color']} !important;
         color: #ffffff !important;
@@ -472,12 +469,11 @@ st.markdown(f"""
         border-radius: 6px !important;
     }}
 
-    .stTextInput input:focus, .stTextArea textarea:focus {{
+    .stTextInput input:focus {{
         border-color: {cfg['primary']} !important;
         box-shadow: 0 0 8px {cfg['primary']} !important;
     }}
 
-    /* Labels styling */
     div[data-testid="stWidgetLabel"] label p {{
         font-size: 0.95rem !important;
         font-weight: 700 !important;
@@ -486,7 +482,6 @@ st.markdown(f"""
         text-transform: uppercase !important;
     }}
 
-    /* Solid buttons */
     .stButton>button {{
         font-family: {cfg['font_family']} !important;
         background-color: {cfg['secondary']} !important;
@@ -504,7 +499,6 @@ st.markdown(f"""
         transform: translateY(-2px);
     }}
 
-    /* Tabs styling */
     .stTabs [data-baseweb="tab-list"] {{
         background: {cfg['panel_bg']};
         border: 1px solid {cfg['border_color']};
@@ -527,14 +521,15 @@ st.markdown(f"""
         border: 1px solid {cfg['primary']} !important;
     }}
 
-    /* Instructions callout box */
-    .token-guide-box {{
+    .guide-box {{
         background-color: {cfg['input_bg']};
         border-left: 4px solid {cfg['primary']};
-        padding: 14px 18px;
+        padding: 12px 16px;
         border-radius: 4px;
-        margin-top: 10px;
-        margin-bottom: 18px;
+        margin-top: 8px;
+        margin-bottom: 16px;
+        color: {cfg['text_secondary']};
+        font-size: 0.95rem;
     }}
 
     .status-card-active {{
@@ -581,7 +576,7 @@ if top_col2.button("🔄 Swap Realm"):
     st.rerun()
 
 # ==========================================
-# CRISP SOLID BANNER
+# SOLID BANNER
 # ==========================================
 st.markdown(f"""
 <div class="solid-banner-box">
@@ -606,21 +601,20 @@ with tab_status:
     st.markdown(f"##### {cfg['tab1_header']}")
     st.caption(cfg["tab1_caption"])
 
-    search_email = st.text_input(
-        "REGISTERED SPACEBASIC EMAIL OR PHONE NUMBER",
+    search_id = st.text_input(
+        "REGISTERED SPACEBASIC LOGIN IDENTIFIER (EMAIL OR PHONE)",
         placeholder="student@example.com or 9876543210",
         key="status_lookup_box"
     ).strip().lower()
 
-    if search_email:
+    if search_id:
         try:
-            res = supabase.table("users").select("*").eq("email", search_email).execute()
+            res = supabase.table("users").select("*").eq("email", search_id).execute()
             
             if res.data and len(res.data) > 0:
                 user_rec = res.data[0]
                 user_name = user_rec.get("name", cfg["role_title"]).upper()
                 is_active = user_rec.get("is_active", True)
-                auth_type_stored = user_rec.get("auth_type", "password").upper()
 
                 st.write("")
                 if is_active:
@@ -630,14 +624,13 @@ with tab_status:
                             STATUS: ACTIVE • {cfg['role_title']} {user_name}
                         </div>
                         <p style="margin: 8px 0 0 0; color: #a7f3d0; font-size: 1rem;">
-                            Autopilot routine engaged. Daily meal booking triggers at <b>17:30:00 IST (5:30 PM)</b>.<br>
-                            <span style="font-size: 0.85rem; opacity: 0.9;">AUTHENTICATION PROTOCOL: {auth_type_stored}</span>
+                            Autopilot routine engaged. Daily meal booking triggers at <b>17:30:00 IST (5:30 PM)</b>.
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
 
                     if st.button("🏖️ ENTER REST MODE (PAUSE BOOKINGS)"):
-                        supabase.table("users").update({"is_active": False}).eq("email", search_email).execute()
+                        supabase.table("users").update({"is_active": False}).eq("email", search_id).execute()
                         st.rerun()
                 else:
                     st.markdown(f"""
@@ -652,7 +645,7 @@ with tab_status:
                     """, unsafe_allow_html=True)
 
                     if st.button("⚔️ RESUME AUTOPILOT"):
-                        supabase.table("users").update({"is_active": True}).eq("email", search_email).execute()
+                        supabase.table("users").update({"is_active": True}).eq("email", search_id).execute()
                         st.rerun()
             else:
                 st.info("No registered profile located with this identifier. Inscribe your details in Tab 2.")
@@ -667,13 +660,13 @@ with tab_config:
     st.caption(cfg["tab2_caption"])
     
     with st.form("universe_contract_form"):
-        st.markdown("#### 1. HOW DO YOU NORMALLY LOG INTO SPACEBASIC?")
+        st.markdown("#### 1. HOW DO YOU LOG INTO SPACEBASIC?")
         
         login_method = st.radio(
-            "SELECT YOUR LOGIN METHOD",
+            "SELECT YOUR LOGIN IDENTIFIER TYPE",
             [
                 "Option A: SpaceBasic Email & Password",
-                "Option B: Phone Number & OTP (No password)"
+                "Option B: Phone Number & Password"
             ],
             index=0
         )
@@ -683,17 +676,15 @@ with tab_config:
 
         col1, col2 = st.columns(2)
         with col1:
-            name_input = st.text_input(f"{cfg['role_title']} FULL NAME", placeholder="Your Name")
+            name_input = st.text_input(f"{cfg['role_title']} FULL NAME", placeholder="Your Full Name")
         with col2:
             tenant_id = st.text_input("SPACEBASIC TENANT ID", value="143")
 
-        # Distinct input paths for Email users vs Phone users
         if "Option A" in login_method:
             st.markdown(f"""
-            <div class="token-guide-box">
-                <b style="color: {cfg['primary']};">EMAIL + PASSWORD PATH:</b><br>
-                Enter the email address and password you use to log into SpaceBasic directly. 
-                The system uses these credentials to log in automatically at 5:30 PM.
+            <div class="guide-box">
+                <b style="color: {cfg['primary']};">EMAIL + PASSWORD LOGIN:</b><br>
+                Enter your registered SpaceBasic email and your account password.
             </div>
             """, unsafe_allow_html=True)
 
@@ -701,32 +692,22 @@ with tab_config:
             with col_a1:
                 identifier_input = st.text_input("SPACEBASIC EMAIL ADDRESS", placeholder="student@example.com")
             with col_a2:
-                secret_input = st.text_input("SPACEBASIC PASSWORD", placeholder="••••••••", type="password")
+                password_input = st.text_input("SPACEBASIC PASSWORD", placeholder="••••••••", type="password")
 
         else:
             st.markdown(f"""
-            <div class="token-guide-box">
-                <b style="color: {cfg['primary']};">PHONE NUMBER + OTP PATH:</b><br>
-                Since background runners cannot receive SMS OTPs at 5:30 PM, you must provide your <b>Authorization Session Token</b> once.<br><br>
-                <b>Steps to get your Authorization Token:</b><br>
-                1. Open Chrome/Brave/Edge on your laptop and go to your university SpaceBasic web portal.<br>
-                2. Press <code>F12</code> (or right-click $\\rightarrow$ Inspect) and open the <b>Network</b> tab.<br>
-                3. Log in with your Phone Number + OTP.<br>
-                4. In the Network tab list, click any request (e.g., <code>profile</code>, <code>dashboard</code>, or <code>book</code>).<br>
-                5. Under <b>Request Headers</b>, find <code>Authorization</code> and copy the entire string (e.g., <code>Bearer eyJhbG...</code>).
+            <div class="guide-box">
+                <b style="color: {cfg['primary']};">PHONE NUMBER + PASSWORD LOGIN:</b><br>
+                If you normally use OTP or mobile login, enter your registered 10-digit phone number and your SpaceBasic account password.<br>
+                <i>(Note: If you don't remember your password, you can set/reset it via "Forgot Password" on the SpaceBasic portal.)</i>
             </div>
             """, unsafe_allow_html=True)
 
-            identifier_input = st.text_input(
-                "REGISTERED 10-DIGIT MOBILE NUMBER",
-                placeholder="9876543210",
-                help="Enter the phone number registered on SpaceBasic."
-            )
-            secret_input = st.text_area(
-                "SPACEBASIC AUTHORIZATION / BEARER TOKEN",
-                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                help="Paste the full token or Bearer string copied from Developer Tools."
-            )
+            col_b1, col_b2 = st.columns(2)
+            with col_b1:
+                identifier_input = st.text_input("REGISTERED 10-DIGIT MOBILE NUMBER", placeholder="9876543210")
+            with col_b2:
+                password_input = st.text_input("SPACEBASIC PASSWORD", placeholder="••••••••", type="password")
 
         st.markdown("<hr style='border: 0.5px solid #334155; margin: 1.2rem 0;'>", unsafe_allow_html=True)
         st.markdown("#### 3. MEAL PREFERENCES & RECURRING SKIPS")
@@ -762,32 +743,24 @@ with tab_config:
         submit = st.form_submit_button(f"⚔️ LOCK {cfg['role_title']} CONTRACT & ACTIVATE")
 
     if submit:
-        if not name_input or not identifier_input or not secret_input:
-            st.error("Parameters incomplete: Please provide your Name, Email/Phone Number, and Password or Session Token.")
+        if not name_input or not identifier_input or not password_input:
+            st.error("Parameters incomplete: Please enter Name, Login Identifier (Email or Phone), and Password.")
         else:
             try:
-                cleaned_secret = secret_input.strip().replace("Bearer ", "")
-                encrypted_secret = encrypt_value(cleaned_secret)
-
-                is_token_user = "Option B" in login_method
+                encrypted_password = encrypt_value(password_input.strip())
 
                 payload = {
                     "name": name_input.strip(),
                     "email": identifier_input.strip().lower(),
+                    "password": encrypted_password,
                     "tenant_id": str(tenant_id).strip(),
-                    "auth_type": "token" if is_token_user else "password",
+                    "auth_type": "password",
+                    "auth_token": None,
                     "lunch_preference": lunch_pref,
                     "dinner_preference": dinner_pref,
                     "skip_days": skip_config,
                     "is_active": True
                 }
-
-                if is_token_user:
-                    payload["auth_token"] = encrypted_secret
-                    payload["password"] = None
-                else:
-                    payload["password"] = encrypted_secret
-                    payload["auth_token"] = None
 
                 supabase.table("users").upsert(payload, on_conflict="email").execute()
                 st.success("CONTRACT LOCKED: Credentials encrypted and armed for 17:30:00 IST execution.")
