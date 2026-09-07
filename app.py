@@ -4,7 +4,7 @@ from supabase import create_client, Client
 from security import encrypt_value
 
 # ==========================================
-# PAGE CONFIGURATION & STYLING
+# PAGE CONFIGURATION & THEME
 # ==========================================
 st.set_page_config(
     page_title="SpaceBasic Mess Autopilot",
@@ -12,7 +12,6 @@ st.set_page_config(
     layout="centered"
 )
 
-# Dark Glassmorphism CSS
 st.markdown("""
 <style>
     .stApp {
@@ -50,7 +49,7 @@ SUPABASE_URL = st.secrets.get("SUPABASE_URL") or os.getenv("SUPABASE_URL")
 SUPABASE_KEY = st.secrets.get("SUPABASE_KEY") or os.getenv("SUPABASE_KEY")
 
 if not SUPABASE_URL or not SUPABASE_KEY:
-    st.error("🔒 Security Config Missing: SUPABASE_URL and SUPABASE_KEY must be set in Secrets!")
+    st.error("🔒 Configuration Error: SUPABASE_URL and SUPABASE_KEY must be configured in secrets!")
     st.stop()
 
 @st.cache_resource
@@ -59,63 +58,40 @@ def init_supabase() -> Client:
 
 supabase = init_supabase()
 
-# ==========================================
-# HEADER & TUTORIAL SECTION
-# ==========================================
 st.title("🍱 SpaceBasic Mess Autopilot")
-st.caption("Configure your automated daily mess RSVP preferences securely.")
-
-with st.expander("📹 Step-by-Step Guide & Tutorial Video", expanded=False):
-    st.markdown("""
-    **Quick Instructions:**
-    1. Open SpaceBasic in your browser (Chrome / Edge / Brave).
-    2. Press `F12` (or Right Click $\\rightarrow$ **Inspect**) and open the **Network** tab.
-    3. Refresh the mess page or click any meal item.
-    4. Find the request named `mealsmenu` (or `rsvpmeal`).
-    5. Under **Request Headers**, copy the `Authorization` header (`Bearer eyJ...`).
-    6. Copy your `userId` (found in the request URL or payload).
-    """)
-    
-    try:
-        st.video("Screen Recording 2026-08-08 151423.mp4")
-    except Exception as e:
-        st.warning(f"Could not load tutorial video: {e}")
+st.caption("Automatic Session Generation: No manual Bearer tokens or User IDs required.")
 
 st.markdown("---")
 
 # ==========================================
-# FRESH USER REGISTRATION FORM
+# REGISTRATION FORM
 # ==========================================
-with st.form("fresh_user_form"):
-    st.subheader("👤 Account Configuration")
+with st.form("account_form"):
+    st.subheader("👤 SpaceBasic Account Login")
     
     col1, col2 = st.columns(2)
     with col1:
         name_input = st.text_input("Full Name", placeholder="e.g. Alex Kumar")
-        user_id_input = st.text_input("SpaceBasic User ID", placeholder="e.g. 123456")
+        email_input = st.text_input("SpaceBasic Registered Email", placeholder="student@example.com")
     with col2:
         tenant_id = st.text_input("Tenant ID", value="143")
-
-    token_input = st.text_input(
-        "Authorization Token (Bearer Token)",
-        placeholder="Bearer eyJhbGciOiJIUzI1Ni...",
-        help="Paste your active SpaceBasic Bearer token copied from DevTools headers.",
-        type="password"
-    )
+        password_input = st.text_input(
+            "SpaceBasic Password",
+            placeholder="••••••••",
+            type="password",
+            help="Your password is encrypted with AES-128 before saving."
+        )
 
     st.markdown("---")
     st.subheader("🥗 Dietary Preferences")
     col_pref1, col_pref2 = st.columns(2)
-    
     with col_pref1:
-        lunch_pref = st.selectbox("Lunch Preference Chain", ["Non Veg", "Egg", "Veg"], index=0)
+        lunch_pref = st.selectbox("Lunch Preference", ["Non Veg", "Egg", "Veg"], index=0)
     with col_pref2:
-        dinner_pref = st.selectbox("Dinner Preference Chain", ["Non Veg", "Egg", "Veg"], index=0)
+        dinner_pref = st.selectbox("Dinner Preference", ["Non Veg", "Egg", "Veg"], index=0)
 
     st.markdown("---")
     st.subheader("📅 Skip Days Schedule")
-    st.caption("Select meals or full days you want the autopilot to skip automatically.")
-
     days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
     
     skip_config = {}
@@ -134,27 +110,27 @@ with st.form("fresh_user_form"):
         if day_skips_list:
             skip_config[day] = day_skips_list
 
-    submit = st.form_submit_button("🔒 Save Preferences & Encrypt Token")
+    submit = st.form_submit_button("🔒 Save Account & Enable Autopilot")
 
 if submit:
-    if not name_input or not user_id_input or not token_input:
-        st.error("Please fill in all required fields (Name, User ID, and Authorization Token).")
+    if not name_input or not email_input or not password_input:
+        st.error("Please fill in Name, Email, and Password.")
     else:
         try:
-            # Token is encrypted; Name and User ID remain clear for database management
-            encrypted_token = encrypt_value(token_input)
+            # Encrypt password before sending to database
+            encrypted_password = encrypt_value(password_input)
 
             payload = {
                 "name": name_input.strip(),
-                "user_id": str(user_id_input).strip(),
+                "email": email_input.strip().lower(),
+                "password": encrypted_password,
                 "tenant_id": str(tenant_id).strip(),
-                "token": encrypted_token,
                 "lunch_preference": lunch_pref,
                 "dinner_preference": dinner_pref,
                 "skip_days": skip_config
             }
 
             supabase.table("users").insert(payload).execute()
-            st.success("🎉 Account saved successfully with encrypted token protection!")
+            st.success("🎉 Account saved! The system will log in and book meals automatically.")
         except Exception as err:
-            st.error(f"❌ Failed to save preferences to database: {err}")
+            st.error(f"❌ Failed to save account: {err}")
