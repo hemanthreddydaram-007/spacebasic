@@ -1,36 +1,27 @@
 import os
+import streamlit as st
 from cryptography.fernet import Fernet
 
-def get_cipher():
-    key = os.getenv("ENCRYPTION_KEY")
+def get_secret_key() -> str:
+    key = os.getenv("SECRET_KEY")
     if not key:
         try:
-            import streamlit as st
-            key = st.secrets.get("ENCRYPTION_KEY")
+            key = st.secrets["SECRET_KEY"]
         except Exception:
-            pass
-
+            key = None
+            
     if not key:
-        raise ValueError("⛔ CRITICAL: ENCRYPTION_KEY is missing from environment variables / secrets!")
+        raise ValueError("SECRET_KEY is missing from environment or Streamlit secrets.")
+    return key.strip()
 
-    return Fernet(key.encode() if isinstance(key, str) else key)
-
-def encrypt_value(val: str) -> str:
-    """Encrypts raw text (e.g., password) into Fernet ciphertext."""
-    if not val:
+def encrypt_value(raw_value: str) -> str:
+    if not raw_value:
         return ""
-    cipher = get_cipher()
-    return cipher.encrypt(str(val).strip().encode()).decode()
+    cipher = Fernet(get_secret_key().encode())
+    return cipher.encrypt(raw_value.encode()).decode()
 
-def decrypt_value(val: str) -> str:
-    """Decrypts ciphertext string back to plaintext."""
-    if not val:
+def decrypt_value(encrypted_value: str) -> str:
+    if not encrypted_value:
         return ""
-    if not str(val).startswith("gAAAAA"):
-        return str(val)
-    try:
-        cipher = get_cipher()
-        return cipher.decrypt(str(val).encode()).decode()
-    except Exception as e:
-        print(f"❌ Decryption failed: {e}")
-        return str(val)
+    cipher = Fernet(get_secret_key().encode())
+    return cipher.decrypt(encrypted_value.encode()).decode()
