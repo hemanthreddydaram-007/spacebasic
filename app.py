@@ -75,15 +75,6 @@ st.markdown("""
         margin-bottom: 1.5rem;
     }
 
-    /* Banner Image Box Styling */
-    div[data-testid="stImage"] > img {
-        border-radius: 6px;
-        border: 1.5px solid #0284c7;
-        box-shadow: 0 0 25px rgba(14, 165, 233, 0.35);
-        object-fit: cover;
-        max-height: 220px;
-    }
-
     /* System Window Panel */
     div[data-testid="stForm"], .system-panel {
         background: rgba(7, 23, 48, 0.75) !important;
@@ -216,13 +207,62 @@ def init_supabase() -> Client:
 supabase = init_supabase()
 
 # ==========================================
-# HERO SECTION & SYSTEM BANNER
+# HERO SECTION & SYSTEM BANNER (SELF-CONTAINED)
 # ==========================================
 if os.path.exists("jinwoo.png"):
     st.image("jinwoo.png", use_container_width=True)
 else:
-    # Reliable Wikimedia CDN image of Sung Jin-Woo / Solo Leveling (no hotlink blocks)
-    st.image("https://upload.wikimedia.org/wikipedia/en/9/90/Solo_Leveling_Webtoon.png", use_container_width=True)
+    st.markdown("""
+        <div style="
+            position: relative;
+            width: 100%;
+            height: 180px;
+            border-radius: 8px;
+            border: 1.5px solid #0284c7;
+            background: radial-gradient(circle at 50% 30%, rgba(14, 165, 233, 0.35) 0%, rgba(3, 7, 18, 0.95) 75%),
+                        repeating-linear-gradient(0deg, rgba(56, 189, 248, 0.05) 0px, rgba(56, 189, 248, 0.05) 1px, transparent 1px, transparent 4px);
+            box-shadow: 0 0 25px rgba(14, 165, 233, 0.4), inset 0 0 30px rgba(2, 132, 199, 0.25);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        ">
+            <div style="
+                font-family: 'Orbitron', monospace;
+                font-size: 2.6rem;
+                filter: drop-shadow(0 0 16px #38bdf8);
+                margin-bottom: 6px;
+            ">⚔️ 👁️‍🗨️ ⚔️</div>
+            <div style="
+                font-family: 'Orbitron', monospace;
+                font-size: 1.35rem;
+                font-weight: 900;
+                letter-spacing: 0.35em;
+                color: #ffffff;
+                text-shadow: 0 0 10px #38bdf8, 0 0 22px #0284c7;
+            ">SUNG JIN-WOO</div>
+            <div style="
+                font-family: 'Rajdhani', sans-serif;
+                font-size: 0.88rem;
+                font-weight: 700;
+                letter-spacing: 0.25em;
+                color: #7dd3fc;
+                text-transform: uppercase;
+                margin-top: 4px;
+            ">[ SHADOW MONARCH • SYSTEM INTERFACE ]</div>
+            <div style="
+                position: absolute;
+                bottom: 8px;
+                right: 14px;
+                font-family: 'Orbitron', monospace;
+                font-size: 0.62rem;
+                color: rgba(56, 189, 248, 0.7);
+                letter-spacing: 0.15em;
+            ">STATUS: AWAKENED</div>
+        </div>
+    """, unsafe_allow_html=True)
 
 st.markdown('<div class="system-badge">[ SYSTEM ALERT: MISSION ACTIVE ]</div>', unsafe_allow_html=True)
 st.markdown('<div class="system-title">QUEST: MESS CONQUER</div>', unsafe_allow_html=True)
