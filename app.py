@@ -229,7 +229,7 @@ st.markdown("""
     }
 
     div[data-testid="stForm"]::before {
-        content: "[ SYSTEM WORKFLOW: AUTOMATION PROTOCOL ]";
+        content: "[ SYSTEM PROTOCOL: HUNTER SETUP ]";
         font-family: 'Orbitron', monospace;
         font-size: 0.65rem;
         color: #38bdf8;
@@ -445,19 +445,18 @@ st.markdown('<div class="system-badge">[ SYSTEM ALERT: AUTOMATION ENGINE ARMED ]
 st.markdown('<div class="system-title">MESS CONQUERS</div>', unsafe_allow_html=True)
 st.markdown('<div class="system-subtitle">Target Execution Window: 18:00:00 IST Sharp</div>', unsafe_allow_html=True)
 
-# Functional, work-aligned tab labels
-tab_manage, tab_register = st.tabs(["[ ⚡ SERVICE STATUS & VACATION MODE ]", "[ 🛠️ ACCOUNT SETUP & MEAL PREFERENCES ]"])
+tab_manage, tab_register = st.tabs(["[ ⚡ HUNTER STATUS & REST MODE ]", "[ 🛠️ HUNTER SETUP & MEAL PREFERENCES ]"])
 
 # ==========================================
-# TAB 1: SERVICE STATUS & VACATION MODE
+# TAB 1: HUNTER STATUS & REST MODE
 # ==========================================
 with tab_manage:
-    st.markdown("##### 📍 MANAGE BOOKING AUTOPILOT")
-    st.caption("Check your booking service state or pause requests during trips and holidays.")
+    st.markdown("##### 📍 HUNTER SYSTEM DEPLOYMENT")
+    st.caption("Inspect active automated booking status or enter rest mode during campus leave.")
 
     search_email = st.text_input(
-        "REGISTERED SPACEBASIC EMAIL",
-        placeholder="student@example.com",
+        "HUNTER IDENTIFIER (EMAIL)",
+        placeholder="hunter@system.com",
         key="status_email_box"
     ).strip().lower()
 
@@ -467,7 +466,7 @@ with tab_manage:
             
             if res.data and len(res.data) > 0:
                 user_record = res.data[0]
-                user_name = user_record.get("name", "Student").upper()
+                user_name = user_record.get("name", "Hunter").upper()
                 is_active = user_record.get("is_active", True)
 
                 st.write("")
@@ -475,59 +474,59 @@ with tab_manage:
                     st.markdown(f"""
                     <div class="quest-active">
                         <div style="font-family: 'Orbitron'; font-size: 1rem; font-weight: 700; color: #6ee7b7; letter-spacing: 0.1em;">
-                            STATUS: RUNNING • {user_name}
+                            STATUS: AWAKENED • HUNTER {user_name}
                         </div>
                         <p style="margin: 8px 0 0 0; color: #a7f3d0; font-size: 0.95rem;">
-                            Autopilot is active. Tomorrow's meals will be booked automatically at <b>18:00:00 IST</b>.
+                            Autopilot routine engaged. Next ration booking sequence triggers automatically at <b>18:00:00 IST</b>.
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
 
-                    if st.button("✈️ HEADING HOME: PAUSE AUTO-BOOKING"):
+                    if st.button("🏖️ ENTER REST MODE: PAUSE AUTO-BOOKING"):
                         supabase.table("users").update({"is_active": False}).eq("email", search_email).execute()
                         st.rerun()
                 else:
                     st.markdown(f"""
                     <div class="quest-paused">
                         <div style="font-family: 'Orbitron'; font-size: 1rem; font-weight: 700; color: #fcd34d; letter-spacing: 0.1em;">
-                            STATUS: PAUSED • {user_name}
+                            STATUS: DORMANT • HUNTER {user_name}
                         </div>
                         <p style="margin: 8px 0 0 0; color: #fde68a; font-size: 0.95rem;">
-                            Auto-booking is paused. The daily runner will bypass this account.
+                            Rest mode active. Daily execution cycles will bypass this Hunter profile.
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
 
-                    if st.button("🎒 BACK ON CAMPUS: RESUME AUTO-BOOKING"):
+                    if st.button("⚔️ AWAKEN: RESUME AUTO-BOOKING"):
                         supabase.table("users").update({"is_active": True}).eq("email", search_email).execute()
                         st.rerun()
             else:
-                st.info("No registered account found with this email. Switch to **Account Setup & Meal Preferences** to register.")
+                st.info("No Hunter profile located under this identifier. Switch to **Hunter Setup & Meal Preferences** to register.")
         except Exception as e:
             st.error(f"System scan error: {e}")
 
 # ==========================================
-# TAB 2: ACCOUNT SETUP & MEAL PREFERENCES
+# TAB 2: HUNTER SETUP & MEAL PREFERENCES
 # ==========================================
 with tab_register:
-    st.markdown("##### ⚙️ CREDENTIALS & AUTOMATED BOOKING RULES")
-    st.caption("Passwords are encrypted via Fernet AES-128 before syncing to Supabase.")
+    st.markdown("##### ⚙️ HUNTER REGISTRATION & CONTRACT PARAMETERS")
+    st.caption("All passkeys are encrypted via Fernet AES-128 before syncing to database storage.")
     
     with st.form("account_form"):
         col1, col2 = st.columns(2)
         with col1:
-            name_input = st.text_input("FULL NAME", placeholder="Alex Kumar")
-            email_input = st.text_input("SPACEBASIC EMAIL", placeholder="student@example.com")
+            name_input = st.text_input("HUNTER NAME", placeholder="Sung Jin-Woo")
+            email_input = st.text_input("SPACEBASIC IDENTIFIER (EMAIL)", placeholder="hunter@domain.com")
         with col2:
-            tenant_id = st.text_input("TENANT ID", value="143")
+            tenant_id = st.text_input("GATE TENANT ID", value="143")
             password_input = st.text_input(
-                "SPACEBASIC PASSWORD",
+                "DUNGEON PASSKEY (PASSWORD)",
                 placeholder="••••••••",
                 type="password"
             )
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("##### 🍱 MEAL PRIORITY HIERARCHY")
+        st.markdown("##### 🍱 RATION PRIORITY HIERARCHY")
         col_p1, col_p2 = st.columns(2)
         with col_p1:
             lunch_pref = st.selectbox("LUNCH PRIORITY ORDER", ["Non Veg", "Egg", "Veg"], index=0)
@@ -535,8 +534,8 @@ with tab_register:
             dinner_pref = st.selectbox("DINNER PRIORITY ORDER", ["Non Veg", "Egg", "Veg"], index=0)
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("##### 🚫 RECURRING WEEKLY SKIPS")
-        st.caption("Select meals you want the automation script to bypass automatically:")
+        st.markdown("##### 🚫 SCHEDULED REST DAYS (SKIP DAYS)")
+        st.caption("Select weekly days to automatically skip automated meal claims:")
 
         days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
         skip_config = {}
@@ -557,11 +556,11 @@ with tab_register:
                 skip_config[day] = day_skips_list
 
         st.markdown("<br>", unsafe_allow_html=True)
-        submit = st.form_submit_button("🚀 SAVE PREFERENCES & ACTIVATE")
+        submit = st.form_submit_button("⚔️ ACCEPT CONTRACT & AWAKEN")
 
     if submit:
         if not name_input or not email_input or not password_input:
-            st.error("Missing required inputs: Full Name, SpaceBasic Email, and Password required.")
+            st.error("Missing required parameters: Hunter Name, SpaceBasic Identifier, and Passkey required.")
         else:
             try:
                 encrypted_password = encrypt_value(password_input)
@@ -578,6 +577,6 @@ with tab_register:
                 }
 
                 supabase.table("users").upsert(payload, on_conflict="email").execute()
-                st.success("CONFIGURATION SAVED: Your account is synchronized and armed for 18:00:00 IST execution.")
+                st.success("SYSTEM CONTRACT LOCKED: Hunter status synchronized and armed for 18:00:00 IST execution.")
             except Exception as err:
                 st.error(f"System synchronization failure: {err}")
