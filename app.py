@@ -75,6 +75,15 @@ st.markdown("""
         margin-bottom: 1.5rem;
     }
 
+    /* Banner Image Box Styling */
+    div[data-testid="stImage"] > img {
+        border-radius: 6px;
+        border: 1.5px solid #0284c7;
+        box-shadow: 0 0 25px rgba(14, 165, 233, 0.35);
+        object-fit: cover;
+        max-height: 220px;
+    }
+
     /* System Window Panel */
     div[data-testid="stForm"], .system-panel {
         background: rgba(7, 23, 48, 0.75) !important;
@@ -209,18 +218,11 @@ supabase = init_supabase()
 # ==========================================
 # HERO SECTION & SYSTEM BANNER
 # ==========================================
-# Checks local repository file first, then falls back to direct GitHub CDN
 if os.path.exists("jinwoo.png"):
     st.image("jinwoo.png", use_container_width=True)
 else:
-    # Direct GitHub raw CDN (embed-safe, never blocked by hotlinking)
-    st.markdown("""
-        <div style="border: 1.5px solid #0284c7; border-radius: 6px; overflow: hidden; margin-bottom: 1.2rem; box-shadow: 0 0 25px rgba(14, 165, 233, 0.35);">
-            <img src="https://raw.githubusercontent.com/hemanthreddydaram-007/spacebasic/main/jinwoo.png" 
-                 onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1200&auto=format&fit=crop';" 
-                 style="width: 100%; height: 210px; object-fit: cover; filter: brightness(0.9) contrast(1.15);" />
-        </div>
-    """, unsafe_allow_html=True)
+    # Reliable Wikimedia CDN image of Sung Jin-Woo / Solo Leveling (no hotlink blocks)
+    st.image("https://upload.wikimedia.org/wikipedia/en/9/90/Solo_Leveling_Webtoon.png", use_container_width=True)
 
 st.markdown('<div class="system-badge">[ SYSTEM ALERT: MISSION ACTIVE ]</div>', unsafe_allow_html=True)
 st.markdown('<div class="system-title">QUEST: MESS CONQUER</div>', unsafe_allow_html=True)
