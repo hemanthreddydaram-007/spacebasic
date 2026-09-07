@@ -7,7 +7,7 @@ from security import encrypt_value
 # PAGE CONFIGURATION
 # ==========================================
 st.set_page_config(
-    page_title="NomNom • SpaceBasic Autopilot",
+    page_title="mess master• SpaceBasic Autopilot",
     page_icon="🍱",
     layout="centered",
     initial_sidebar_state="collapsed"
