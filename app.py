@@ -412,7 +412,6 @@ st.markdown(f"""
         font-family: {cfg['body_font']};
     }}
 
-    /* Ambient Motion Background */
     @keyframes ambientPulse {{
         0%, 100% {{
             background-color: {cfg['bg_base']};
@@ -429,7 +428,6 @@ st.markdown(f"""
         color: {cfg['text_primary']};
     }}
 
-    /* System Title Motion Glow */
     @keyframes titleGlow {{
         0%, 100% {{
             text-shadow: 0 0 10px {cfg['primary']}aa, 0 0 20px {cfg['secondary']}66;
@@ -451,7 +449,6 @@ st.markdown(f"""
         margin-bottom: 0.2rem;
     }}
 
-    /* Badge Pulse Animation */
     @keyframes badgePing {{
         0%, 100% {{
             transform: scale(1);
@@ -480,7 +477,6 @@ st.markdown(f"""
         margin-bottom: 0.8rem;
     }}
 
-    /* Holographic Banner Scan Line & Motion Border */
     @keyframes bannerGlow {{
         0%, 100% {{
             border-color: {cfg['border_color']};
@@ -521,7 +517,6 @@ st.markdown(f"""
         pointer-events: none;
     }}
 
-    /* Entry Transition for Forms */
     @keyframes formEntrance {{
         from {{ opacity: 0; transform: translateY(12px); }}
         to {{ opacity: 1; transform: translateY(0); }}
@@ -536,7 +531,6 @@ st.markdown(f"""
         animation: formEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }}
 
-    /* Inputs with Hover and Focus Transitions */
     .stTextInput input, .stTextArea textarea, .stSelectbox select {{
         background-color: {cfg['input_bg']} !important;
         border: 1.5px solid {cfg['border_color']} !important;
@@ -559,7 +553,6 @@ st.markdown(f"""
         transform: translateY(-2px);
     }}
 
-    /* Interactive Buttons */
     .stButton>button {{
         font-family: {cfg['font_family']} !important;
         background: linear-gradient(180deg, {cfg['primary']} 0%, {cfg['secondary']} 100%) !important;
@@ -581,7 +574,6 @@ st.markdown(f"""
         transform: translateY(1px) scale(0.98) !important;
     }}
 
-    /* Checkbox Hover Action */
     div[data-testid="stCheckbox"] {{
         padding: 4px 6px;
         border-radius: 4px;
@@ -593,7 +585,6 @@ st.markdown(f"""
         transform: translateX(4px);
     }}
 
-    /* Labels styling */
     div[data-testid="stWidgetLabel"] label p {{
         font-size: 0.95rem !important;
         font-weight: 700 !important;
@@ -602,7 +593,6 @@ st.markdown(f"""
         text-transform: uppercase !important;
     }}
 
-    /* Tabs styling */
     .stTabs [data-baseweb="tab-list"] {{
         background: {cfg['panel_bg']};
         border: 1px solid {cfg['border_color']};
@@ -645,7 +635,6 @@ st.markdown(f"""
         box-shadow: inset 0 0 15px {cfg['primary']}15;
     }}
 
-    /* Status Telemetry Cards */
     @keyframes greenGlow {{
         0%, 100% {{ box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }}
         50% {{ box-shadow: 0 0 28px rgba(16, 185, 129, 0.65); }}
@@ -739,7 +728,7 @@ with tab_status:
 
     search_id = st.text_input(
         "REGISTERED IDENTIFIER (EMAIL OR SPACEBASIC USER ID)",
-        placeholder="student@example.com or SB-10492",
+        placeholder="student@example.com or 12345",
         key="status_lookup_box"
     ).strip().lower()
 
@@ -799,7 +788,6 @@ with tab_config:
 
     st.markdown("#### 1. HOW DO YOU LOG INTO SPACEBASIC?")
     
-    # Placed OUTSIDE st.form so selecting an option triggers an instant UI update
     login_method = st.radio(
         "SELECT YOUR LOGIN METHOD",
         [
@@ -821,7 +809,6 @@ with tab_config:
         with col2:
             tenant_id = st.text_input("SPACEBASIC TENANT ID", value="143")
 
-        # Distinct form inputs based on login method
         if "Option A" in login_method:
             st.markdown(f"""
             <div class="guide-box">
@@ -854,7 +841,7 @@ with tab_config:
             with col_b1:
                 identifier_input = st.text_input(
                     "SPACEBASIC USER ID",
-                    placeholder="e.g., SB-10492 or roll number",
+                    placeholder="e.g., 12345",
                     help="Found in your SpaceBasic profile or URL after logging in."
                 )
             with col_b2:
