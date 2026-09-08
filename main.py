@@ -33,7 +33,7 @@ def send_expiration_notification(recipient_email, user_identifier):
         f"Your SpaceBasic session link or credentials for [{user_identifier}] have expired or failed.\n\n"
         f"Automated daily meal bookings are currently PAUSED for your account.\n\n"
         f"Please update your link or credentials to reactivate bookings:\n"
-        f"https://messconquers.streamlit.app\n\n"
+        f"https://autobook.streamlit.app\n\n"
         f"— MessConquers Automated Bot"
     )
 
