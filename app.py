@@ -845,9 +845,13 @@ with tab_config:
             st.markdown("#### 1. USER ID & ALERT EMAIL")
             st.markdown(f"""
             <div class="guide-box">
-                <b>Quick 2-Step Guide:</b><br>
-                <b>Step 1 (User ID):</b> Log into SpaceBasic $\\rightarrow$ check your URL or profile number (e.g. <code>123456</code>).<br>
-                <b>Step 2 (Token):</b> Press <code>F12</code> on SpaceBasic $\\rightarrow$ click <b>Network</b> $\\rightarrow$ click any request $\\rightarrow$ copy the <code>Authorization</code> header value.
+                <b>Easy Steps to Get User ID & Token:</b><br>
+                1. Open SpaceBasic and go to <b>Mess -> Booking</b>.<br>
+                2. Right-click anywhere and select <b>Inspect</b> (or press F12) -> go to the <b>Network</b> tab.<br>
+                3. Click on <b>Tomorrow</b> (on the left side).<br>
+                4. Look for <code>mealsmenu?userId=123456...</code> in the list and click it.<br>
+                5. Under the <b>Headers</b> tab, scroll down to <code>Authorization</code> and copy the full value starting with <b>Bearer ...</b><br>
+                6. Your <b>SpaceBasic User ID</b> is the number after <code>userId=</code> (e.g. <code>123456</code>).
             </div>
             """, unsafe_allow_html=True)
 
@@ -862,7 +866,7 @@ with tab_config:
                 spacebasic_id = st.text_input(
                     "SPACEBASIC USER ID",
                     placeholder="123456",
-                    help="Your numeric user ID."
+                    help="The number seen after userId= in the mealsmenu network request."
                 ).strip()
             with col_b2:
                 notification_email = st.text_input(
@@ -874,7 +878,7 @@ with tab_config:
             secret_input = st.text_area(
                 "SPACEBASIC AUTHENTICATION LINK OR BEARER TOKEN",
                 placeholder="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                help="Paste your Bearer token or login link here."
+                help="Paste the full Authorization Bearer token copied from the headers."
             ).strip()
             email_input = None
 
