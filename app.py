@@ -1,4 +1,5 @@
 import os
+import re
 import streamlit as st
 import streamlit.components.v1 as components
 from supabase import create_client, Client
@@ -14,9 +15,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ==========================================
-# THEME & VOCABULARY DICTIONARY
-# ==========================================
 THEMES = {
     "Solo Leveling": {
         "primary": "#38bdf8",
@@ -114,7 +112,7 @@ THEMES = {
         "role_title": "SLAYER",
         "tab1_title": "[ 🏮 SLAYER TELEMETRY & REHAB ]",
         "tab2_title": "[ 🗡️ CORPS OATH & RATION FORMS ]",
-        "tab1_header": "📍 CORPS HEADQUARTERS DISPATCH",
+        "tab1_header": "📍 CORPS HEADQUAR headquarters DISPATCH",
         "tab1_caption": "Track daily ration acquisition or enter Butterfly Mansion for recovery.",
         "tab2_header": "⚙️ NICHIRIN OATH & CORPS ALLOCATION",
         "tab2_caption": "Breathing ciphers are forged under unbreakable AES-128 ward seals.",
@@ -306,9 +304,6 @@ THEMES = {
     }
 }
 
-# ==========================================
-# THEME GATEKEEPER SELECTOR
-# ==========================================
 if "theme" not in st.session_state:
     st.markdown("""
     <style>
@@ -332,7 +327,7 @@ if "theme" not in st.session_state:
     </style>
     <div class="intro-box">
         <div class="intro-title">MESS CONQUERS</div>
-        <p style="color: #cbd5e1; font-size: 1.05rem;">Choose from the Top 10 Anime Realms or Standard Mode:</p>
+        <p style="color: #cbd5e1; font-size: 1.05rem;">Choose your interface realm to begin:</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -347,9 +342,6 @@ if "theme" not in st.session_state:
 
 cfg = THEMES[st.session_state["theme"]]
 
-# ==========================================
-# FLOATING PARTICLES CANVAS
-# ==========================================
 components.html(f"""
 <canvas id="systemParticles" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0;"></canvas>
 <script>
@@ -397,42 +389,16 @@ components.html(f"""
 </script>
 """, height=0)
 
-# ==========================================
-# MOTION ANIMATION & HIGH-CONTRAST CSS
-# ==========================================
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700&family=Space+Grotesk:wght@600;700&family=Plus+Jakarta+Sans:wght@600;700;800&family=Cinzel:wght@700;900&display=swap');
 
-    * {{
-        font-family: {cfg['body_font']};
-    }}
-
-    @keyframes ambientPulse {{
-        0%, 100% {{
-            background-color: {cfg['bg_base']};
-            background-image: radial-gradient(circle at 50% 0%, {cfg['primary']}22 0%, transparent 70%);
-        }}
-        50% {{
-            background-color: {cfg['bg_base']};
-            background-image: radial-gradient(circle at 50% 12%, {cfg['primary']}38 0%, transparent 80%);
-        }}
-    }}
+    * {{ font-family: {cfg['body_font']}; }}
 
     .stApp {{
-        animation: ambientPulse 8s infinite alternate ease-in-out;
+        background-color: {cfg['bg_base']};
+        background-image: radial-gradient(circle at 50% 0%, {cfg['primary']}22 0%, transparent 70%);
         color: {cfg['text_primary']};
-    }}
-
-    @keyframes titleGlow {{
-        0%, 100% {{
-            text-shadow: 0 0 10px {cfg['primary']}aa, 0 0 20px {cfg['secondary']}66;
-            letter-spacing: 0.05em;
-        }}
-        50% {{
-            text-shadow: 0 0 20px {cfg['primary']}, 0 0 35px {cfg['secondary']};
-            letter-spacing: 0.07em;
-        }}
     }}
 
     .system-title {{
@@ -441,19 +407,7 @@ st.markdown(f"""
         font-weight: 900;
         text-transform: uppercase;
         color: #ffffff;
-        animation: titleGlow 3.5s infinite ease-in-out;
         margin-bottom: 0.2rem;
-    }}
-
-    @keyframes badgePing {{
-        0%, 100% {{
-            transform: scale(1);
-            box-shadow: 0 0 10px {cfg['primary']}44;
-        }}
-        50% {{
-            transform: scale(1.02);
-            box-shadow: 0 0 22px {cfg['primary']}99;
-        }}
     }}
 
     .system-badge {{
@@ -469,53 +423,16 @@ st.markdown(f"""
         font-weight: 800;
         color: {cfg['primary']};
         letter-spacing: 0.12em;
-        animation: badgePing 2.5s infinite ease-in-out;
         margin-bottom: 0.8rem;
     }}
 
-    @keyframes bannerGlow {{
-        0%, 100% {{
-            border-color: {cfg['border_color']};
-            box-shadow: 0 0 15px {cfg['primary']}33;
-        }}
-        50% {{
-            border-color: {cfg['primary']};
-            box-shadow: 0 0 30px {cfg['primary']}77, inset 0 0 15px {cfg['primary']}33;
-        }}
-    }}
-
-    @keyframes scanLineMotion {{
-        0% {{ transform: translateY(-100%); }}
-        100% {{ transform: translateY(900%); }}
-    }}
-
     .motion-banner-box {{
-        position: relative;
-        overflow: hidden;
         background: {cfg['panel_bg']};
         border: 1.5px solid {cfg['border_color']};
         border-radius: 8px;
-        padding: 2.4rem 1rem;
+        padding: 2rem 1rem;
         text-align: center;
         margin-bottom: 1.4rem;
-        animation: bannerGlow 4s infinite ease-in-out;
-    }}
-
-    .motion-banner-box::after {{
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 25px;
-        background: linear-gradient(180deg, transparent, {cfg['primary']}55, transparent);
-        animation: scanLineMotion 3.2s linear infinite;
-        pointer-events: none;
-    }}
-
-    @keyframes formEntrance {{
-        from {{ opacity: 0; transform: translateY(12px); }}
-        to {{ opacity: 1; transform: translateY(0); }}
     }}
 
     div[data-testid="stForm"], .system-panel {{
@@ -523,8 +440,6 @@ st.markdown(f"""
         border: 1.5px solid {cfg['border_color']} !important;
         border-radius: 8px !important;
         padding: 1.8rem !important;
-        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7) !important;
-        animation: formEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }}
 
     .stTextInput input, .stTextArea textarea, .stSelectbox select {{
@@ -534,19 +449,6 @@ st.markdown(f"""
         font-size: 1.05rem !important;
         font-weight: 600 !important;
         border-radius: 6px !important;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    }}
-
-    .stTextInput input:hover, .stTextArea textarea:hover, .stSelectbox select:hover {{
-        border-color: {cfg['primary']} !important;
-        box-shadow: 0 0 10px {cfg['primary']}44 !important;
-        transform: translateY(-1px);
-    }}
-
-    .stTextInput input:focus, .stTextArea textarea:focus {{
-        border-color: {cfg['primary']} !important;
-        box-shadow: 0 0 16px {cfg['primary']}88 !important;
-        transform: translateY(-2px);
     }}
 
     .stButton>button {{
@@ -557,65 +459,7 @@ st.markdown(f"""
         border: 1.5px solid {cfg['primary']} !important;
         border-radius: 6px !important;
         padding: 0.75rem 1.4rem !important;
-        box-shadow: 0 0 16px {cfg['primary']}55 !important;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    }}
-
-    .stButton>button:hover {{
-        box-shadow: 0 0 28px {cfg['primary']}, inset 0 0 10px rgba(255, 255, 255, 0.3) !important;
-        transform: translateY(-3px) scale(1.02);
-    }}
-
-    .stButton>button:active {{
-        transform: translateY(1px) scale(0.98) !important;
-    }}
-
-    div[data-testid="stCheckbox"] {{
-        padding: 4px 6px;
-        border-radius: 4px;
-        transition: all 0.2s ease;
-    }}
-
-    div[data-testid="stCheckbox"]:hover {{
-        background: {cfg['primary']}15;
-        transform: translateX(4px);
-    }}
-
-    div[data-testid="stWidgetLabel"] label p {{
-        font-size: 0.95rem !important;
-        font-weight: 700 !important;
-        color: {cfg['text_primary']} !important;
-        letter-spacing: 0.04em !important;
-        text-transform: uppercase !important;
-    }}
-
-    .stTabs [data-baseweb="tab-list"] {{
-        background: {cfg['panel_bg']};
-        border: 1px solid {cfg['border_color']};
-        border-radius: 6px;
-        padding: 6px;
-        gap: 8px;
-    }}
-
-    .stTabs [data-baseweb="tab"] {{
-        font-family: {cfg['font_family']};
-        font-size: 0.8rem;
-        color: #94a3b8;
-        font-weight: 700;
-        border-radius: 4px;
-        transition: all 0.25s ease !important;
-    }}
-
-    .stTabs [data-baseweb="tab"]:hover {{
-        color: {cfg['primary']} !important;
-        transform: translateY(-2px);
-    }}
-
-    .stTabs [aria-selected="true"] {{
-        background: {cfg['input_bg']} !important;
-        color: {cfg['primary']} !important;
-        border: 1px solid {cfg['primary']} !important;
-        box-shadow: 0 0 14px {cfg['primary']}44 !important;
+        width: 100%;
     }}
 
     .guide-box {{
@@ -628,57 +472,15 @@ st.markdown(f"""
         color: {cfg['text_secondary']};
         font-size: 0.95rem;
         line-height: 1.5;
-        box-shadow: inset 0 0 15px {cfg['primary']}15;
-    }}
-
-    @keyframes greenGlow {{
-        0%, 100% {{ box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }}
-        50% {{ box-shadow: 0 0 28px rgba(16, 185, 129, 0.65); }}
-    }}
-
-    @keyframes amberGlow {{
-        0%, 100% {{ box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); }}
-        50% {{ box-shadow: 0 0 28px rgba(245, 158, 11, 0.65); }}
-    }}
-
-    .status-card-active {{
-        background: #064e3b;
-        border: 1.5px solid #10b981;
-        border-radius: 6px;
-        padding: 1.2rem;
-        margin-bottom: 1.2rem;
-        animation: greenGlow 3s infinite ease-in-out;
-        transition: transform 0.25s ease;
-    }}
-
-    .status-card-active:hover {{
-        transform: scale(1.01);
-    }}
-
-    .status-card-paused {{
-        background: #451a03;
-        border: 1.5px solid #f59e0b;
-        border-radius: 6px;
-        padding: 1.2rem;
-        margin-bottom: 1.2rem;
-        animation: amberGlow 3s infinite ease-in-out;
-        transition: transform 0.25s ease;
-    }}
-
-    .status-card-paused:hover {{
-        transform: scale(1.01);
     }}
 </style>
 """, unsafe_allow_html=True)
 
-# ==========================================
-# SUPABASE INITIALIZATION
-# ==========================================
 SUPABASE_URL = st.secrets.get("SUPABASE_URL") or os.getenv("SUPABASE_URL")
 SUPABASE_KEY = st.secrets.get("SUPABASE_KEY") or os.getenv("SUPABASE_KEY")
 
 if not SUPABASE_URL or not SUPABASE_KEY:
-    st.error("SYSTEM CONFIGURATION ERROR: Supabase credentials missing from secrets matrix.")
+    st.error("Supabase credentials missing from secrets.")
     st.stop()
 
 @st.cache_resource
@@ -687,24 +489,18 @@ def init_supabase() -> Client:
 
 supabase = init_supabase()
 
-# ==========================================
-# REALM SELECTOR
-# ==========================================
 top_col1, top_col2 = st.columns([3, 1])
 top_col1.markdown(f'<div class="system-badge">{cfg["badge"]}</div>', unsafe_allow_html=True)
 if top_col2.button("🔄 Swap Realm"):
     del st.session_state["theme"]
     st.rerun()
 
-# ==========================================
-# HEADER BANNER
-# ==========================================
 st.markdown(f"""
 <div class="motion-banner-box">
-    <div style="font-family: {cfg['font_family']}; font-size: 1.7rem; font-weight: 900; letter-spacing: 0.2em; color: #ffffff;">
+    <div style="font-family: {cfg['font_family']}; font-size: 1.6rem; font-weight: 900; letter-spacing: 0.15em; color: #ffffff;">
         {cfg['banner_tag']}
     </div>
-    <div style="font-size: 0.9rem; font-weight: 700; letter-spacing: 0.15em; color: {cfg['primary']}; margin-top: 6px;">
+    <div style="font-size: 0.85rem; font-weight: 700; letter-spacing: 0.15em; color: {cfg['primary']}; margin-top: 6px;">
         {cfg['banner_sub']}
     </div>
 </div>
@@ -716,65 +512,46 @@ st.markdown(f'<div style="color: {cfg["text_secondary"]}; font-size: 1rem; margi
 tab_status, tab_config = st.tabs([cfg["tab1_title"], cfg["tab2_title"]])
 
 # ==========================================
-# TAB 1: STATUS INSPECTION & VACATION MODE
+# TAB 1: TELEMETRY & STATUS INSPECTION
 # ==========================================
 with tab_status:
     st.markdown(f"##### {cfg['tab1_header']}")
     st.caption(cfg["tab1_caption"])
 
     search_id = st.text_input(
-        "REGISTERED IDENTIFIER (EMAIL, PHONE NUMBER, OR SPACEBASIC USER ID)",
-        placeholder="student@example.com, 9876543210, or 380180",
+        "SPACEBASIC USER ID (PRIMARY KEY)",
+        placeholder="e.g. 123456",
         key="status_lookup_box"
-    ).strip().lower()
+    ).strip()
 
     if search_id:
         try:
-            res = supabase.table("users").select("*").eq("email", search_id).execute()
-            
+            res = supabase.table("users").select("*").eq("spacebasic_id", search_id).execute()
             if res.data and len(res.data) > 0:
                 user_rec = res.data[0]
                 user_name = user_rec.get("name", cfg["role_title"]).upper()
                 is_active = user_rec.get("is_active", True)
-                auth_type_stored = user_rec.get("auth_type", "password").upper()
-                alert_email = user_rec.get("notification_email", "Not configured")
+                auth_type_stored = user_rec.get("auth_type", "token").upper()
+                notif_email = user_rec.get("notification_email", "None configured")
 
                 st.write("")
                 if is_active:
-                    st.markdown(f"""
-                    <div class="status-card-active">
-                        <div style="font-family: {cfg['font_family']}; font-size: 1.1rem; font-weight: 800; color: #6ee7b7; letter-spacing: 0.05em;">
-                            STATUS: ACTIVE • {cfg['role_title']} {user_name}
-                        </div>
-                        <p style="margin: 8px 0 0 0; color: #a7f3d0; font-size: 1rem;">
-                            Autopilot routine engaged. Daily meal booking triggers dynamically within the SpaceBasic portal window.<br>
-                            <span style="font-size: 0.85rem; opacity: 0.9;">AUTHENTICATION PROTOCOL: {auth_type_stored}</span><br>
-                            <span style="font-size: 0.85rem; opacity: 0.9;">ALERT DESTINATION: {alert_email}</span>
-                        </p>
-                    </div>
-                    """, unsafe_allow_html=True)
-
-                    if st.button("🏖️ ENTER REST MODE (PAUSE BOOKINGS)"):
-                        supabase.table("users").update({"is_active": False}).eq("email", search_id).execute()
+                    st.success(f"STATUS: ACTIVE • {cfg['role_title']} {user_name}\n"
+                               f"• SpaceBasic ID: {search_id}\n"
+                               f"• Protocol: {auth_type_stored}\n"
+                               f"• Expiration Alert Destination: {notif_email}")
+                    if st.button("🏖️ ENTER REST MODE (PAUSE AUTOPILOT)"):
+                        supabase.table("users").update({"is_active": False}).eq("spacebasic_id", search_id).execute()
                         st.rerun()
                 else:
-                    st.markdown(f"""
-                    <div class="status-card-paused">
-                        <div style="font-family: {cfg['font_family']}; font-size: 1.1rem; font-weight: 800; color: #fcd34d; letter-spacing: 0.05em;">
-                            STATUS: PAUSED • {cfg['role_title']} {user_name}
-                        </div>
-                        <p style="margin: 8px 0 0 0; color: #fde68a; font-size: 1rem;">
-                            Account is paused or session link expired. Automated booking will bypass this profile until refreshed.<br>
-                            <span style="font-size: 0.85rem; opacity: 0.9;">ALERT DESTINATION: {alert_email}</span>
-                        </p>
-                    </div>
-                    """, unsafe_allow_html=True)
-
+                    st.warning(f"STATUS: PAUSED / EXPIRED • {cfg['role_title']} {user_name}\n"
+                               f"• SpaceBasic ID: {search_id}\n"
+                               f"• Expiration alerts sent to: {notif_email}")
                     if st.button("⚔️ RESUME AUTOPILOT"):
-                        supabase.table("users").update({"is_active": True}).eq("email", search_id).execute()
+                        supabase.table("users").update({"is_active": True}).eq("spacebasic_id", search_id).execute()
                         st.rerun()
             else:
-                st.info("No registered profile located with this identifier. Register your credentials in Tab 2.")
+                st.info("No hunter contract registered with this SpaceBasic User ID. Lock your contract in Tab 2.")
         except Exception as e:
             st.error(f"Telemetry query error: {e}")
 
@@ -785,13 +562,11 @@ with tab_config:
     st.markdown(f"##### {cfg['tab2_header']}")
     st.caption(cfg["tab2_caption"])
 
-    st.markdown("#### 1. HOW DO YOU LOG INTO SPACEBASIC?")
-    
     login_method = st.radio(
-        "SELECT YOUR LOGIN METHOD",
+        "SELECT YOUR LOGIN PROTOCOL",
         [
-            "Option A: SpaceBasic Email & Password",
-            "Option B: SpaceBasic Mobile Number / Token / Magic Link"
+            "Option A: SpaceBasic Auth Link / Bearer Token",
+            "Option B: SpaceBasic Direct Email & Password"
         ],
         index=0,
         key="login_method_selector"
@@ -800,135 +575,121 @@ with tab_config:
     st.markdown("<hr style='border: 0.5px solid #334155; margin: 1.2rem 0;'>", unsafe_allow_html=True)
 
     with st.form("universe_contract_form"):
-        st.markdown("#### 2. CREDENTIALS & IDENTIFIER")
+        st.markdown("#### 1. PRIMARY IDENTIFIERS")
 
         col1, col2 = st.columns(2)
         with col1:
-            name_input = st.text_input(f"{cfg['role_title']} FULL NAME", placeholder="Your Full Name")
+            spacebasic_id = st.text_input(
+                "SPACEBASIC USER ID (PRIMARY KEY)",
+                placeholder="e.g. 123456",
+                help="Your numerical user ID found in your SpaceBasic portal or API URL parameters."
+            ).strip()
         with col2:
-            tenant_id = st.text_input("SPACEBASIC TENANT ID", value="143")
+            name_input = st.text_input(f"{cfg['role_title']} FULL NAME", placeholder="Your Full Name").strip()
 
-        notification_email_input = ""
-        spacebasic_uid_input = ""
+        col3, col4 = st.columns(2)
+        with col3:
+            notification_email = st.text_input(
+                "ALERT EMAIL ADDRESS (DISPATCH RECEIVER)",
+                placeholder="e.g. student@gmail.com",
+                help="We send an expiration alert here if your token, link, or password fails."
+            ).strip().lower()
+        with col4:
+            tenant_id = st.text_input("SPACEBASIC TENANT ID", value="143").strip()
+
+        st.markdown("#### 2. AUTHENTICATION CREDENTIALS")
 
         if "Option A" in login_method:
             st.markdown(f"""
             <div class="guide-box">
+                <b style="color: {cfg['primary']};">TOKEN OR DIRECT AUTHENTICATION LINK PATH:</b><br>
+                Paste your full login redirect URL (magic link) or authorization Bearer JWT token. If this link expires, an automated notice will be dispatched to your Alert Email so you can refresh it here.
+            </div>
+            """, unsafe_allow_html=True)
+
+            secret_input = st.text_area(
+                "SPACEBASIC AUTHENTICATION LINK OR BEARER TOKEN",
+                placeholder="https://portal.spacebasic.com/auth/verify?token=eyJhbGciOi...\n\nOR\n\neyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                help="Paste the full link starting with https:// or the JWT token."
+            ).strip()
+            direct_login_email = None
+        else:
+            st.markdown(f"""
+            <div class="guide-box">
                 <b style="color: {cfg['primary']};">EMAIL + PASSWORD PATH:</b><br>
-                Enter your registered SpaceBasic email and password. The system will authenticate directly via the API. Any session issues or alerts will automatically route to this email.
+                Enter your SpaceBasic portal email and password. The system logs in dynamically on schedule.
             </div>
             """, unsafe_allow_html=True)
 
             col_a1, col_a2 = st.columns(2)
             with col_a1:
-                identifier_input = st.text_input("SPACEBASIC EMAIL ADDRESS", placeholder="student@example.com")
+                direct_login_email = st.text_input("SPACEBASIC LOGIN EMAIL", placeholder="e.g. student@example.com").strip()
             with col_a2:
-                secret_input = st.text_input("SPACEBASIC PASSWORD", placeholder="••••••••", type="password")
-
-        else:
-            st.markdown(f"""
-            <div class="guide-box">
-                <b style="color: {cfg['primary']};">MOBILE NUMBER / TOKEN / LINK PATH:</b><br>
-                Provide your mobile number (or user ID), your token/link, and a <b>Notification Email</b>. If your session token or magic link expires, an automated alert email will be sent to notify you immediately.
-            </div>
-            """, unsafe_allow_html=True)
-
-            col_b1, col_b2 = st.columns(2)
-            with col_b1:
-                identifier_input = st.text_input(
-                    "PRIMARY IDENTIFIER (MOBILE NUMBER OR ID)",
-                    placeholder="e.g. 9876543210",
-                    help="Your phone number or primary identifier used for tracking."
-                )
-            with col_b2:
-                notification_email_input = st.text_input(
-                    "ALERT EMAIL ADDRESS",
-                    placeholder="student@gmail.com",
-                    help="Destination email where expiration notices will be dispatched if your token/link dies."
-                )
-
-            col_b3, col_b4 = st.columns([1, 1])
-            with col_b3:
-                spacebasic_uid_input = st.text_input(
-                    "SPACEBASIC USER ID",
-                    placeholder="e.g. 380180",
-                    help="Found in your SpaceBasic network calls, profile, or booking URL."
-                )
-            with col_b4:
-                secret_input = st.text_area(
-                    "SPACEBASIC AUTHORIZATION TOKEN / FULL MAGIC LINK",
-                    placeholder="eyJhbGciOiJIUzI1Ni... or https://portal.spacebasic.com/auth/...",
-                    help="Paste the full session JWT token or magic link."
-                )
+                secret_input = st.text_input("SPACEBASIC PASSWORD", type="password", placeholder="••••••••").strip()
 
         st.markdown("<hr style='border: 0.5px solid #334155; margin: 1.2rem 0;'>", unsafe_allow_html=True)
         st.markdown("#### 3. MEAL PREFERENCES & RECURRING SKIPS")
 
         col_p1, col_p2 = st.columns(2)
         with col_p1:
-            lunch_pref = st.selectbox("LUNCH PREFERENCE ORDER", ["Non Veg", "Eggetarian", "Veg"], index=0)
+            lunch_pref = st.selectbox("LUNCH PREFERENCE", ["Non Veg", "Eggetarian", "Veg"], index=0)
         with col_p2:
-            dinner_pref = st.selectbox("DINNER PREFERENCE ORDER", ["Non Veg", "Eggetarian", "Veg"], index=0)
+            dinner_pref = st.selectbox("DINNER PREFERENCE", ["Non Veg", "Eggetarian", "Veg"], index=0)
 
-        st.markdown("<br>", unsafe_allow_html=True)
         st.caption("Select any meals you want the automation script to skip claiming automatically:")
 
         days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
         skip_config = {}
 
         for day in days:
-            st.write(f"**{day.upper()}**")
-            c1, c2, c3 = st.columns(3)
-            b_skip = c1.checkbox("Skip Breakfast", key=f"{day}_b")
-            l_skip = c2.checkbox("Skip Lunch", key=f"{day}_l")
-            d_skip = c3.checkbox("Skip Dinner", key=f"{day}_d")
-            
-            day_skips_list = []
-            if b_skip: day_skips_list.append("breakfast")
-            if l_skip: day_skips_list.append("lunch")
-            if d_skip: day_skips_list.append("dinner")
-            
-            if day_skips_list:
-                skip_config[day] = day_skips_list
+            skips = st.multiselect(f"Skip on {day.capitalize()}", ["Breakfast", "Lunch", "Dinner"], key=f"skip_{day}")
+            if skips:
+                skip_config[day] = [s.lower() for s in skips]
 
         st.markdown("<br>", unsafe_allow_html=True)
         submit = st.form_submit_button(f"⚔️ LOCK {cfg['role_title']} CONTRACT & ACTIVATE")
 
     if submit:
-        is_token_user = "Option B" in login_method
+        is_token_user = "Option A" in login_method
 
-        if not name_input or not identifier_input or not secret_input:
-            st.error("Incomplete fields: Please provide your Name, Identifier, and Password / Session Token.")
-        elif is_token_user and (not notification_email_input or "@" not in notification_email_input):
-            st.error("A valid Notification Email is required for link/phone accounts to receive expiration warnings.")
+        if not spacebasic_id or not secret_input:
+            st.error("SpaceBasic User ID and Authentication Credential are required.")
+        elif not notification_email or "@" not in notification_email:
+            st.error("A valid Alert Email is required to receive expiration alerts.")
+        elif not is_token_user and not direct_login_email:
+            st.error("SpaceBasic Login Email is required when selecting Email & Password login.")
         else:
             try:
-                cleaned_secret = secret_input.strip().replace("Bearer ", "")
-                encrypted_secret = encrypt_value(cleaned_secret)
+                # Clean token/link: Extract JWT if a full URL was pasted
+                token_to_encrypt = secret_input
+                if "http://" in token_to_encrypt or "https://" in token_to_encrypt:
+                    # Parse token query parameter from magic link if present
+                    match = re.search(r"[?&](?:token|jwt|auth)=([^&#\s]+)", token_to_encrypt)
+                    if match:
+                        token_to_encrypt = match.group(1)
+                    else:
+                        token_to_encrypt = token_to_encrypt.strip()
+                else:
+                    token_to_encrypt = token_to_encrypt.replace("Bearer ", "").strip()
 
-                resolved_alert_email = notification_email_input.strip().lower() if is_token_user else identifier_input.strip().lower()
+                encrypted_secret = encrypt_value(token_to_encrypt)
 
-                payload = {
-                    "name": name_input.strip(),
-                    "email": identifier_input.strip().lower(),
-                    "notification_email": resolved_alert_email,
-                    "tenant_id": str(tenant_id).strip(),
+                record = {
+                    "spacebasic_id": str(spacebasic_id).strip(),
+                    "name": name_input or "Hunter",
+                    "notification_email": notification_email,
+                    "tenant_id": tenant_id or "143",
                     "auth_type": "token" if is_token_user else "password",
-                    "spacebasic_id": spacebasic_uid_input.strip() if is_token_user else None,
+                    "auth_token": encrypted_secret if is_token_user else None,
+                    "password": encrypted_secret if not is_token_user else None,
+                    "email": direct_login_email if not is_token_user else None,
                     "lunch_preference": lunch_pref,
                     "dinner_preference": dinner_pref,
                     "skip_days": skip_config,
                     "is_active": True
                 }
 
-                if is_token_user:
-                    payload["auth_token"] = encrypted_secret
-                    payload["password"] = None
-                else:
-                    payload["password"] = encrypted_secret
-                    payload["auth_token"] = None
-
-                supabase.table("users").upsert(payload, on_conflict="email").execute()
-                st.success(f"CONTRACT LOCKED: Credentials encrypted. Expiration alerts will route to {resolved_alert_email}.")
+                supabase.table("users").upsert(record, on_conflict="spacebasic_id").execute()
+                st.success(f"CONTRACT ARMED for SpaceBasic ID {spacebasic_id}! Expiration alerts will route to {notification_email}.")
             except Exception as err:
                 st.error(f"System synchronization failure: {err}")
