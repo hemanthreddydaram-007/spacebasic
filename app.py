@@ -633,40 +633,6 @@ st.markdown(f"""
         box-shadow: inset 0 0 15px {cfg['primary']}15;
     }}
 
-    .guide-step-card {{
-        background: #07111e;
-        border: 1px solid #1e293b;
-        border-radius: 6px;
-        padding: 12px 16px;
-        margin-bottom: 10px;
-    }}
-
-    .guide-step-num {{
-        display: inline-block;
-        background: {cfg['primary']};
-        color: #000000;
-        font-weight: 800;
-        border-radius: 50%;
-        width: 22px;
-        height: 22px;
-        text-align: center;
-        line-height: 22px;
-        font-size: 0.8rem;
-        margin-right: 8px;
-    }}
-
-    .ref-code-block {{
-        background: #020617;
-        border: 1px dashed {cfg['border_color']};
-        border-radius: 4px;
-        padding: 10px;
-        font-family: monospace;
-        font-size: 0.85rem;
-        color: #38bdf8;
-        word-break: break-all;
-        margin-top: 6px;
-    }}
-
     @keyframes greenGlow {{
         0%, 100% {{ box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); }}
         50% {{ box-shadow: 0 0 28px rgba(16, 185, 129, 0.65); }}
@@ -873,44 +839,15 @@ with tab_config:
             notification_email = None
 
         # ===============================================
-        # OPTION B: SESSION TOKEN / LINK USERS
+        # OPTION B: AUTH LINK / TOKEN USERS
         # ===============================================
         else:
             st.markdown("#### 1. USER ID & ALERT EMAIL")
             st.markdown(f"""
             <div class="guide-box">
-                <b style="color: {cfg['primary']};">TOKEN / MAGIC LINK PROTOCOL:</b><br>
-                Use this option if you log into SpaceBasic via phone number & SMS OTP. Because login links and tokens expire after a few weeks, provide your <b>Alert Email</b> so an automated alert will notify you when a link refresh is needed.
-            </div>
-            """, unsafe_allow_html=True)
-
-            # STEP-BY-STEP FIELD GUIDE FOR NON-EMAIL USERS
-            st.markdown(f"""
-            <div style="margin-bottom: 1.2rem;">
-                <div class="guide-step-card">
-                    <span class="guide-step-num">1</span>
-                    <b>How to find your SpaceBasic User ID:</b><br>
-                    <span style="color: #cbd5e1; font-size: 0.9rem;">
-                    Log into the SpaceBasic portal on your laptop. Open Developer Tools (<code>F12</code>) $\\rightarrow$ <b>Network</b> tab. Click on any meal booking or menu request. Look at the Request URL for <code>userId=123456</code> (or your profile page).
-                    </span>
-                    <div class="ref-code-block">
-                        <b>Example User ID:</b> 123456
-                    </div>
-                </div>
-                <div class="guide-step-card">
-                    <span class="guide-step-num">2</span>
-                    <b>How to get your Authentication Link or Token:</b><br>
-                    <span style="color: #cbd5e1; font-size: 0.9rem;">
-                    <b>Method 1 (Easiest - Mobile SMS):</b> Copy the full magic login link you receive via SMS/WhatsApp from SpaceBasic when you log in.<br>
-                    <b>Method 2 (Laptop Browser):</b> Press <code>F12</code> $\\rightarrow$ Network tab $\\rightarrow$ Click on <code>mealsmenu</code> $\\rightarrow$ Request Headers $\\rightarrow$ Copy the <code>Authorization</code> Bearer value.
-                    </span>
-                    <div class="ref-code-block">
-                        <b>Example Magic Link:</b><br>
-                        https://portal.spacebasic.com/auth/verify?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...<br><br>
-                        <b>Example Bearer Token:</b><br>
-                        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoi...
-                    </div>
-                </div>
+                <b>Quick 2-Step Guide:</b><br>
+                <b>Step 1 (User ID):</b> Log into SpaceBasic $\\rightarrow$ check your URL or profile number (e.g. <code>123456</code>).<br>
+                <b>Step 2 (Token):</b> Press <code>F12</code> on SpaceBasic $\\rightarrow$ click <b>Network</b> $\\rightarrow$ click any request $\\rightarrow$ copy the <code>Authorization</code> header value.
             </div>
             """, unsafe_allow_html=True)
 
@@ -924,20 +861,20 @@ with tab_config:
             with col_b1:
                 spacebasic_id = st.text_input(
                     "SPACEBASIC USER ID",
-                    placeholder="e.g. 123456",
-                    help="Your numeric user ID (e.g. 123456) seen in mealsmenu or SpaceBasic network requests."
+                    placeholder="123456",
+                    help="Your numeric user ID."
                 ).strip()
             with col_b2:
                 notification_email = st.text_input(
-                    "ALERT EMAIL (WHERE EXPIRATION NOTICES ARE SENT)",
+                    "ALERT EMAIL ADDRESS",
                     placeholder="student@gmail.com",
-                    help="We send an automated email alert here if your link or token expires."
+                    help="We will email you here when your token expires so you can refresh it."
                 ).strip().lower()
 
             secret_input = st.text_area(
                 "SPACEBASIC AUTHENTICATION LINK OR BEARER TOKEN",
-                placeholder="https://portal.spacebasic.com/auth/verify?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\n\nOR\n\neyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                help="Paste the full link starting with https:// or the JWT token string."
+                placeholder="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                help="Paste your Bearer token or login link here."
             ).strip()
             email_input = None
 
@@ -981,7 +918,6 @@ with tab_config:
         try:
             token_to_encrypt = secret_input
             if not is_direct_email:
-                # Extract token from URL if user pasted full magic link
                 if "http://" in token_to_encrypt or "https://" in token_to_encrypt:
                     match = re.search(r"[?&](?:token|jwt|auth)=([^&#\s]+)", token_to_encrypt)
                     if match:
