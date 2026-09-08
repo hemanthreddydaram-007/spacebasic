@@ -336,10 +336,10 @@ if "theme" not in st.session_state:
         <p style="color: #cbd5e1; font-size: 1.05rem;">Choose from the Top 10 Anime Realms or Standard Mode:</p>
     </div>
     """, unsafe_allow_html=True)
-    
+
     st.write("")
     choice = st.selectbox("SELECT YOUR INTERFACE REALM", list(THEMES.keys()), index=0)
-    
+
     if st.button("INITIALIZE INTERFACE →", use_container_width=True):
         st.session_state["theme"] = choice
         st.rerun()
