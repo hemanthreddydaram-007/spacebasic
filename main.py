@@ -2,6 +2,7 @@ import os
 import sys
 import datetime
 import requests
+import jwt as pyjwt
 from supabase import create_client, Client
 from security import decrypt_value
 
@@ -17,22 +18,32 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 BASE_URL = "https://api.spacebasic.com"
 
 def get_target_date_info():
-    # Targets tomorrow's date for next-day meal allocations
+    # Target next calendar day
     target_dt = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=1)
     date_str = target_dt.strftime("%Y-%m-%d")
     day_name = target_dt.strftime("%A").lower()
     return date_str, day_name
 
+def extract_user_id(token, fallback_val=None):
+    try:
+        decoded = pyjwt.decode(token, options={"verify_signature": False})
+        uid = decoded.get("uid") or decoded.get("sub") or decoded.get("userId")
+        if uid:
+            return str(uid)
+    except Exception:
+        pass
+    return str(fallback_val) if fallback_val else ""
+
 def resolve_authentication(user):
     auth_type = user.get("auth_type", "password")
 
-    # Branch 1: Persistent Session / Bearer Token (Option B)
+    # Persistent Session / Token
     if auth_type == "token" and user.get("auth_token"):
         print(f"[{user.get('email')}] Authenticating via stored persistent session token.")
         try:
             raw_token = decrypt_value(user["auth_token"]).strip()
         except Exception as dec_err:
-            raise Exception(f"Session token decryption failed (stale Fernet key): {dec_err}")
+            raise Exception(f"Session token decryption failed: {dec_err}")
 
         if not raw_token:
             raise Exception("Decrypted session token was empty.")
@@ -40,25 +51,22 @@ def resolve_authentication(user):
             raw_token = raw_token.replace("Bearer ", "").strip()
         return raw_token
 
-    # Branch 2: Real SpaceBasic Email Login Endpoint (Option A)
+    # SpaceBasic Email Authentication
     if user.get("password"):
         print(f"[{user.get('email')}] Authenticating via SpaceBasic /authenticate/email endpoint.")
         try:
             raw_password = decrypt_value(user["password"]).strip()
         except Exception as dec_err:
-            raise Exception(f"Password decryption failed (stale Fernet key): {dec_err}")
+            raise Exception(f"Password decryption failed: {dec_err}")
 
         if not raw_password:
             raise Exception("Decrypted password was empty. Re-register on the web portal.")
 
-        # Updated to the real endpoint verified via DevTools
         login_url = f"{BASE_URL}/authenticate/email"
-
         payload = {
             "username": user["email"].strip(),
             "password": raw_password
         }
-
         clean_headers = {
             "Content-Type": "application/json",
             "Accept": "application/json, text/plain, */*",
@@ -68,37 +76,67 @@ def resolve_authentication(user):
         }
 
         resp = requests.post(login_url, json=payload, headers=clean_headers, timeout=20)
-
         if resp.status_code in (200, 201):
             data = resp.json()
-            # Verified keys from network response
             token = data.get("jwt") or data.get("accessToken")
             if token:
                 return token.replace("Bearer ", "").strip()
-            raise Exception(f"Login succeeded but token missing in payload: {resp.text}")
+            raise Exception(f"Login succeeded but token missing: {resp.text}")
 
         raise Exception(f"Login failed: HTTP {resp.status_code} - {resp.text}")
 
-    raise Exception("No valid credentials (password or auth_token) found for this profile.")
+    raise Exception("No valid credentials found for this profile.")
 
-def book_meal(session, token, tenant_id, date_str, meal_type, preference):
+def fetch_menu_and_book(session, token, user_id, tenant_id, date_str, meal_type, preference):
     headers = {
         "Authorization": f"Bearer {token}",
         "Content-Type": "application/json",
-        "Accept": "application/json",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+        "Accept": "application/json, text/plain, */*",
+        "Origin": "https://web.spacebasic.com",
+        "Referer": "https://web.spacebasic.com/",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
 
-    booking_url = f"{BASE_URL}/api/v1/cafeteria/book"
+    # Step 1: Fetch Menu to get the active mealId
+    menu_url = f"{BASE_URL}/api/v3/messmanager/mealsmenu?userId={user_id}&tenantId={tenant_id}&mealDate={date_str}"
+    menu_resp = session.get(menu_url, headers=headers, timeout=20)
+    
+    if menu_resp.status_code != 200:
+        return False, f"Failed to fetch menu: HTTP {menu_resp.status_code} - {menu_resp.text}"
+
+    menu_data = menu_resp.json()
+    meals_list = menu_data.get("result", {}).get("meals", [])
+    if not meals_list:
+        return False, "No meals found for this date."
+
+    # Step 2: Match the appropriate mealId
+    target_meal_id = None
+    pref_clean = preference.strip().lower()
+
+    for meal in meals_list:
+        m_name = (meal.get("mealName") or "").lower()
+        if meal_type.lower() in m_name:
+            if pref_clean in m_name:
+                target_meal_id = meal.get("mealId")
+                break
+            elif not target_meal_id:
+                target_meal_id = meal.get("mealId")
+
+    if not target_meal_id:
+        return False, f"Could not find matching mealId for {meal_type} ({preference})"
+
+    # Step 3: Book via v3 rsvpmeal endpoint
+    rsvp_url = f"{BASE_URL}/api/v3/messmanager/rsvpmeal"
     payload = {
-        "tenant_id": str(tenant_id),
-        "date": date_str,
-        "meal_type": meal_type,
-        "preference": preference
+        "mealId": target_meal_id,
+        "userId": str(user_id),
+        "status": "1",
+        "createdBy": str(user_id),
+        "isSpecial": 0
     }
 
-    resp = session.post(booking_url, json=payload, headers=headers, timeout=20)
-    return resp.status_code in (200, 201), resp.text
+    rsvp_resp = session.post(rsvp_url, json=payload, headers=headers, timeout=20)
+    return rsvp_resp.status_code in (200, 201), rsvp_resp.text
 
 def process_user(user, date_str, day_name):
     ident = user.get("email")
@@ -111,27 +149,33 @@ def process_user(user, date_str, day_name):
         return
 
     tenant_id = user.get("tenant_id", "143")
+    user_id = extract_user_id(token, fallback_val=user.get("spacebasic_id"))
+
+    if not user_id:
+        print(f"[ERROR] Could not extract userId from token for {ident}")
+        return
+
     skips = user.get("skip_days") or {}
     day_skips = [s.lower() for s in skips.get(day_name, [])]
 
     meals_plan = [
-        ("breakfast", "Veg"),
-        ("lunch", user.get("lunch_preference", "Non Veg")),
-        ("dinner", user.get("dinner_preference", "Non Veg"))
+        ("Breakfast", "Veg"),
+        ("Lunch", user.get("lunch_preference", "Non Veg")),
+        ("Dinner", user.get("dinner_preference", "Non Veg"))
     ]
 
     session = requests.Session()
     for meal_type, pref in meals_plan:
-        if meal_type in day_skips:
-            print(f"[{ident}] Skipping {meal_type} per schedule skip preferences.")
+        if meal_type.lower() in day_skips:
+            print(f"[{ident}] Skipping {meal_type} per skip preferences.")
             continue
 
         try:
-            success, msg = book_meal(session, token, tenant_id, date_str, meal_type, pref)
+            success, msg = fetch_menu_and_book(session, token, user_id, tenant_id, date_str, meal_type, pref)
             if success:
-                print(f"[{ident}] SUCCESS: {meal_type.capitalize()} ({pref}) reserved.")
+                print(f"[{ident}] SUCCESS: {meal_type} ({pref}) reserved.")
             else:
-                print(f"[{ident}] FAILED: {meal_type.capitalize()} -> {msg}")
+                print(f"[{ident}] FAILED: {meal_type} -> {msg}")
         except Exception as net_err:
             print(f"[{ident}] EXCEPTION during {meal_type} request: {net_err}")
 
