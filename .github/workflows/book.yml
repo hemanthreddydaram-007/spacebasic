@@ -2,8 +2,8 @@ name: SpaceBasic Daily Autopilot Booking
 
 on:
   schedule:
-    # 12:00 UTC = 17:30 IST (5:30 PM IST)
-    - cron: '0 12 * * *'
+    # 02:30 UTC = 08:00 AM IST
+    - cron: '30 2 * * *'
   workflow_dispatch:
 
 jobs:
@@ -31,5 +31,7 @@ jobs:
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
           SECRET_KEY: ${{ secrets.SECRET_KEY || secrets.ENCRYPTION_KEY }}
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY || secrets.SECRET_KEY }}
+          ALERT_SENDER_EMAIL: ${{ secrets.ALERT_SENDER_EMAIL }}
+          ALERT_SENDER_PASSWORD: ${{ secrets.ALERT_SENDER_PASSWORD }}
         run: |
           python main.py
