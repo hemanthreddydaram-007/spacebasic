@@ -32,7 +32,7 @@ THEMES = {
         "body_font": "'Rajdhani', sans-serif",
         "title": "QUEST: MESS CONQUER",
         "badge": "[ SYSTEM ALERT: MONARCH CORE ARMED ]",
-        "subtitle": "Dungeon Gate Infiltration Window: 17:30:00 IST Sharp (5:30 PM)",
+        "subtitle": "Daily Infiltration Window: 07:00 AM – 09:30 PM IST",
         "role_title": "HUNTER",
         "tab1_title": "[ ⚡ HUNTER STATUS & REST GATE ]",
         "tab2_title": "[ 🛠️ HUNTER REGISTRATION & CONTRACT ]",
@@ -58,7 +58,7 @@ THEMES = {
         "body_font": "'Rajdhani', sans-serif",
         "title": "SCROLL: MESS CONQUEST",
         "badge": "🍥 [ HIDDEN LEAF MISSION PROTOCOL ]",
-        "subtitle": "Chakra Infiltration Window: 17:30:00 IST Sharp (5:30 PM)",
+        "subtitle": "Daily Infiltration Window: 07:00 AM – 09:30 PM IST",
         "role_title": "SHINOBI",
         "tab1_title": "[ 🍥 MISSION STATUS & RECOVERY ]",
         "tab2_title": "[ 📜 SHINOBI PACT & RATION JUTSU ]",
@@ -84,7 +84,7 @@ THEMES = {
         "body_font": "'Rajdhani', sans-serif",
         "title": "LOG POSE: MESS RAID",
         "badge": "☠️ [ GRAND LINE LOG POSE LOCKED ]",
-        "subtitle": "Galleon Galley Infiltration Time: 17:30:00 IST Sharp (5:30 PM)",
+        "subtitle": "Daily Infiltration Window: 07:00 AM – 09:30 PM IST",
         "role_title": "PIRATE",
         "tab1_title": "[ ⚓ FLEET LOG & DOCKING MODE ]",
         "tab2_title": "[ 🍖 CREW REGISTRATION & BANQUET RULES ]",
@@ -110,7 +110,7 @@ THEMES = {
         "body_font": "'Rajdhani', sans-serif",
         "title": "BREATHING STYLE: MEAL CLAIM",
         "badge": "⚔️ [ DEMON SLAYER CORPS DISPATCH ]",
-        "subtitle": "Nichirin Blade Strike Target: 17:30:00 IST Sharp (5:30 PM)",
+        "subtitle": "Daily Infiltration Window: 07:00 AM – 09:30 PM IST",
         "role_title": "SLAYER",
         "tab1_title": "[ 🏮 SLAYER TELEMETRY & REHAB ]",
         "tab2_title": "[ 🗡️ CORPS OATH & RATION FORMS ]",
@@ -136,7 +136,7 @@ THEMES = {
         "body_font": "'Rajdhani', sans-serif",
         "title": "DOMAIN EXPANSION: MESS REIGN",
         "badge": "👁️ [ SPECIAL GRADE CURSED SEAL ]",
-        "subtitle": "Sure-Hit Booking Activation: 17:30:00 IST Sharp (5:30 PM)",
+        "subtitle": "Daily Infiltration Window: 07:00 AM – 09:30 PM IST",
         "role_title": "SORCERER",
         "tab1_title": "[ 👁️ DOMAIN STATUS & SEALED BARRIER ]",
         "tab2_title": "[ 🗝️ CURSED CONTRACT & MEAL TECHNIQUE ]",
@@ -162,7 +162,7 @@ THEMES = {
         "body_font": "'Rajdhani', sans-serif",
         "title": "EXPEDITION: WALL ROSE RATION",
         "badge": "🛡️ [ SCOUT REGIMENT DEPLOYMENT ]",
-        "subtitle": "Wall Reconnaissance Strike Time: 17:30:00 IST Sharp (5:30 PM)",
+        "subtitle": "Daily Infiltration Window: 07:00 AM – 09:30 PM IST",
         "role_title": "SOLDIER",
         "tab1_title": "[ 🛡️ SCOUT TELEMETRY & INTERIOR RETREAT ]",
         "tab2_title": "[ ⚔️ CADET CONTRACT & RATION ALLOCATION ]",
@@ -188,7 +188,7 @@ THEMES = {
         "body_font": "'Rajdhani', sans-serif",
         "title": "BANKAI: SEIREITEI MESS ORDER",
         "badge": "⚡ [ GOTEI 13 REISHI DISPATCH ]",
-        "subtitle": "Senkaimon Infiltration Window: 17:30:00 IST Sharp (5:30 PM)",
+        "subtitle": "Daily Infiltration Window: 07:00 AM – 09:30 PM IST",
         "role_title": "REAPER",
         "tab1_title": "[ ⚡ REISHI STATUS & WORLD OF LIVING ]",
         "tab2_title": "[ 🗡️ SQUAD CONTRACT & PROVISION KIDO ]",
@@ -214,7 +214,7 @@ THEMES = {
         "body_font": "'Rajdhani', sans-serif",
         "title": "SUPER SAIYAN: SENZU CLAIM",
         "badge": "🐉 [ CAPSULE CORP RADAR ARMED ]",
-        "subtitle": "Kame House Delivery Target: 17:30:00 IST Sharp (5:30 PM)",
+        "subtitle": "Daily Infiltration Window: 07:00 AM – 09:30 PM IST",
         "role_title": "WARRIOR",
         "tab1_title": "[ 🐉 SCOUTER RADAR & GRAVITY ROOM ]",
         "tab2_title": "[ 🥩 SAIYAN FEAST & RATION STATS ]",
@@ -240,7 +240,7 @@ THEMES = {
         "body_font": "'Rajdhani', sans-serif",
         "title": "DEATH NOTE: MEAL JUDGMENT",
         "badge": "📓 [ SHINIGAMI EYE CONTRACT ACTIVE ]",
-        "subtitle": "Notebook Inscription Deadline: 17:30:00 IST Sharp (5:30 PM)",
+        "subtitle": "Daily Infiltration Window: 07:00 AM – 09:30 PM IST",
         "role_title": "INVESTIGATOR",
         "tab1_title": "[ 📓 NOTEBOOK SURVEILLANCE & REST ]",
         "tab2_title": "[ 🖋️ DEATH NOTE CONTRACT & RULES ]",
@@ -266,7 +266,7 @@ THEMES = {
         "body_font": "'Rajdhani', sans-serif",
         "title": "PLUS ULTRA: U.A. CAFETERIA",
         "badge": "💥 [ HERO ALLIANCE REGISTRY ENGAGED ]",
-        "subtitle": "Lunch Rush Speed Claim Window: 17:30:00 IST Sharp (5:30 PM)",
+        "subtitle": "Daily Infiltration Window: 07:00 AM – 09:30 PM IST",
         "role_title": "HERO",
         "tab1_title": "[ 💥 QUIRK MONITOR & DORM REST ]",
         "tab2_title": "[ 🦸 HERO REGISTRATION & DIET PLAN ]",
@@ -292,7 +292,7 @@ THEMES = {
         "body_font": "'Plus Jakarta Sans', sans-serif",
         "title": "MESS CONQUERS AUTOPILOT",
         "badge": "⚡ [ AUTOMATED CLOUD DISPATCH ACTIVE ]",
-        "subtitle": "Daily Execution Scheduled: 17:30:00 IST Sharp (5:30 PM)",
+        "subtitle": "Daily Infiltration Window: 07:00 AM – 09:30 PM IST",
         "role_title": "STUDENT",
         "tab1_title": "[ ⚡ SERVICE STATUS & VACATION MODE ]",
         "tab2_title": "[ 🛠️ ACCOUNT SETUP & PREFERENCES ]",
@@ -723,8 +723,8 @@ with tab_status:
     st.caption(cfg["tab1_caption"])
 
     search_id = st.text_input(
-        "REGISTERED IDENTIFIER (EMAIL OR SPACEBASIC USER ID)",
-        placeholder="student@example.com or 12345",
+        "REGISTERED IDENTIFIER (EMAIL, PHONE NUMBER, OR SPACEBASIC USER ID)",
+        placeholder="student@example.com, 9876543210, or 380180",
         key="status_lookup_box"
     ).strip().lower()
 
@@ -737,6 +737,7 @@ with tab_status:
                 user_name = user_rec.get("name", cfg["role_title"]).upper()
                 is_active = user_rec.get("is_active", True)
                 auth_type_stored = user_rec.get("auth_type", "password").upper()
+                alert_email = user_rec.get("notification_email", "Not configured")
 
                 st.write("")
                 if is_active:
@@ -746,8 +747,9 @@ with tab_status:
                             STATUS: ACTIVE • {cfg['role_title']} {user_name}
                         </div>
                         <p style="margin: 8px 0 0 0; color: #a7f3d0; font-size: 1rem;">
-                            Autopilot routine engaged. Daily meal booking triggers at <b>17:30:00 IST (5:30 PM)</b>.<br>
-                            <span style="font-size: 0.85rem; opacity: 0.9;">AUTHENTICATION PROTOCOL: {auth_type_stored}</span>
+                            Autopilot routine engaged. Daily meal booking triggers dynamically within the SpaceBasic portal window.<br>
+                            <span style="font-size: 0.85rem; opacity: 0.9;">AUTHENTICATION PROTOCOL: {auth_type_stored}</span><br>
+                            <span style="font-size: 0.85rem; opacity: 0.9;">ALERT DESTINATION: {alert_email}</span>
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
@@ -762,7 +764,8 @@ with tab_status:
                             STATUS: PAUSED • {cfg['role_title']} {user_name}
                         </div>
                         <p style="margin: 8px 0 0 0; color: #fde68a; font-size: 1rem;">
-                            Account is in rest mode. The 17:30:00 IST booking script will bypass this profile.
+                            Account is paused or session link expired. Automated booking will bypass this profile until refreshed.<br>
+                            <span style="font-size: 0.85rem; opacity: 0.9;">ALERT DESTINATION: {alert_email}</span>
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
@@ -771,7 +774,7 @@ with tab_status:
                         supabase.table("users").update({"is_active": True}).eq("email", search_id).execute()
                         st.rerun()
             else:
-                st.info("No registered profile located with this identifier. Inscribe your details in Tab 2.")
+                st.info("No registered profile located with this identifier. Register your credentials in Tab 2.")
         except Exception as e:
             st.error(f"Telemetry query error: {e}")
 
@@ -784,12 +787,11 @@ with tab_config:
 
     st.markdown("#### 1. HOW DO YOU LOG INTO SPACEBASIC?")
     
-    # Placed outside st.form so selecting an option triggers instant rerender
     login_method = st.radio(
         "SELECT YOUR LOGIN METHOD",
         [
             "Option A: SpaceBasic Email & Password",
-            "Option B: SpaceBasic User ID + Session Token"
+            "Option B: SpaceBasic Mobile Number / Token / Magic Link"
         ],
         index=0,
         key="login_method_selector"
@@ -806,11 +808,14 @@ with tab_config:
         with col2:
             tenant_id = st.text_input("SPACEBASIC TENANT ID", value="143")
 
+        notification_email_input = ""
+        spacebasic_uid_input = ""
+
         if "Option A" in login_method:
             st.markdown(f"""
             <div class="guide-box">
                 <b style="color: {cfg['primary']};">EMAIL + PASSWORD PATH:</b><br>
-                Enter your registered SpaceBasic email and password. The automation script will use these credentials to log in and book meals at 5:30 PM IST daily.
+                Enter your registered SpaceBasic email and password. The system will authenticate directly via the API. Any session issues or alerts will automatically route to this email.
             </div>
             """, unsafe_allow_html=True)
 
@@ -823,29 +828,37 @@ with tab_config:
         else:
             st.markdown(f"""
             <div class="guide-box">
-                <b style="color: {cfg['primary']};">USER ID + SESSION TOKEN (OTP-FREE) PATH:</b><br>
-                Since automated runners cannot prompt for an SMS OTP at 5:30 PM, supply your <b>Authorization Session Token</b> and <b>User ID</b>.<br><br>
-                <b>Steps to get your Authorization Token:</b><br>
-                1. Open your college SpaceBasic web portal on Chrome/Brave/Edge on a laptop.<br>
-                2. Press <code>F12</code> (or right-click $\\rightarrow$ Inspect) and open the <b>Network</b> tab.<br>
-                3. Log in using your phone number and OTP.<br>
-                4. In the Network tab list, click any request (such as <code>profile</code>, <code>dashboard</code>, or <code>book</code>).<br>
-                5. Under <b>Request Headers</b>, find <code>Authorization</code> and copy the entire string (e.g., <code>Bearer eyJhbG...</code>).
+                <b style="color: {cfg['primary']};">MOBILE NUMBER / TOKEN / LINK PATH:</b><br>
+                Provide your mobile number (or user ID), your token/link, and a <b>Notification Email</b>. If your session token or magic link expires, an automated alert email will be sent to notify you immediately.
             </div>
             """, unsafe_allow_html=True)
 
-            col_b1, col_b2 = st.columns([1, 1])
+            col_b1, col_b2 = st.columns(2)
             with col_b1:
                 identifier_input = st.text_input(
-                    "SPACEBASIC USER ID",
-                    placeholder="e.g., 12345",
-                    help="Found in your SpaceBasic profile or URL after logging in."
+                    "PRIMARY IDENTIFIER (MOBILE NUMBER OR ID)",
+                    placeholder="e.g. 9876543210",
+                    help="Your phone number or primary identifier used for tracking."
                 )
             with col_b2:
+                notification_email_input = st.text_input(
+                    "ALERT EMAIL ADDRESS",
+                    placeholder="student@gmail.com",
+                    help="Destination email where expiration notices will be dispatched if your token/link dies."
+                )
+
+            col_b3, col_b4 = st.columns([1, 1])
+            with col_b3:
+                spacebasic_uid_input = st.text_input(
+                    "SPACEBASIC USER ID",
+                    placeholder="e.g. 380180",
+                    help="Found in your SpaceBasic network calls, profile, or booking URL."
+                )
+            with col_b4:
                 secret_input = st.text_area(
-                    "SPACEBASIC AUTHORIZATION / BEARER TOKEN",
-                    placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                    help="Paste the full token or Bearer string copied from Developer Tools."
+                    "SPACEBASIC AUTHORIZATION TOKEN / FULL MAGIC LINK",
+                    placeholder="eyJhbGciOiJIUzI1Ni... or https://portal.spacebasic.com/auth/...",
+                    help="Paste the full session JWT token or magic link."
                 )
 
         st.markdown("<hr style='border: 0.5px solid #334155; margin: 1.2rem 0;'>", unsafe_allow_html=True)
@@ -853,12 +866,12 @@ with tab_config:
 
         col_p1, col_p2 = st.columns(2)
         with col_p1:
-            lunch_pref = st.selectbox("LUNCH PREFERENCE ORDER", ["Non Veg", "Egg", "Veg"], index=0)
+            lunch_pref = st.selectbox("LUNCH PREFERENCE ORDER", ["Non Veg", "Eggetarian", "Veg"], index=0)
         with col_p2:
-            dinner_pref = st.selectbox("DINNER PREFERENCE ORDER", ["Non Veg", "Egg", "Veg"], index=0)
+            dinner_pref = st.selectbox("DINNER PREFERENCE ORDER", ["Non Veg", "Eggetarian", "Veg"], index=0)
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.caption("Check any meals you want the automation script to skip claiming automatically:")
+        st.caption("Select any meals you want the automation script to skip claiming automatically:")
 
         days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
         skip_config = {}
@@ -882,20 +895,26 @@ with tab_config:
         submit = st.form_submit_button(f"⚔️ LOCK {cfg['role_title']} CONTRACT & ACTIVATE")
 
     if submit:
+        is_token_user = "Option B" in login_method
+
         if not name_input or not identifier_input or not secret_input:
-            st.error("Parameters incomplete: Please enter Name, Login Identifier (Email or User ID), and Password or Session Token.")
+            st.error("Incomplete fields: Please provide your Name, Identifier, and Password / Session Token.")
+        elif is_token_user and (not notification_email_input or "@" not in notification_email_input):
+            st.error("A valid Notification Email is required for link/phone accounts to receive expiration warnings.")
         else:
             try:
                 cleaned_secret = secret_input.strip().replace("Bearer ", "")
                 encrypted_secret = encrypt_value(cleaned_secret)
 
-                is_token_user = "Option B" in login_method
+                resolved_alert_email = notification_email_input.strip().lower() if is_token_user else identifier_input.strip().lower()
 
                 payload = {
                     "name": name_input.strip(),
                     "email": identifier_input.strip().lower(),
+                    "notification_email": resolved_alert_email,
                     "tenant_id": str(tenant_id).strip(),
                     "auth_type": "token" if is_token_user else "password",
+                    "spacebasic_id": spacebasic_uid_input.strip() if is_token_user else None,
                     "lunch_preference": lunch_pref,
                     "dinner_preference": dinner_pref,
                     "skip_days": skip_config,
@@ -910,6 +929,6 @@ with tab_config:
                     payload["auth_token"] = None
 
                 supabase.table("users").upsert(payload, on_conflict="email").execute()
-                st.success("CONTRACT LOCKED: Credentials encrypted and armed for 17:30:00 IST execution.")
+                st.success(f"CONTRACT LOCKED: Credentials encrypted. Expiration alerts will route to {resolved_alert_email}.")
             except Exception as err:
                 st.error(f"System synchronization failure: {err}")
