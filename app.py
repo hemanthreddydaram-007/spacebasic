@@ -112,7 +112,7 @@ THEMES = {
         "role_title": "SLAYER",
         "tab1_title": "[ 🏮 SLAYER TELEMETRY & REHAB ]",
         "tab2_title": "[ 🗡️ CORPS OATH & RATION FORMS ]",
-        "tab1_header": "📍 CORPS HEADQUAR headquarters DISPATCH",
+        "tab1_header": "📍 CORPS HEADQUARTERS DISPATCH",
         "tab1_caption": "Track daily ration acquisition or enter Butterfly Mansion for recovery.",
         "tab2_header": "⚙️ NICHIRIN OATH & CORPS ALLOCATION",
         "tab2_caption": "Breathing ciphers are forged under unbreakable AES-128 ward seals.",
@@ -518,40 +518,56 @@ with tab_status:
     st.markdown(f"##### {cfg['tab1_header']}")
     st.caption(cfg["tab1_caption"])
 
-    search_id = st.text_input(
-        "SPACEBASIC USER ID (PRIMARY KEY)",
-        placeholder="e.g. 123456",
-        key="status_lookup_box"
-    ).strip()
+    lookup_choice = st.radio(
+        "IDENTIFY YOUR ACCOUNT TYPE",
+        [
+            "🔑 SpaceBasic User ID (Token / Magic Link Users)",
+            "✉️ Registered Email (Email & Password Users)"
+        ],
+        horizontal=True,
+        key="status_lookup_radio"
+    )
 
-    if search_id:
+    if "User ID" in lookup_choice:
+        search_val = st.text_input("SPACEBASIC USER ID", placeholder="e.g. 123456", key="status_lookup_uid").strip()
+        field_to_query = "spacebasic_id"
+    else:
+        search_val = st.text_input("REGISTERED LOGIN EMAIL", placeholder="e.g. student@example.com", key="status_lookup_email").strip().lower()
+        field_to_query = "email"
+
+    if search_val:
         try:
-            res = supabase.table("users").select("*").eq("spacebasic_id", search_id).execute()
+            res = supabase.table("users").select("*").eq(field_to_query, search_val).execute()
             if res.data and len(res.data) > 0:
                 user_rec = res.data[0]
                 user_name = user_rec.get("name", cfg["role_title"]).upper()
                 is_active = user_rec.get("is_active", True)
                 auth_type_stored = user_rec.get("auth_type", "token").upper()
                 notif_email = user_rec.get("notification_email", "None configured")
+                target_uid = user_rec.get("spacebasic_id")
 
                 st.write("")
                 if is_active:
-                    st.success(f"STATUS: ACTIVE • {cfg['role_title']} {user_name}\n"
-                               f"• SpaceBasic ID: {search_id}\n"
-                               f"• Protocol: {auth_type_stored}\n"
-                               f"• Expiration Alert Destination: {notif_email}")
+                    st.success(
+                        f"STATUS: ACTIVE • {cfg['role_title']} {user_name}\n\n"
+                        f"• SpaceBasic ID: {target_uid}\n"
+                        f"• Protocol: {auth_type_stored}\n"
+                        f"• Alerts Dispatch Destination: {notif_email}"
+                    )
                     if st.button("🏖️ ENTER REST MODE (PAUSE AUTOPILOT)"):
-                        supabase.table("users").update({"is_active": False}).eq("spacebasic_id", search_id).execute()
+                        supabase.table("users").update({"is_active": False}).eq("spacebasic_id", target_uid).execute()
                         st.rerun()
                 else:
-                    st.warning(f"STATUS: PAUSED / EXPIRED • {cfg['role_title']} {user_name}\n"
-                               f"• SpaceBasic ID: {search_id}\n"
-                               f"• Expiration alerts sent to: {notif_email}")
+                    st.warning(
+                        f"STATUS: PAUSED / EXPIRED • {cfg['role_title']} {user_name}\n\n"
+                        f"• SpaceBasic ID: {target_uid}\n"
+                        f"• Expiration alerts sent to: {notif_email}"
+                    )
                     if st.button("⚔️ RESUME AUTOPILOT"):
-                        supabase.table("users").update({"is_active": True}).eq("spacebasic_id", search_id).execute()
+                        supabase.table("users").update({"is_active": True}).eq("spacebasic_id", target_uid).execute()
                         st.rerun()
             else:
-                st.info("No hunter contract registered with this SpaceBasic User ID. Lock your contract in Tab 2.")
+                st.info(f"No profile located for {search_val}. Inscribe your contract in Tab 2.")
         except Exception as e:
             st.error(f"Telemetry query error: {e}")
 
@@ -660,10 +676,8 @@ with tab_config:
             st.error("SpaceBasic Login Email is required when selecting Email & Password login.")
         else:
             try:
-                # Clean token/link: Extract JWT if a full URL was pasted
                 token_to_encrypt = secret_input
                 if "http://" in token_to_encrypt or "https://" in token_to_encrypt:
-                    # Parse token query parameter from magic link if present
                     match = re.search(r"[?&](?:token|jwt|auth)=([^&#\s]+)", token_to_encrypt)
                     if match:
                         token_to_encrypt = match.group(1)
