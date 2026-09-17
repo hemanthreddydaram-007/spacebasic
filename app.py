@@ -27,7 +27,7 @@ st.markdown("""
     }
 
     html, body, [data-testid="stAppViewContainer"], .stApp {
-        background-color: #090d16 !important;
+        background-color: #080c15 !important;
         color: #f8fafc !important;
     }
 
@@ -78,13 +78,13 @@ st.markdown("""
         box-shadow: 0 12px 25px rgba(2, 132, 199, 0.5) !important;
     }
 
-    /* Navigation Tabs */
+    /* Clean Navigation Tabs */
     .stTabs [data-baseweb="tab-list"] {
         background: #0f172a;
         border: 1px solid #1e293b;
         border-radius: 12px;
         padding: 6px;
-        gap: 6px;
+        gap: 8px;
     }
 
     .stTabs [data-baseweb="tab"] {
@@ -92,12 +92,18 @@ st.markdown("""
         font-size: 0.88rem;
         color: #94a3b8;
         border-radius: 8px;
+        padding: 8px 16px;
+        border: none !important;
     }
 
     .stTabs [aria-selected="true"] {
         background: rgba(56, 189, 248, 0.15) !important;
         color: #38bdf8 !important;
         border: 1px solid rgba(56, 189, 248, 0.4) !important;
+    }
+
+    .stTabs [data-baseweb="tab-highlight"] {
+        display: none !important;
     }
 
     .guide-box {
@@ -417,7 +423,6 @@ with tab_register:
     st.markdown("<hr style='border: 0.5px solid #1e293b; margin: 1.2rem 0;'>", unsafe_allow_html=True)
 
     with st.form("autopilot_registration_form"):
-        # OPTION A: DIRECT CREDENTIALS
         if "Option A" in auth_choice:
             st.markdown("#### 1. Identity & Credentials")
             st.markdown("""
@@ -442,7 +447,6 @@ with tab_register:
             spacebasic_id = None
             notification_email = None
 
-        # OPTION B: BEARER / MAGIC LINK
         else:
             st.markdown("#### 1. User ID & Token Setup")
             st.markdown("""
