@@ -9,14 +9,14 @@ from security import encrypt_value
 # SYSTEM CORE CONFIGURATION
 # ==========================================
 st.set_page_config(
-    page_title="Mess Conquers • Automation Hub",
+    page_title="Mess Conquers • Floating Hub",
     page_icon="💠",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
 # ==========================================
-# MODERN HIGH-CONTRAST DARK UI STYLES
+# FLOATING SPATIAL PHYSICS & NEUMORPHIC GLASSCRAFT
 # ==========================================
 st.markdown("""
 <style>
@@ -26,292 +26,238 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
     }
 
+    /* Ambient Spatial Deep Void Background */
     html, body, [data-testid="stAppViewContainer"], .stApp {
-        background-color: #080c15 !important;
-        color: #f8fafc !important;
+        background-color: #060911 !important;
+        background-image: 
+            radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.18) 0%, transparent 50%),
+            radial-gradient(circle at 10% 90%, rgba(99, 102, 241, 0.1) 0%, transparent 45%),
+            radial-gradient(circle at 90% 70%, rgba(56, 189, 248, 0.08) 0%, transparent 40%) !important;
+        color: #f1f5f9 !important;
+        perspective: 1200px;
     }
 
     header[data-testid="stHeader"] {
         background: transparent !important;
     }
 
-    /* Container Card Layout */
-    div[data-testid="stForm"], .panel-box {
-        background: #0f172a !important;
-        border: 1px solid #1e293b !important;
-        border-radius: 16px !important;
-        padding: 2rem !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+    /* Continuous Zero-G Floating Motion */
+    @keyframes floatingElevation {
+        0% {
+            transform: translateY(0px) rotateX(0deg);
+            box-shadow: 
+                0 25px 45px -10px rgba(0, 0, 0, 0.9),
+                0 0 25px rgba(14, 165, 233, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+        50% {
+            transform: translateY(-9px) rotateX(0.5deg);
+            box-shadow: 
+                0 40px 65px -12px rgba(0, 0, 0, 0.95),
+                0 0 45px rgba(14, 165, 233, 0.28),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        }
+        100% {
+            transform: translateY(0px) rotateX(0deg);
+            box-shadow: 
+                0 25px 45px -10px rgba(0, 0, 0, 0.9),
+                0 0 25px rgba(14, 165, 233, 0.15),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
     }
 
-    /* Input Field Styling */
+    /* 3D Floating Hero Console */
+    .floating-hero {
+        background: linear-gradient(145deg, rgba(17, 24, 39, 0.88) 0%, rgba(11, 15, 25, 0.95) 100%);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-top: 1px solid rgba(56, 189, 248, 0.5);
+        border-radius: 24px;
+        padding: 2.4rem 1.8rem;
+        margin-bottom: 2.2rem;
+        text-align: center;
+        animation: floatingElevation 6s ease-in-out infinite;
+        transition: transform 0.3s ease;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 14px;
+        background: rgba(14, 165, 233, 0.12);
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        border-radius: 9999px;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        color: #38bdf8;
+        box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
+        margin-bottom: 0.8rem;
+    }
+
+    .hero-title {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: #ffffff;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.35rem;
+        text-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+    }
+
+    .hero-sub {
+        color: #94a3b8;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    /* Floating Interactive 3D Form Card */
+    div[data-testid="stForm"], .floating-card {
+        background: linear-gradient(160deg, rgba(15, 23, 42, 0.88) 0%, rgba(9, 14, 26, 0.95) 100%) !important;
+        backdrop-filter: blur(25px) !important;
+        -webkit-backdrop-filter: blur(25px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.22) !important;
+        border-radius: 22px !important;
+        padding: 2.4rem !important;
+        box-shadow: 
+            0 30px 60px -15px rgba(0, 0, 0, 0.92),
+            0 0 35px rgba(14, 165, 233, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+        transform: translateZ(10px);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease !important;
+    }
+
+    div[data-testid="stForm"]:hover {
+        transform: translateY(-4px) translateZ(18px);
+        box-shadow: 
+            0 40px 75px -15px rgba(0, 0, 0, 0.98),
+            0 0 45px rgba(14, 165, 233, 0.22),
+            inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+    }
+
+    /* Inset Tactile Inputs */
     .stTextInput input, .stTextArea textarea, .stSelectbox select {
-        background: #020617 !important;
-        border: 1px solid #334155 !important;
+        background: #030611 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
         color: #ffffff !important;
-        border-radius: 10px !important;
-        padding: 0.75rem 1rem !important;
+        border-radius: 12px !important;
+        padding: 0.8rem 1.1rem !important;
         font-size: 0.95rem !important;
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.75) !important;
+        transition: all 0.25s ease !important;
     }
 
     .stTextInput input:focus, .stTextArea textarea:focus, .stSelectbox select:focus {
         border-color: #38bdf8 !important;
-        box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25) !important;
+        box-shadow: 
+            inset 0 2px 5px rgba(0, 0, 0, 0.9),
+            0 0 0 3px rgba(56, 189, 248, 0.28) !important;
+        transform: translateY(-1px);
     }
 
-    /* Primary Action Button */
+    /* Floating Elevated Button */
     .stButton>button {
-        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+        background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%) !important;
         color: #ffffff !important;
         font-weight: 700 !important;
         font-size: 0.98rem !important;
-        border: 1px solid #38bdf8 !important;
-        border-radius: 10px !important;
-        padding: 0.8rem 1.6rem !important;
-        box-shadow: 0 8px 20px rgba(2, 132, 199, 0.35) !important;
+        border: 1px solid rgba(255, 255, 255, 0.25) !important;
+        border-bottom: 3px solid #0369a1 !important;
+        border-radius: 12px !important;
+        padding: 0.85rem 1.8rem !important;
+        box-shadow: 0 12px 25px -4px rgba(2, 132, 199, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
         width: 100%;
-        transition: all 0.2s ease !important;
     }
 
     .stButton>button:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 12px 25px rgba(2, 132, 199, 0.5) !important;
+        transform: translateY(-3px) scale(1.01) !important;
+        box-shadow: 0 18px 32px -4px rgba(2, 132, 199, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
     }
 
-    /* Clean Navigation Tabs */
+    .stButton>button:active {
+        transform: translateY(1px) !important;
+        box-shadow: 0 6px 14px rgba(2, 132, 199, 0.4) !important;
+    }
+
+    /* Floating Tab Bar */
     .stTabs [data-baseweb="tab-list"] {
-        background: #0f172a;
-        border: 1px solid #1e293b;
-        border-radius: 12px;
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
         padding: 6px;
         gap: 8px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     }
 
     .stTabs [data-baseweb="tab"] {
         font-weight: 600;
         font-size: 0.88rem;
         color: #94a3b8;
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 8px 16px;
         border: none !important;
+        transition: all 0.2s ease;
     }
 
     .stTabs [aria-selected="true"] {
-        background: rgba(56, 189, 248, 0.15) !important;
+        background: rgba(56, 189, 248, 0.18) !important;
         color: #38bdf8 !important;
         border: 1px solid rgba(56, 189, 248, 0.4) !important;
+        box-shadow: 0 4px 16px rgba(14, 165, 233, 0.25) !important;
     }
 
     .stTabs [data-baseweb="tab-highlight"] {
         display: none !important;
     }
 
+    /* Depth Guide Card */
     .guide-box {
-        background: #020617;
+        background: #030611;
+        border: 1px solid rgba(56, 189, 248, 0.25);
         border-left: 4px solid #38bdf8;
-        border-radius: 8px;
-        padding: 14px 18px;
-        margin: 12px 0 18px 0;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin: 14px 0 20px 0;
         color: #cbd5e1;
         font-size: 0.92rem;
         line-height: 1.6;
+        box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.6);
     }
 
     .status-card-active {
-        background: rgba(6, 78, 59, 0.5);
+        background: linear-gradient(135deg, rgba(6, 78, 59, 0.5) 0%, rgba(6, 95, 70, 0.3) 100%);
         border: 1px solid #10b981;
-        border-radius: 12px;
-        padding: 1.2rem;
-        margin-bottom: 1.2rem;
+        border-radius: 14px;
+        padding: 1.4rem;
+        margin-bottom: 1.4rem;
+        box-shadow: 0 15px 30px -8px rgba(16, 185, 129, 0.25);
     }
 
     .status-card-paused {
-        background: rgba(120, 53, 15, 0.5);
+        background: linear-gradient(135deg, rgba(120, 53, 15, 0.5) 0%, rgba(146, 64, 14, 0.3) 100%);
         border: 1px solid #f59e0b;
-        border-radius: 12px;
-        padding: 1.2rem;
-        margin-bottom: 1.2rem;
+        border-radius: 14px;
+        padding: 1.4rem;
+        margin-bottom: 1.4rem;
+        box-shadow: 0 15px 30px -8px rgba(245, 158, 11, 0.25);
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# INTERACTIVE 3D COMPONENT (THREE.JS HERO)
+# FLOATING HERO BANNER
 # ==========================================
-components.html("""
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background: transparent;
-            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-        }
-
-        .hero-3d-stage {
-            position: relative;
-            width: 100%;
-            height: 250px;
-            background: radial-gradient(circle at center, #1e293b 0%, #0b0f19 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-top: 1px solid rgba(56, 189, 248, 0.4);
-            border-radius: 20px;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-        }
-
-        #canvas3d {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        .hero-overlay {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            pointer-events: none;
-            padding: 0 20px;
-        }
-
-        .badge-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
-            background: rgba(14, 165, 233, 0.15);
-            border: 1px solid rgba(56, 189, 248, 0.4);
-            border-radius: 9999px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            color: #38bdf8;
-            margin-bottom: 0.5rem;
-        }
-
-        .hero-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            color: #ffffff;
-            margin: 0;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.8);
-            letter-spacing: -0.02em;
-        }
-
-        .hero-sub {
-            color: #94a3b8;
-            font-size: 0.92rem;
-            margin-top: 6px;
-            font-weight: 500;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-</head>
-<body>
-    <div class="hero-3d-stage">
-        <canvas id="canvas3d"></canvas>
-        <div class="hero-overlay">
-            <div class="badge-pill">⚡ AUTONOMOUS ENGINE</div>
-            <h1 class="hero-title">Mess Conquers</h1>
-            <p class="hero-sub">Autonomous SpaceBasic meal bookings & scheduling autopilot</p>
-        </div>
-    </div>
-
-    <script>
-        const canvas = document.getElementById('canvas3d');
-        const container = canvas.parentElement;
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
-        camera.position.z = 18;
-
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        // 3D Gyroscope Group
-        const gyroGroup = new THREE.Group();
-        scene.add(gyroGroup);
-
-        // Ring 1 (Outer)
-        const ring1Geo = new THREE.TorusGeometry(6.5, 0.12, 16, 100);
-        const ring1Mat = new THREE.MeshStandardMaterial({ color: 0x0284c7, metalness: 0.8, roughness: 0.2 });
-        const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
-        gyroGroup.add(ring1);
-
-        // Ring 2 (Middle)
-        const ring2Geo = new THREE.TorusGeometry(5.2, 0.14, 16, 100);
-        const ring2Mat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.9, roughness: 0.15 });
-        const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
-        gyroGroup.add(ring2);
-
-        // Core Glowing Crystal (Center)
-        const coreGeo = new THREE.OctahedronGeometry(2.4, 0);
-        const coreMat = new THREE.MeshStandardMaterial({
-            color: 0x0ea5e9,
-            metalness: 0.2,
-            roughness: 0.1,
-            wireframe: true
-        });
-        const core = new THREE.Mesh(coreGeo, coreMat);
-        gyroGroup.add(core);
-
-        // Ambient Lighting
-        const lightPrimary = new THREE.PointLight(0x38bdf8, 3, 30);
-        lightPrimary.position.set(6, 6, 8);
-        scene.add(lightPrimary);
-
-        const lightSecondary = new THREE.PointLight(0x6366f1, 2, 30);
-        lightSecondary.position.set(-6, -6, 6);
-        scene.add(lightSecondary);
-
-        scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-
-        // Cursor Reactive Tracking
-        let mouseX = 0, mouseY = 0;
-        window.addEventListener('mousemove', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            mouseX = ((e.clientX - rect.left) / container.clientWidth - 0.5) * 2;
-            mouseY = -((e.clientY - rect.top) / container.clientHeight - 0.5) * 2;
-        });
-
-        window.addEventListener('resize', () => {
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        });
-
-        function animate() {
-            requestAnimationFrame(animate);
-
-            ring1.rotation.x += 0.008;
-            ring1.rotation.y += 0.005;
-
-            ring2.rotation.y += 0.012;
-            ring2.rotation.z += 0.007;
-
-            core.rotation.x -= 0.015;
-            core.rotation.y -= 0.015;
-
-            gyroGroup.rotation.y += (mouseX * 0.8 - gyroGroup.rotation.y) * 0.08;
-            gyroGroup.rotation.x += (mouseY * 0.8 - gyroGroup.rotation.x) * 0.08;
-
-            renderer.render(scene, camera);
-        }
-        animate();
-    </script>
-</body>
-</html>
-""", height=270)
+st.markdown("""
+<div class="floating-hero">
+    <div class="hero-badge">⚡ AUTONOMOUS SYNC ENGINE</div>
+    <div class="hero-title">Mess Conquers</div>
+    <p class="hero-sub">High-availability automated meal reservations & session vault</p>
+</div>
+""", unsafe_allow_html=True)
 
 # ==========================================
 # SUPABASE INITIALIZATION
@@ -369,7 +315,7 @@ with tab_telemetry:
                 if is_active:
                     st.markdown(f"""
                     <div class="status-card-active">
-                        <div style="font-weight: 700; color: #34d399; font-size: 1.05rem; margin-bottom: 6px;">
+                        <div style="font-weight: 700; color: #34d399; font-size: 1.1rem; margin-bottom: 6px;">
                             ● STATUS: ACTIVE & SCHEDULED
                         </div>
                         <div style="color: #e2e8f0; font-size: 0.94rem; line-height: 1.6;">
@@ -386,7 +332,7 @@ with tab_telemetry:
                 else:
                     st.markdown(f"""
                     <div class="status-card-paused">
-                        <div style="font-weight: 700; color: #fbbf24; font-size: 1.05rem; margin-bottom: 6px;">
+                        <div style="font-weight: 700; color: #fbbf24; font-size: 1.1rem; margin-bottom: 6px;">
                             ⏸️ STATUS: PAUSED / EXPIRED
                         </div>
                         <div style="color: #e2e8f0; font-size: 0.94rem; line-height: 1.6;">
@@ -420,7 +366,7 @@ with tab_register:
         index=0
     )
 
-    st.markdown("<hr style='border: 0.5px solid #1e293b; margin: 1.2rem 0;'>", unsafe_allow_html=True)
+    st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 1.2rem 0;'>", unsafe_allow_html=True)
 
     with st.form("autopilot_registration_form"):
         if "Option A" in auth_choice:
@@ -487,7 +433,7 @@ with tab_register:
             ).strip()
             email_input = None
 
-        st.markdown("<hr style='border: 0.5px solid #1e293b; margin: 1.4rem 0;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 1.4rem 0;'>", unsafe_allow_html=True)
         st.markdown("#### 2. Meal Preferences & Skip Schedule")
 
         col_p1, col_p2 = st.columns(2)
