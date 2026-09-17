@@ -9,353 +9,303 @@ from security import encrypt_value
 # SYSTEM CORE CONFIGURATION
 # ==========================================
 st.set_page_config(
-    page_title="MESS CONQUERS • SPATIAL SYSTEM",
+    page_title="MESS CONQUERS • SPATIAL 3D",
     page_icon="💠",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
 # ==========================================
-# PROCEDURAL 3D WEBGL SPATIAL ENGINE
+# PARENT-LEVEL 3D SPATIAL WEBGL INJECTION
 # ==========================================
 components.html("""
-<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background: #020617;
-        }
-        #webgl-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: 0;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-</head>
-<body>
-    <canvas id="webgl-canvas"></canvas>
-    <script>
-        const canvas = document.getElementById('webgl-canvas');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 28;
-
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        // Spatial 3D Icosahedron Core with Wireframe + Points
-        const geoCore = new THREE.IcosahedronGeometry(9, 3);
-        const matWire = new THREE.MeshStandardMaterial({
-            color: 0x38bdf8,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.22,
-            roughness: 0.1,
-            metalness: 0.9
-        });
-        const meshCore = new THREE.Mesh(geoCore, matWire);
-        scene.add(meshCore);
-
-        // Core Inner Pulsing Solid
-        const innerGeo = new THREE.OctahedronGeometry(4, 2);
-        const innerMat = new THREE.MeshStandardMaterial({
-            color: 0x6366f1,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.35
-        });
-        const innerCore = new THREE.Mesh(innerGeo, innerMat);
-        scene.add(innerCore);
-
-        // Ambient Volumetric Particle Ring
-        const pCount = 300;
-        const pGeo = new THREE.BufferGeometry();
-        const coords = new Float32Array(pCount * 3);
-
-        for(let i = 0; i < pCount * 3; i += 3) {
-            const rad = 14 + Math.random() * 12;
-            const theta = Math.random() * Math.PI * 2;
-            const phi = (Math.random() - 0.5) * Math.PI;
-            coords[i] = rad * Math.cos(theta) * Math.cos(phi);
-            coords[i+1] = rad * Math.sin(phi);
-            coords[i+2] = rad * Math.sin(theta) * Math.cos(phi);
+<script>
+    (function() {
+        const parentDoc = window.parent.document;
+        
+        // Prevent duplicate instances during Streamlit reruns
+        if (parentDoc.getElementById('threejs-spatial-canvas')) {
+            return;
         }
 
-        pGeo.setAttribute('position', new THREE.BufferAttribute(coords, 3));
-        const pMat = new THREE.PointsMaterial({
-            size: 0.28,
-            color: 0x38bdf8,
-            transparent: true,
-            opacity: 0.6
-        });
-        const pField = new THREE.Points(pGeo, pMat);
-        scene.add(pField);
+        // 1. Create and attach canvas to parent body
+        const canvas = parentDoc.createElement('canvas');
+        canvas.id = 'threejs-spatial-canvas';
+        canvas.style.position = 'fixed';
+        canvas.style.top = '0';
+        canvas.style.left = '0';
+        canvas.style.width = '100vw';
+        canvas.style.height = '100vh';
+        canvas.style.pointerEvents = 'none';
+        canvas.style.zIndex = '0';
+        parentDoc.body.prepend(canvas);
 
-        // Dynamic 3D Spatial Lights
-        const lightA = new THREE.PointLight(0x0ea5e9, 3, 50);
-        lightA.position.set(12, 14, 10);
-        scene.add(lightA);
-
-        const lightB = new THREE.PointLight(0x818cf8, 2.5, 50);
-        lightB.position.set(-14, -10, 8);
-        scene.add(lightB);
-
-        scene.add(new THREE.AmbientLight(0xffffff, 0.3));
-
-        // Interactive Viewport Tracking
-        let targetX = 0, targetY = 0;
-        window.addEventListener('mousemove', (e) => {
-            targetX = (e.clientX / window.innerWidth - 0.5) * 1.2;
-            targetY = (e.clientY / window.innerHeight - 0.5) * 1.2;
-        });
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        let clock = new THREE.Clock();
-        function renderLoop() {
-            requestAnimationFrame(renderLoop);
-            const delta = clock.getElapsedTime();
-
-            meshCore.rotation.y = delta * 0.08;
-            meshCore.rotation.x = delta * 0.05;
-            innerCore.rotation.y = -delta * 0.12;
-
-            pField.rotation.y = delta * 0.03;
-            pField.rotation.z = delta * 0.02;
-
-            camera.position.x += (targetX * 8 - camera.position.x) * 0.04;
-            camera.position.y += (-targetY * 8 - camera.position.y) * 0.04;
-            camera.lookAt(scene.position);
-
-            renderer.render(scene, camera);
+        // 2. Load Three.js into the parent window
+        function initSpatialThree() {
+            const THREE = window.parent.THREE;
+            if (!THREE) {
+                const script = parentDoc.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+                script.onload = () => build3DScene(window.parent.THREE);
+                parentDoc.head.appendChild(script);
+            } else {
+                build3DScene(THREE);
+            }
         }
-        renderLoop();
-    </script>
-</body>
-</html>
+
+        function build3DScene(THREE) {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(55, window.parent.innerWidth / window.parent.innerHeight, 0.1, 1000);
+            camera.position.z = 26;
+
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+            renderer.setSize(window.parent.innerWidth, window.parent.innerHeight);
+            renderer.setPixelRatio(Math.min(window.parent.devicePixelRatio, 2));
+
+            // Outer Dynamic Geometric Lattice
+            const knotGeo = new THREE.TorusKnotGeometry(8, 1.9, 130, 18);
+            const knotMat = new THREE.MeshStandardMaterial({
+                color: 0x38bdf8,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.28,
+                roughness: 0.1,
+                metalness: 0.85
+            });
+            const knotMesh = new THREE.Mesh(knotGeo, knotMat);
+            scene.add(knotMesh);
+
+            // Floating Volumetric Particle Cloud
+            const particleCount = 280;
+            const particleGeo = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 55;
+                positions[i + 1] = (Math.random() - 0.5) * 55;
+                positions[i + 2] = (Math.random() - 0.5) * 35;
+            }
+
+            particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const particleMat = new THREE.PointsMaterial({
+                size: 0.32,
+                color: 0x818cf8,
+                transparent: true,
+                opacity: 0.5
+            });
+            const particleCloud = new THREE.Points(particleGeo, particleMat);
+            scene.add(particleCloud);
+
+            // 3D Spatial Point Lights
+            const lightA = new THREE.PointLight(0x38bdf8, 3.2, 80);
+            lightA.position.set(12, 14, 15);
+            scene.add(lightA);
+
+            const lightB = new THREE.PointLight(0x6366f1, 2.5, 80);
+            lightB.position.set(-15, -12, 10);
+            scene.add(lightB);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+
+            // Responsive Parallax
+            let mouseX = 0, mouseY = 0;
+            window.parent.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.parent.innerWidth - 0.5) * 1.5;
+                mouseY = (e.clientY / window.parent.innerHeight - 0.5) * 1.5;
+            });
+
+            window.parent.addEventListener('resize', () => {
+                camera.aspect = window.parent.innerWidth / window.parent.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.parent.innerWidth, window.parent.innerHeight);
+            });
+
+            function render() {
+                requestAnimationFrame(render);
+                knotMesh.rotation.x += 0.003;
+                knotMesh.rotation.y += 0.005;
+                particleCloud.rotation.y -= 0.001;
+
+                camera.position.x += (mouseX * 6 - camera.position.x) * 0.04;
+                camera.position.y += (-mouseY * 6 - camera.position.y) * 0.04;
+                camera.lookAt(scene.position);
+
+                renderer.render(scene, camera);
+            }
+            render();
+        }
+
+        initSpatialThree();
+    })();
+</script>
 """, height=0)
 
 # ==========================================
-# 3D SPATIAL NEUMORPHIC GLASSCRAFT CSS
+# STREAMLIT GLASSMORPHIC OVERRIDES
 # ==========================================
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap');
 
     * {
         font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
     }
 
-    .stApp {
+    /* Force background transparent so the parent 3D canvas is visible */
+    html, body, [data-testid="stAppViewContainer"], .stApp {
+        background: transparent !important;
         background-color: transparent !important;
-        color: #f8fafc;
+        color: #f8fafc !important;
     }
 
-    /* 3D Floating Spatial Console Header */
-    .spatial-head-card {
+    /* Header Panel */
+    .spatial-banner {
         position: relative;
-        background: linear-gradient(135deg, rgba(15, 23, 42, 0.75) 0%, rgba(30, 41, 59, 0.45) 100%);
-        backdrop-filter: blur(25px);
-        -webkit-backdrop-filter: blur(25px);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-top: 1px solid rgba(255, 255, 255, 0.25);
-        border-radius: 20px;
+        background: rgba(15, 23, 42, 0.72) !important;
+        backdrop-filter: blur(18px) !important;
+        -webkit-backdrop-filter: blur(18px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.28) !important;
+        border-radius: 18px !important;
         padding: 2.2rem 1.6rem;
         margin-bottom: 2rem;
-        box-shadow: 
-            0 25px 50px -12px rgba(0, 0, 0, 0.85),
-            0 0 30px rgba(14, 165, 233, 0.15),
-            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85),
+                    0 0 25px rgba(56, 189, 248, 0.18) !important;
         text-align: center;
-        transform: perspective(1000px) translateZ(0);
-        transition: transform 0.3s ease;
     }
 
-    .spatial-head-card:hover {
-        transform: perspective(1000px) translateZ(8px);
-    }
-
-    .core-pill {
+    .badge-pill {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 6px 16px;
-        background: rgba(14, 165, 233, 0.12);
-        border: 1px solid rgba(56, 189, 248, 0.4);
+        gap: 6px;
+        padding: 5px 14px;
+        background: rgba(56, 189, 248, 0.12);
+        border: 1px solid rgba(56, 189, 248, 0.45);
         border-radius: 9999px;
-        font-size: 0.75rem;
+        font-size: 0.76rem;
         font-weight: 700;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
+        letter-spacing: 0.08em;
         color: #38bdf8;
-        box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
-        margin-bottom: 0.8rem;
+        margin-bottom: 0.65rem;
     }
 
-    .console-title {
+    .title-text {
         font-family: 'Space Grotesk', sans-serif;
         font-size: 2.4rem;
         font-weight: 800;
-        letter-spacing: -0.02em;
         color: #ffffff;
-        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-        margin-bottom: 0.4rem;
+        margin-bottom: 0.3rem;
     }
 
-    .console-subtitle {
+    .sub-text {
         color: #94a3b8;
         font-size: 0.95rem;
-        font-weight: 500;
         margin: 0;
     }
 
-    /* 3D Glass Surface for Forms & Tabs */
-    div[data-testid="stForm"], .spatial-surface {
-        background: linear-gradient(160deg, rgba(15, 23, 42, 0.82) 0%, rgba(10, 15, 30, 0.72) 100%) !important;
-        backdrop-filter: blur(30px) !important;
-        -webkit-backdrop-filter: blur(30px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 20px !important;
-        padding: 2.2rem !important;
-        box-shadow: 
-            0 30px 60px -15px rgba(0, 0, 0, 0.9),
-            inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+    /* 3D Glass Surface for Form & Panels */
+    div[data-testid="stForm"], .glass-box {
+        background: rgba(15, 23, 42, 0.75) !important;
+        backdrop-filter: blur(24px) !important;
+        -webkit-backdrop-filter: blur(24px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.24) !important;
+        border-radius: 18px !important;
+        padding: 2rem !important;
+        box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.9) !important;
     }
 
-    /* Tactile 3D Inset Inputs */
+    /* 3D Tactile Inputs */
     .stTextInput input, .stTextArea textarea, .stSelectbox select {
         background: rgba(3, 7, 18, 0.75) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 12px !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
         color: #ffffff !important;
-        font-size: 0.95rem !important;
-        font-weight: 500 !important;
-        padding: 0.8rem 1.1rem !important;
+        border-radius: 10px !important;
+        padding: 0.75rem 1rem !important;
         box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6) !important;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    }
-
-    .stTextInput input:hover, .stTextArea textarea:hover, .stSelectbox select:hover {
-        border-color: rgba(56, 189, 248, 0.4) !important;
     }
 
     .stTextInput input:focus, .stTextArea textarea:focus {
         border-color: #38bdf8 !important;
-        background: rgba(3, 7, 18, 0.95) !important;
-        box-shadow: 
-            inset 0 2px 4px rgba(0, 0, 0, 0.8),
-            0 0 0 3px rgba(56, 189, 248, 0.25) !important;
-        transform: translateY(-1px);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8),
+                    0 0 0 3px rgba(56, 189, 248, 0.25) !important;
     }
 
-    /* 3D Elevated Solid Button */
+    /* 3D Elevated Button */
     .stButton>button {
-        position: relative;
         background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%) !important;
         color: #ffffff !important;
         font-weight: 700 !important;
-        font-size: 0.98rem !important;
-        letter-spacing: 0.02em !important;
+        font-size: 0.96rem !important;
         border: 1px solid rgba(255, 255, 255, 0.25) !important;
         border-bottom: 2px solid #0369a1 !important;
-        border-radius: 12px !important;
-        padding: 0.85rem 1.8rem !important;
-        box-shadow: 
-            0 12px 25px -4px rgba(2, 132, 199, 0.5),
-            inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        border-radius: 10px !important;
+        padding: 0.8rem 1.6rem !important;
+        box-shadow: 0 10px 25px -4px rgba(2, 132, 199, 0.55),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+        transition: all 0.2s ease !important;
         width: 100%;
     }
 
     .stButton>button:hover {
-        transform: translateY(-2px);
-        box-shadow: 
-            0 18px 30px -4px rgba(2, 132, 199, 0.7),
-            inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 16px 30px -4px rgba(2, 132, 199, 0.75) !important;
     }
 
-    .stButton>button:active {
-        transform: translateY(1px);
-        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4) !important;
-    }
-
-    /* 3D Floating Nav Segment Tabs */
+    /* Navigation Tabs */
     .stTabs [data-baseweb="tab-list"] {
         background: rgba(15, 23, 42, 0.65);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
         padding: 6px;
-        gap: 8px;
+        gap: 6px;
     }
 
     .stTabs [data-baseweb="tab"] {
-        font-family: 'Space Grotesk', sans-serif;
-        font-size: 0.88rem;
         font-weight: 600;
+        font-size: 0.88rem;
         color: #94a3b8;
-        border-radius: 10px;
-        transition: all 0.2s ease;
+        border-radius: 8px;
     }
 
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, rgba(56, 189, 248, 0.18) 0%, rgba(14, 165, 233, 0.08) 100%) !important;
+        background: rgba(56, 189, 248, 0.16) !important;
         color: #38bdf8 !important;
-        border: 1px solid rgba(56, 189, 248, 0.4) !important;
-        box-shadow: 0 4px 16px rgba(14, 165, 233, 0.25) !important;
+        border: 1px solid rgba(56, 189, 248, 0.35) !important;
     }
 
-    /* Step Card with 3D Depth Specular Edge */
-    .step-box {
-        background: rgba(3, 7, 18, 0.6);
+    .guide-box {
+        background: rgba(2, 6, 23, 0.6);
         border: 1px solid rgba(56, 189, 248, 0.25);
         border-left: 4px solid #38bdf8;
-        border-radius: 12px;
-        padding: 16px 20px;
-        margin: 14px 0 20px 0;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin: 12px 0 18px 0;
         color: #cbd5e1;
         font-size: 0.92rem;
         line-height: 1.6;
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     }
 
-    /* Status Visual Telemetry Shields */
-    .telemetry-active {
-        background: linear-gradient(135deg, rgba(6, 78, 59, 0.45) 0%, rgba(6, 95, 70, 0.25) 100%);
+    .status-card-active {
+        background: rgba(6, 78, 59, 0.4);
         border: 1px solid #10b981;
-        border-radius: 14px;
-        padding: 1.4rem;
-        margin-bottom: 1.4rem;
-        box-shadow: 0 12px 30px -5px rgba(16, 185, 129, 0.2);
+        border-radius: 12px;
+        padding: 1.2rem;
+        margin-bottom: 1.2rem;
     }
 
-    .telemetry-paused {
-        background: linear-gradient(135deg, rgba(120, 53, 15, 0.45) 0%, rgba(146, 64, 14, 0.25) 100%);
+    .status-card-paused {
+        background: rgba(120, 53, 15, 0.4);
         border: 1px solid #f59e0b;
-        border-radius: 14px;
-        padding: 1.4rem;
-        margin-bottom: 1.4rem;
-        box-shadow: 0 12px 30px -5px rgba(245, 158, 11, 0.2);
+        border-radius: 12px;
+        padding: 1.2rem;
+        margin-bottom: 1.2rem;
     }
 </style>
 """, unsafe_allow_html=True)
 
 # ==========================================
-# SUPABASE CLIENT INITIALIZATION
+# SUPABASE INITIALIZATION
 # ==========================================
 SUPABASE_URL = st.secrets.get("SUPABASE_URL") or os.getenv("SUPABASE_URL")
 SUPABASE_KEY = st.secrets.get("SUPABASE_KEY") or os.getenv("SUPABASE_KEY")
@@ -371,39 +321,39 @@ def init_supabase() -> Client:
 supabase = init_supabase()
 
 # ==========================================
-# SPATIAL HUD BANNER
+# HERO BANNER
 # ==========================================
 st.markdown("""
-<div class="spatial-head-card">
-    <div class="core-pill">⚡ AUTONOMOUS MEAL SYNC ENGINE</div>
-    <div class="console-title">MESS CONQUERS</div>
-    <p class="console-subtitle">High-availability automated meal reservations & session vault</p>
+<div class="spatial-banner">
+    <div class="badge-pill">⚡ AUTONOMOUS MEAL SYNC ENGINE</div>
+    <div class="title-text">Mess Conquers</div>
+    <p class="sub-text">Automated SpaceBasic reservations, credentials vault, and vacation management</p>
 </div>
 """, unsafe_allow_html=True)
 
-tab_telemetry, tab_register = st.tabs(["[ TELEMETRY & REST GATE ]", "[ CREDENTIAL ALLOCATION ]"])
+tab_telemetry, tab_register = st.tabs(["⚡ Service Status & Vacation", "🛠️ Account Setup & Credentials"])
 
 # ==========================================
-# TAB 1: TELEMETRY RADAR & VACATION MODE
+# TAB 1: TELEMETRY & VACATION MODE
 # ==========================================
 with tab_telemetry:
-    st.markdown("##### Account Telemetry & State Control")
-    st.caption("Inspect live automated booking queues or enter rest mode during vacations.")
+    st.markdown("##### Account Status & Controls")
+    st.caption("Inspect your active daily schedule or pause automation when leaving campus.")
 
     lookup_protocol = st.radio(
-        "ACCOUNT LOOKUP PROTOCOL",
+        "Identifier Protocol",
         [
-            "🔑 SpaceBasic User ID (Token / Link Protocol)",
-            "✉️ Direct Registered Email (Password Protocol)"
+            "🔑 SpaceBasic User ID (Token / Magic Link Users)",
+            "✉️ Direct Login Email (Password Users)"
         ],
         horizontal=True
     )
 
     if "User ID" in lookup_protocol:
-        query_val = st.text_input("SPACEBASIC USER ID", placeholder="e.g. 123456").strip()
+        query_val = st.text_input("SpaceBasic User ID", placeholder="e.g. 123456").strip()
         query_field = "spacebasic_id"
     else:
-        query_val = st.text_input("REGISTERED LOGIN EMAIL", placeholder="e.g. student@example.com").strip().lower()
+        query_val = st.text_input("Login Email", placeholder="e.g. student@example.com").strip().lower()
         query_field = "email"
 
     if query_val:
@@ -411,7 +361,7 @@ with tab_telemetry:
             record_query = supabase.table("users").select("*").eq(query_field, query_val).execute()
             if record_query.data and len(record_query.data) > 0:
                 user_info = record_query.data[0]
-                user_name = user_info.get("name", "Student").upper()
+                user_name = user_info.get("name", "Student")
                 is_active = user_info.get("is_active", True)
                 auth_type = user_info.get("auth_type", "password").upper()
                 notif_email = user_info.get("notification_email") or user_info.get("email") or "Not configured"
@@ -420,51 +370,51 @@ with tab_telemetry:
                 st.write("")
                 if is_active:
                     st.markdown(f"""
-                    <div class="telemetry-active">
-                        <div style="font-family: 'Space Grotesk'; font-weight: 700; color: #34d399; font-size: 1.15rem; letter-spacing: 0.04em;">
-                            ● RADAR STATUS: AUTONOMOUS BOOKING ENGAGED
+                    <div class="status-card-active">
+                        <div style="font-weight: 700; color: #34d399; font-size: 1.05rem; margin-bottom: 4px;">
+                            ● STATUS: ACTIVE & RUNNING
                         </div>
-                        <div style="color: #e2e8f0; font-size: 0.95rem; margin-top: 8px; line-height: 1.6;">
+                        <div style="color: #e2e8f0; font-size: 0.94rem; line-height: 1.5;">
                             Account: <b>{user_name}</b> ({query_val})<br>
-                            Auth Protocol: <code>{auth_type}</code> | Alert Receiver: <code>{notif_email}</code><br>
-                            Daily execution window is active daily at 08:00 AM IST.
+                            Protocol: <code>{auth_type}</code> | Alert Receiver: <code>{notif_email}</code><br>
+                            Daily execution window triggers automatically at 08:00 AM IST.
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
 
-                    if st.button("⏸️ ENGAGE REST MODE (PAUSE AUTOMATION)"):
+                    if st.button("🏖️ Pause Bookings (Vacation Mode)"):
                         supabase.table("users").update({"is_active": False}).eq("id", row_id).execute()
                         st.rerun()
                 else:
                     st.markdown(f"""
-                    <div class="telemetry-paused">
-                        <div style="font-family: 'Space Grotesk'; font-weight: 700; color: #fbbf24; font-size: 1.15rem; letter-spacing: 0.04em;">
-                            ⏸️ RADAR STATUS: REST GATE ACTIVE (PAUSED)
+                    <div class="status-card-paused">
+                        <div style="font-weight: 700; color: #fbbf24; font-size: 1.05rem; margin-bottom: 4px;">
+                            ⏸️ STATUS: PAUSED / EXPIRED
                         </div>
-                        <div style="color: #e2e8f0; font-size: 0.95rem; margin-top: 8px; line-height: 1.6;">
+                        <div style="color: #e2e8f0; font-size: 0.94rem; line-height: 1.5;">
                             Account: <b>{user_name}</b> ({query_val})<br>
-                            Daily dispatch is bypassed during vacation. Resuming reactivates bookings immediately.
+                            Bookings are paused. Daily runners bypass this profile until resumed.
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
 
-                    if st.button("⚡ DISENGAGE REST MODE (RESUME AUTOMATION)"):
+                    if st.button("▶️ Resume Autopilot"):
                         supabase.table("users").update({"is_active": True}).eq("id", row_id).execute()
                         st.rerun()
             else:
-                st.info(f"No configured profile located for '{query_val}'. Configure credentials in the allocation tab.")
+                st.info(f"No configured profile located for '{query_val}'. Register in Tab 2.")
         except Exception as e:
-            st.error(f"Telemetry radar query failure: {e}")
+            st.error(f"Status query error: {e}")
 
 # ==========================================
 # TAB 2: CREDENTIAL ALLOCATION & RULES
 # ==========================================
 with tab_register:
-    st.markdown("##### Credential Allocation & Meal Protocol")
-    st.caption("Passwords and session tokens are encrypted with AES-128 before writing to database.")
+    st.markdown("##### Configuration & Registration")
+    st.caption("Credentials and tokens are encrypted with AES-128 before syncing to Supabase.")
 
     auth_choice = st.radio(
-        "CHOOSE AUTHENTICATION METHOD",
+        "Authentication Protocol",
         [
             "Option A: SpaceBasic Direct Email & Password (Recommended)",
             "Option B: SpaceBasic Auth Link / Bearer Token"
@@ -472,14 +422,14 @@ with tab_register:
         index=0
     )
 
-    st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 1.2rem 0;'>", unsafe_allow_html=True)
+    st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.1); margin: 1.2rem 0;'>", unsafe_allow_html=True)
 
     with st.form("spatial_registration_console"):
         # OPTION A: DIRECT CREDENTIALS
         if "Option A" in auth_choice:
             st.markdown("#### 1. Identity & Credentials")
             st.markdown("""
-            <div class="step-box">
+            <div class="guide-box">
                 <b>Direct Dispatch Mode:</b><br>
                 Enter your SpaceBasic login email and password. The system dynamically generates fresh session tokens during daily runs—no user IDs or manual link updates required.
             </div>
@@ -487,15 +437,15 @@ with tab_register:
 
             col1, col2 = st.columns(2)
             with col1:
-                name_input = st.text_input("FULL NAME", placeholder="Your Name").strip()
+                name_input = st.text_input("Full Name", placeholder="Your Name").strip()
             with col2:
-                tenant_id = st.text_input("SPACEBASIC TENANT ID", value="143").strip()
+                tenant_id = st.text_input("SpaceBasic Tenant ID", value="143").strip()
 
             col_a1, col_a2 = st.columns(2)
             with col_a1:
-                email_input = st.text_input("SPACEBASIC EMAIL", placeholder="student@example.com").strip().lower()
+                email_input = st.text_input("SpaceBasic Login Email", placeholder="student@example.com").strip().lower()
             with col_a2:
-                secret_input = st.text_input("SPACEBASIC PASSWORD", type="password", placeholder="••••••••").strip()
+                secret_input = st.text_input("SpaceBasic Password", type="password", placeholder="••••••••").strip()
 
             spacebasic_id = None
             notification_email = None
@@ -504,8 +454,8 @@ with tab_register:
         else:
             st.markdown("#### 1. User ID & Token Setup")
             st.markdown("""
-            <div class="step-box">
-                <b>Token Retrieval Protocol:</b><br>
+            <div class="guide-box">
+                <b>Token Retrieval Steps:</b><br>
                 1. Open SpaceBasic and go to <b>Mess -> Booking</b>.<br>
                 2. Right-click anywhere and select <b>Inspect</b> (or F12) -> open <b>Network</b> tab.<br>
                 3. Click on <b>Tomorrow</b> on the calendar list.<br>
@@ -516,39 +466,39 @@ with tab_register:
 
             col1, col2 = st.columns(2)
             with col1:
-                name_input = st.text_input("FULL NAME", placeholder="Your Name").strip()
+                name_input = st.text_input("Full Name", placeholder="Your Name").strip()
             with col2:
-                tenant_id = st.text_input("SPACEBASIC TENANT ID", value="143").strip()
+                tenant_id = st.text_input("SpaceBasic Tenant ID", value="143").strip()
 
             col_b1, col_b2 = st.columns(2)
             with col_b1:
                 spacebasic_id = st.text_input(
-                    "SPACEBASIC USER ID",
+                    "SpaceBasic User ID",
                     placeholder="123456",
-                    help="Numeric ID found in your portal URL or network requests."
+                    help="Numeric ID found after userId= in network requests."
                 ).strip()
             with col_b2:
                 notification_email = st.text_input(
-                    "ALERT EMAIL ADDRESS",
+                    "Alert Email Address",
                     placeholder="student@gmail.com",
                     help="Used to alert you if your session token expires."
                 ).strip().lower()
 
             secret_input = st.text_area(
-                "SPACEBASIC AUTHENTICATION LINK OR BEARER TOKEN",
+                "SpaceBasic Authorization Token or Link",
                 placeholder="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                 help="Paste the full Authorization Bearer string copied from Developer Tools."
             ).strip()
             email_input = None
 
-        st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 1.4rem 0;'>", unsafe_allow_html=True)
-        st.markdown("#### 2. Meal Preferences & Skip Routine")
+        st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.1); margin: 1.4rem 0;'>", unsafe_allow_html=True)
+        st.markdown("#### 2. Meal Preferences & Skip Schedule")
 
         col_p1, col_p2 = st.columns(2)
         with col_p1:
-            lunch_pref = st.selectbox("LUNCH PREFERENCE", ["Non Veg", "Eggetarian", "Veg"], index=0)
+            lunch_pref = st.selectbox("Lunch Preference", ["Non Veg", "Eggetarian", "Veg"], index=0)
         with col_p2:
-            dinner_pref = st.selectbox("DINNER PREFERENCE", ["Non Veg", "Eggetarian", "Veg"], index=0)
+            dinner_pref = st.selectbox("Dinner Preference", ["Non Veg", "Eggetarian", "Veg"], index=0)
 
         st.caption("Select recurring days when automated bookings should be skipped:")
 
@@ -561,7 +511,7 @@ with tab_register:
                 skip_config[day] = [s.lower() for s in skips]
 
         st.write("")
-        submit = st.form_submit_button("💠 LOCK CREDENTIALS & INITIALIZE AUTOPILOT")
+        submit = st.form_submit_button("⚡ Save & Activate Autopilot")
 
     if submit:
         is_direct_email = "Option A" in auth_choice
@@ -611,6 +561,6 @@ with tab_register:
             supabase.table("users").upsert(record, on_conflict=conflict_col).execute()
 
             target_display = email_input if is_direct_email else f"SpaceBasic ID {spacebasic_id}"
-            st.success(f"System profile locked for {target_display}! Autonomous sync is now scheduled.")
+            st.success(f"System profile registered for {target_display}! Autopilot is active.")
         except Exception as err:
             st.error(f"Synchronization failure: {err}")
