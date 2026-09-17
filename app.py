@@ -1,6 +1,7 @@
 import os
 import re
 import streamlit as st
+import streamlit.components.v1 as components
 from supabase import create_client, Client
 from security import encrypt_value
 
@@ -8,14 +9,14 @@ from security import encrypt_value
 # SYSTEM CORE CONFIGURATION
 # ==========================================
 st.set_page_config(
-    page_title="Mess Conquers • Automation Suite",
-    page_icon="⚡",
+    page_title="Mess Conquers • Automation Hub",
+    page_icon="💠",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
 # ==========================================
-# 3D DEPTH, AMBIENT LIGHTING & SPATIAL STYLING
+# MODERN HIGH-CONTRAST DARK UI STYLES
 # ==========================================
 st.markdown("""
 <style>
@@ -25,128 +26,62 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
     }
 
-    /* Force Dark Spatial Stage across all parent layers */
     html, body, [data-testid="stAppViewContainer"], .stApp {
-        background-color: #07090e !important;
-        background-image: 
-            radial-gradient(ellipse 80% 50% at 50% -20%, rgba(14, 165, 233, 0.15), transparent),
-            radial-gradient(circle at 15% 85%, rgba(99, 102, 241, 0.08), transparent 45%),
-            radial-gradient(circle at 85% 60%, rgba(56, 189, 248, 0.06), transparent 40%) !important;
-        color: #f1f5f9 !important;
+        background-color: #090d16 !important;
+        color: #f8fafc !important;
     }
 
-    /* Hide default Streamlit fluff */
     header[data-testid="stHeader"] {
         background: transparent !important;
     }
-    
-    /* 3D Elevated Header Console */
-    .spatial-hero {
-        background: linear-gradient(145deg, #111827 0%, #0b0f19 100%);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-top: 1px solid rgba(56, 189, 248, 0.4);
-        border-radius: 20px;
-        padding: 2.2rem 1.8rem;
-        margin-bottom: 2rem;
-        box-shadow: 
-            0 20px 40px -15px rgba(0, 0, 0, 0.9),
-            0 0 35px rgba(14, 165, 233, 0.12),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        text-align: center;
-        position: relative;
+
+    /* Container Card Layout */
+    div[data-testid="stForm"], .panel-box {
+        background: #0f172a !important;
+        border: 1px solid #1e293b !important;
+        border-radius: 16px !important;
+        padding: 2rem !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
     }
 
-    .hero-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 14px;
-        background: rgba(14, 165, 233, 0.1);
-        border: 1px solid rgba(56, 189, 248, 0.35);
-        border-radius: 9999px;
-        font-size: 0.76rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        color: #38bdf8;
-        margin-bottom: 0.75rem;
-        box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
-    }
-
-    .hero-title {
-        font-family: 'Space Grotesk', sans-serif;
-        font-size: 2.3rem;
-        font-weight: 800;
-        color: #ffffff;
-        letter-spacing: -0.02em;
-        margin-bottom: 0.4rem;
-        text-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
-    }
-
-    .hero-subtitle {
-        color: #94a3b8;
-        font-size: 0.95rem;
-        margin: 0;
-    }
-
-    /* 3D Elevated Form Surface */
-    div[data-testid="stForm"], .spatial-card {
-        background: linear-gradient(160deg, #0f172a 0%, #090e1a 100%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.07) !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
-        border-radius: 18px !important;
-        padding: 2.2rem !important;
-        box-shadow: 
-            0 25px 50px -12px rgba(0, 0, 0, 0.85),
-            inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
-    }
-
-    /* 3D Inset Inputs */
+    /* Input Field Styling */
     .stTextInput input, .stTextArea textarea, .stSelectbox select {
-        background: #050811 !important;
-        border: 1px solid rgba(255, 255, 255, 0.09) !important;
-        color: #f8fafc !important;
+        background: #020617 !important;
+        border: 1px solid #334155 !important;
+        color: #ffffff !important;
         border-radius: 10px !important;
         padding: 0.75rem 1rem !important;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7) !important;
-        transition: all 0.2s ease !important;
+        font-size: 0.95rem !important;
     }
 
     .stTextInput input:focus, .stTextArea textarea:focus, .stSelectbox select:focus {
-        border-color: #0ea5e9 !important;
-        box-shadow: 
-            inset 0 2px 4px rgba(0, 0, 0, 0.8),
-            0 0 0 3px rgba(14, 165, 233, 0.22) !important;
+        border-color: #38bdf8 !important;
+        box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25) !important;
     }
 
-    /* 3D Tactile Solid Button */
+    /* Primary Action Button */
     .stButton>button {
-        background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%) !important;
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
         color: #ffffff !important;
         font-weight: 700 !important;
-        font-size: 0.96rem !important;
-        border: 1px solid rgba(255, 255, 255, 0.22) !important;
-        border-bottom: 3px solid #0369a1 !important;
+        font-size: 0.98rem !important;
+        border: 1px solid #38bdf8 !important;
         border-radius: 10px !important;
         padding: 0.8rem 1.6rem !important;
-        box-shadow: 0 10px 20px -4px rgba(2, 132, 199, 0.45) !important;
-        transition: all 0.15s ease !important;
+        box-shadow: 0 8px 20px rgba(2, 132, 199, 0.35) !important;
         width: 100%;
+        transition: all 0.2s ease !important;
     }
 
     .stButton>button:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 14px 26px -3px rgba(2, 132, 199, 0.65) !important;
+        box-shadow: 0 12px 25px rgba(2, 132, 199, 0.5) !important;
     }
 
-    .stButton>button:active {
-        transform: translateY(1px) !important;
-        border-bottom-width: 1px !important;
-    }
-
-    /* 3D Segmented Tab Controls */
+    /* Navigation Tabs */
     .stTabs [data-baseweb="tab-list"] {
-        background: #0b0f19;
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #0f172a;
+        border: 1px solid #1e293b;
         border-radius: 12px;
         padding: 6px;
         gap: 6px;
@@ -157,22 +92,18 @@ st.markdown("""
         font-size: 0.88rem;
         color: #94a3b8;
         border-radius: 8px;
-        transition: all 0.2s ease;
     }
 
     .stTabs [aria-selected="true"] {
-        background: rgba(14, 165, 233, 0.15) !important;
+        background: rgba(56, 189, 248, 0.15) !important;
         color: #38bdf8 !important;
-        border: 1px solid rgba(56, 189, 248, 0.35) !important;
-        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15) !important;
+        border: 1px solid rgba(56, 189, 248, 0.4) !important;
     }
 
-    /* Guided 3D Instructions Card */
-    .guide-card {
-        background: #070c18;
-        border: 1px solid rgba(56, 189, 248, 0.2);
-        border-left: 4px solid #0ea5e9;
-        border-radius: 10px;
+    .guide-box {
+        background: #020617;
+        border-left: 4px solid #38bdf8;
+        border-radius: 8px;
         padding: 14px 18px;
         margin: 12px 0 18px 0;
         color: #cbd5e1;
@@ -180,26 +111,201 @@ st.markdown("""
         line-height: 1.6;
     }
 
-    /* Status Visual Cards */
-    .status-active {
-        background: linear-gradient(145deg, rgba(6, 78, 59, 0.45) 0%, rgba(6, 95, 70, 0.25) 100%);
+    .status-card-active {
+        background: rgba(6, 78, 59, 0.5);
         border: 1px solid #10b981;
         border-radius: 12px;
-        padding: 1.3rem;
+        padding: 1.2rem;
         margin-bottom: 1.2rem;
-        box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.2);
     }
 
-    .status-paused {
-        background: linear-gradient(145deg, rgba(120, 53, 15, 0.45) 0%, rgba(146, 64, 14, 0.25) 100%);
+    .status-card-paused {
+        background: rgba(120, 53, 15, 0.5);
         border: 1px solid #f59e0b;
         border-radius: 12px;
-        padding: 1.3rem;
+        padding: 1.2rem;
         margin-bottom: 1.2rem;
-        box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.2);
     }
 </style>
 """, unsafe_allow_html=True)
+
+# ==========================================
+# INTERACTIVE 3D COMPONENT (THREE.JS HERO)
+# ==========================================
+components.html("""
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: transparent;
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+        }
+
+        .hero-3d-stage {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            background: radial-gradient(circle at center, #1e293b 0%, #0b0f19 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+        }
+
+        #canvas3d {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .hero-overlay {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            pointer-events: none;
+            padding: 0 20px;
+        }
+
+        .badge-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: rgba(14, 165, 233, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            border-radius: 9999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: #38bdf8;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin: 0;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            letter-spacing: -0.02em;
+        }
+
+        .hero-sub {
+            color: #94a3b8;
+            font-size: 0.92rem;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <div class="hero-3d-stage">
+        <canvas id="canvas3d"></canvas>
+        <div class="hero-overlay">
+            <div class="badge-pill">⚡ AUTONOMOUS ENGINE</div>
+            <h1 class="hero-title">Mess Conquers</h1>
+            <p class="hero-sub">Autonomous SpaceBasic meal bookings & scheduling autopilot</p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas3d');
+        const container = canvas.parentElement;
+
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+        camera.position.z = 18;
+
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // 3D Gyroscope Group
+        const gyroGroup = new THREE.Group();
+        scene.add(gyroGroup);
+
+        // Ring 1 (Outer)
+        const ring1Geo = new THREE.TorusGeometry(6.5, 0.12, 16, 100);
+        const ring1Mat = new THREE.MeshStandardMaterial({ color: 0x0284c7, metalness: 0.8, roughness: 0.2 });
+        const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
+        gyroGroup.add(ring1);
+
+        // Ring 2 (Middle)
+        const ring2Geo = new THREE.TorusGeometry(5.2, 0.14, 16, 100);
+        const ring2Mat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.9, roughness: 0.15 });
+        const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
+        gyroGroup.add(ring2);
+
+        // Core Glowing Crystal (Center)
+        const coreGeo = new THREE.OctahedronGeometry(2.4, 0);
+        const coreMat = new THREE.MeshStandardMaterial({
+            color: 0x0ea5e9,
+            metalness: 0.2,
+            roughness: 0.1,
+            wireframe: true
+        });
+        const core = new THREE.Mesh(coreGeo, coreMat);
+        gyroGroup.add(core);
+
+        // Ambient Lighting
+        const lightPrimary = new THREE.PointLight(0x38bdf8, 3, 30);
+        lightPrimary.position.set(6, 6, 8);
+        scene.add(lightPrimary);
+
+        const lightSecondary = new THREE.PointLight(0x6366f1, 2, 30);
+        lightSecondary.position.set(-6, -6, 6);
+        scene.add(lightSecondary);
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+
+        // Cursor Reactive Tracking
+        let mouseX = 0, mouseY = 0;
+        window.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = ((e.clientX - rect.left) / container.clientWidth - 0.5) * 2;
+            mouseY = -((e.clientY - rect.top) / container.clientHeight - 0.5) * 2;
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            ring1.rotation.x += 0.008;
+            ring1.rotation.y += 0.005;
+
+            ring2.rotation.y += 0.012;
+            ring2.rotation.z += 0.007;
+
+            core.rotation.x -= 0.015;
+            core.rotation.y -= 0.015;
+
+            gyroGroup.rotation.y += (mouseX * 0.8 - gyroGroup.rotation.y) * 0.08;
+            gyroGroup.rotation.x += (mouseY * 0.8 - gyroGroup.rotation.x) * 0.08;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
+""", height=270)
 
 # ==========================================
 # SUPABASE INITIALIZATION
@@ -208,7 +314,7 @@ SUPABASE_URL = st.secrets.get("SUPABASE_URL") or os.getenv("SUPABASE_URL")
 SUPABASE_KEY = st.secrets.get("SUPABASE_KEY") or os.getenv("SUPABASE_KEY")
 
 if not SUPABASE_URL or not SUPABASE_KEY:
-    st.error("System configuration missing: Supabase credentials not found in secrets.")
+    st.error("System configuration error: Supabase credentials not found in secrets.")
     st.stop()
 
 @st.cache_resource
@@ -217,25 +323,14 @@ def init_supabase() -> Client:
 
 supabase = init_supabase()
 
-# ==========================================
-# 3D ELEVATED HEADER
-# ==========================================
-st.markdown("""
-<div class="spatial-hero">
-    <div class="hero-badge">⚡ AUTONOMOUS SYNC ENGINE</div>
-    <div class="hero-title">Mess Conquers</div>
-    <p class="hero-subtitle">High-availability automated meal reservations & session management</p>
-</div>
-""", unsafe_allow_html=True)
-
 tab_telemetry, tab_register = st.tabs(["⚡ Service Status & Vacation", "🛠️ Account Setup & Credentials"])
 
 # ==========================================
-# TAB 1: TELEMETRY & VACATION MODE
+# TAB 1: STATUS & CONTROLS
 # ==========================================
 with tab_telemetry:
     st.markdown("##### Account Status & Controls")
-    st.caption("Inspect your active daily schedule or pause automation during holidays.")
+    st.caption("Inspect your active daily schedule or pause automation when leaving campus.")
 
     lookup_protocol = st.radio(
         "Identifier Protocol",
@@ -267,13 +362,13 @@ with tab_telemetry:
                 st.write("")
                 if is_active:
                     st.markdown(f"""
-                    <div class="status-active">
-                        <div style="font-weight: 700; color: #34d399; font-size: 1.1rem; margin-bottom: 6px;">
-                            ● STATUS: ACTIVE & RUNNING
+                    <div class="status-card-active">
+                        <div style="font-weight: 700; color: #34d399; font-size: 1.05rem; margin-bottom: 6px;">
+                            ● STATUS: ACTIVE & SCHEDULED
                         </div>
                         <div style="color: #e2e8f0; font-size: 0.94rem; line-height: 1.6;">
                             Account: <b>{user_name}</b> ({query_val})<br>
-                            Protocol: <code>{auth_type}</code> | Expiration Alerts: <code>{notif_email}</code><br>
+                            Protocol: <code>{auth_type}</code> | Alert Receiver: <code>{notif_email}</code><br>
                             Daily execution window triggers automatically at 08:00 AM IST.
                         </div>
                     </div>
@@ -284,8 +379,8 @@ with tab_telemetry:
                         st.rerun()
                 else:
                     st.markdown(f"""
-                    <div class="status-paused">
-                        <div style="font-weight: 700; color: #fbbf24; font-size: 1.1rem; margin-bottom: 6px;">
+                    <div class="status-card-paused">
+                        <div style="font-weight: 700; color: #fbbf24; font-size: 1.05rem; margin-bottom: 6px;">
                             ⏸️ STATUS: PAUSED / EXPIRED
                         </div>
                         <div style="color: #e2e8f0; font-size: 0.94rem; line-height: 1.6;">
@@ -299,12 +394,12 @@ with tab_telemetry:
                         supabase.table("users").update({"is_active": True}).eq("id", row_id).execute()
                         st.rerun()
             else:
-                st.info(f"No configured profile located for '{query_val}'. Register in Tab 2.")
+                st.info(f"No configured profile found for '{query_val}'. Register in Tab 2.")
         except Exception as e:
             st.error(f"Status query error: {e}")
 
 # ==========================================
-# TAB 2: CREDENTIAL ALLOCATION & RULES
+# TAB 2: REGISTRATION & PREFERENCES
 # ==========================================
 with tab_register:
     st.markdown("##### Configuration & Registration")
@@ -319,14 +414,14 @@ with tab_register:
         index=0
     )
 
-    st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 1.2rem 0;'>", unsafe_allow_html=True)
+    st.markdown("<hr style='border: 0.5px solid #1e293b; margin: 1.2rem 0;'>", unsafe_allow_html=True)
 
-    with st.form("spatial_registration_console"):
+    with st.form("autopilot_registration_form"):
         # OPTION A: DIRECT CREDENTIALS
         if "Option A" in auth_choice:
             st.markdown("#### 1. Identity & Credentials")
             st.markdown("""
-            <div class="guide-card">
+            <div class="guide-box">
                 <b>Direct Dispatch Mode:</b><br>
                 Enter your SpaceBasic login email and password. The system dynamically generates fresh session tokens during daily runs—no user IDs or manual link updates required.
             </div>
@@ -351,7 +446,7 @@ with tab_register:
         else:
             st.markdown("#### 1. User ID & Token Setup")
             st.markdown("""
-            <div class="guide-card">
+            <div class="guide-box">
                 <b>Token Retrieval Steps:</b><br>
                 1. Open SpaceBasic and go to <b>Mess -> Booking</b>.<br>
                 2. Right-click anywhere and select <b>Inspect</b> (or F12) -> open <b>Network</b> tab.<br>
@@ -388,7 +483,7 @@ with tab_register:
             ).strip()
             email_input = None
 
-        st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 1.4rem 0;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='border: 0.5px solid #1e293b; margin: 1.4rem 0;'>", unsafe_allow_html=True)
         st.markdown("#### 2. Meal Preferences & Skip Schedule")
 
         col_p1, col_p2 = st.columns(2)
