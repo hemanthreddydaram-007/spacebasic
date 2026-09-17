@@ -1,7 +1,6 @@
 import os
 import re
 import streamlit as st
-import streamlit.components.v1 as components
 from supabase import create_client, Client
 from security import encrypt_value
 
@@ -9,139 +8,14 @@ from security import encrypt_value
 # SYSTEM CORE CONFIGURATION
 # ==========================================
 st.set_page_config(
-    page_title="MESS CONQUERS • SPATIAL 3D",
-    page_icon="💠",
+    page_title="Mess Conquers • Automation Suite",
+    page_icon="⚡",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
 # ==========================================
-# PARENT-LEVEL 3D SPATIAL WEBGL INJECTION
-# ==========================================
-components.html("""
-<script>
-    (function() {
-        const parentDoc = window.parent.document;
-        
-        // Prevent duplicate instances during Streamlit reruns
-        if (parentDoc.getElementById('threejs-spatial-canvas')) {
-            return;
-        }
-
-        // 1. Create and attach canvas to parent body
-        const canvas = parentDoc.createElement('canvas');
-        canvas.id = 'threejs-spatial-canvas';
-        canvas.style.position = 'fixed';
-        canvas.style.top = '0';
-        canvas.style.left = '0';
-        canvas.style.width = '100vw';
-        canvas.style.height = '100vh';
-        canvas.style.pointerEvents = 'none';
-        canvas.style.zIndex = '0';
-        parentDoc.body.prepend(canvas);
-
-        // 2. Load Three.js into the parent window
-        function initSpatialThree() {
-            const THREE = window.parent.THREE;
-            if (!THREE) {
-                const script = parentDoc.createElement('script');
-                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-                script.onload = () => build3DScene(window.parent.THREE);
-                parentDoc.head.appendChild(script);
-            } else {
-                build3DScene(THREE);
-            }
-        }
-
-        function build3DScene(THREE) {
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(55, window.parent.innerWidth / window.parent.innerHeight, 0.1, 1000);
-            camera.position.z = 26;
-
-            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-            renderer.setSize(window.parent.innerWidth, window.parent.innerHeight);
-            renderer.setPixelRatio(Math.min(window.parent.devicePixelRatio, 2));
-
-            // Outer Dynamic Geometric Lattice
-            const knotGeo = new THREE.TorusKnotGeometry(8, 1.9, 130, 18);
-            const knotMat = new THREE.MeshStandardMaterial({
-                color: 0x38bdf8,
-                wireframe: true,
-                transparent: true,
-                opacity: 0.28,
-                roughness: 0.1,
-                metalness: 0.85
-            });
-            const knotMesh = new THREE.Mesh(knotGeo, knotMat);
-            scene.add(knotMesh);
-
-            // Floating Volumetric Particle Cloud
-            const particleCount = 280;
-            const particleGeo = new THREE.BufferGeometry();
-            const positions = new Float32Array(particleCount * 3);
-
-            for (let i = 0; i < particleCount * 3; i += 3) {
-                positions[i] = (Math.random() - 0.5) * 55;
-                positions[i + 1] = (Math.random() - 0.5) * 55;
-                positions[i + 2] = (Math.random() - 0.5) * 35;
-            }
-
-            particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            const particleMat = new THREE.PointsMaterial({
-                size: 0.32,
-                color: 0x818cf8,
-                transparent: true,
-                opacity: 0.5
-            });
-            const particleCloud = new THREE.Points(particleGeo, particleMat);
-            scene.add(particleCloud);
-
-            // 3D Spatial Point Lights
-            const lightA = new THREE.PointLight(0x38bdf8, 3.2, 80);
-            lightA.position.set(12, 14, 15);
-            scene.add(lightA);
-
-            const lightB = new THREE.PointLight(0x6366f1, 2.5, 80);
-            lightB.position.set(-15, -12, 10);
-            scene.add(lightB);
-
-            scene.add(new THREE.AmbientLight(0xffffff, 0.45));
-
-            // Responsive Parallax
-            let mouseX = 0, mouseY = 0;
-            window.parent.addEventListener('mousemove', (e) => {
-                mouseX = (e.clientX / window.parent.innerWidth - 0.5) * 1.5;
-                mouseY = (e.clientY / window.parent.innerHeight - 0.5) * 1.5;
-            });
-
-            window.parent.addEventListener('resize', () => {
-                camera.aspect = window.parent.innerWidth / window.parent.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.parent.innerWidth, window.parent.innerHeight);
-            });
-
-            function render() {
-                requestAnimationFrame(render);
-                knotMesh.rotation.x += 0.003;
-                knotMesh.rotation.y += 0.005;
-                particleCloud.rotation.y -= 0.001;
-
-                camera.position.x += (mouseX * 6 - camera.position.x) * 0.04;
-                camera.position.y += (-mouseY * 6 - camera.position.y) * 0.04;
-                camera.lookAt(scene.position);
-
-                renderer.render(scene, camera);
-            }
-            render();
-        }
-
-        initSpatialThree();
-    })();
-</script>
-""", height=0)
-
-# ==========================================
-# STREAMLIT GLASSMORPHIC OVERRIDES
+# 3D DEPTH, AMBIENT LIGHTING & SPATIAL STYLING
 # ==========================================
 st.markdown("""
 <style>
@@ -151,111 +25,128 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
     }
 
-    /* Force background transparent so the parent 3D canvas is visible */
+    /* Force Dark Spatial Stage across all parent layers */
     html, body, [data-testid="stAppViewContainer"], .stApp {
+        background-color: #07090e !important;
+        background-image: 
+            radial-gradient(ellipse 80% 50% at 50% -20%, rgba(14, 165, 233, 0.15), transparent),
+            radial-gradient(circle at 15% 85%, rgba(99, 102, 241, 0.08), transparent 45%),
+            radial-gradient(circle at 85% 60%, rgba(56, 189, 248, 0.06), transparent 40%) !important;
+        color: #f1f5f9 !important;
+    }
+
+    /* Hide default Streamlit fluff */
+    header[data-testid="stHeader"] {
         background: transparent !important;
-        background-color: transparent !important;
-        color: #f8fafc !important;
     }
-
-    /* Header Panel */
-    .spatial-banner {
-        position: relative;
-        background: rgba(15, 23, 42, 0.72) !important;
-        backdrop-filter: blur(18px) !important;
-        -webkit-backdrop-filter: blur(18px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.28) !important;
-        border-radius: 18px !important;
-        padding: 2.2rem 1.6rem;
+    
+    /* 3D Elevated Header Console */
+    .spatial-hero {
+        background: linear-gradient(145deg, #111827 0%, #0b0f19 100%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-top: 1px solid rgba(56, 189, 248, 0.4);
+        border-radius: 20px;
+        padding: 2.2rem 1.8rem;
         margin-bottom: 2rem;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85),
-                    0 0 25px rgba(56, 189, 248, 0.18) !important;
+        box-shadow: 
+            0 20px 40px -15px rgba(0, 0, 0, 0.9),
+            0 0 35px rgba(14, 165, 233, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
         text-align: center;
+        position: relative;
     }
 
-    .badge-pill {
+    .hero-badge {
         display: inline-flex;
         align-items: center;
         gap: 6px;
         padding: 5px 14px;
-        background: rgba(56, 189, 248, 0.12);
-        border: 1px solid rgba(56, 189, 248, 0.45);
+        background: rgba(14, 165, 233, 0.1);
+        border: 1px solid rgba(56, 189, 248, 0.35);
         border-radius: 9999px;
         font-size: 0.76rem;
         font-weight: 700;
         letter-spacing: 0.08em;
         color: #38bdf8;
-        margin-bottom: 0.65rem;
+        margin-bottom: 0.75rem;
+        box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
     }
 
-    .title-text {
+    .hero-title {
         font-family: 'Space Grotesk', sans-serif;
-        font-size: 2.4rem;
+        font-size: 2.3rem;
         font-weight: 800;
         color: #ffffff;
-        margin-bottom: 0.3rem;
+        letter-spacing: -0.02em;
+        margin-bottom: 0.4rem;
+        text-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     }
 
-    .sub-text {
+    .hero-subtitle {
         color: #94a3b8;
         font-size: 0.95rem;
         margin: 0;
     }
 
-    /* 3D Glass Surface for Form & Panels */
-    div[data-testid="stForm"], .glass-box {
-        background: rgba(15, 23, 42, 0.75) !important;
-        backdrop-filter: blur(24px) !important;
-        -webkit-backdrop-filter: blur(24px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.24) !important;
+    /* 3D Elevated Form Surface */
+    div[data-testid="stForm"], .spatial-card {
+        background: linear-gradient(160deg, #0f172a 0%, #090e1a 100%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.07) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
         border-radius: 18px !important;
-        padding: 2rem !important;
-        box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.9) !important;
+        padding: 2.2rem !important;
+        box-shadow: 
+            0 25px 50px -12px rgba(0, 0, 0, 0.85),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
     }
 
-    /* 3D Tactile Inputs */
+    /* 3D Inset Inputs */
     .stTextInput input, .stTextArea textarea, .stSelectbox select {
-        background: rgba(3, 7, 18, 0.75) !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
-        color: #ffffff !important;
+        background: #050811 !important;
+        border: 1px solid rgba(255, 255, 255, 0.09) !important;
+        color: #f8fafc !important;
         border-radius: 10px !important;
         padding: 0.75rem 1rem !important;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7) !important;
+        transition: all 0.2s ease !important;
     }
 
-    .stTextInput input:focus, .stTextArea textarea:focus {
-        border-color: #38bdf8 !important;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8),
-                    0 0 0 3px rgba(56, 189, 248, 0.25) !important;
+    .stTextInput input:focus, .stTextArea textarea:focus, .stSelectbox select:focus {
+        border-color: #0ea5e9 !important;
+        box-shadow: 
+            inset 0 2px 4px rgba(0, 0, 0, 0.8),
+            0 0 0 3px rgba(14, 165, 233, 0.22) !important;
     }
 
-    /* 3D Elevated Button */
+    /* 3D Tactile Solid Button */
     .stButton>button {
         background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%) !important;
         color: #ffffff !important;
         font-weight: 700 !important;
         font-size: 0.96rem !important;
-        border: 1px solid rgba(255, 255, 255, 0.25) !important;
-        border-bottom: 2px solid #0369a1 !important;
+        border: 1px solid rgba(255, 255, 255, 0.22) !important;
+        border-bottom: 3px solid #0369a1 !important;
         border-radius: 10px !important;
         padding: 0.8rem 1.6rem !important;
-        box-shadow: 0 10px 25px -4px rgba(2, 132, 199, 0.55),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
-        transition: all 0.2s ease !important;
+        box-shadow: 0 10px 20px -4px rgba(2, 132, 199, 0.45) !important;
+        transition: all 0.15s ease !important;
         width: 100%;
     }
 
     .stButton>button:hover {
         transform: translateY(-2px) !important;
-        box-shadow: 0 16px 30px -4px rgba(2, 132, 199, 0.75) !important;
+        box-shadow: 0 14px 26px -3px rgba(2, 132, 199, 0.65) !important;
     }
 
-    /* Navigation Tabs */
+    .stButton>button:active {
+        transform: translateY(1px) !important;
+        border-bottom-width: 1px !important;
+    }
+
+    /* 3D Segmented Tab Controls */
     .stTabs [data-baseweb="tab-list"] {
-        background: rgba(15, 23, 42, 0.65);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: #0b0f19;
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 12px;
         padding: 6px;
         gap: 6px;
@@ -266,18 +157,21 @@ st.markdown("""
         font-size: 0.88rem;
         color: #94a3b8;
         border-radius: 8px;
+        transition: all 0.2s ease;
     }
 
     .stTabs [aria-selected="true"] {
-        background: rgba(56, 189, 248, 0.16) !important;
+        background: rgba(14, 165, 233, 0.15) !important;
         color: #38bdf8 !important;
         border: 1px solid rgba(56, 189, 248, 0.35) !important;
+        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15) !important;
     }
 
-    .guide-box {
-        background: rgba(2, 6, 23, 0.6);
-        border: 1px solid rgba(56, 189, 248, 0.25);
-        border-left: 4px solid #38bdf8;
+    /* Guided 3D Instructions Card */
+    .guide-card {
+        background: #070c18;
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        border-left: 4px solid #0ea5e9;
         border-radius: 10px;
         padding: 14px 18px;
         margin: 12px 0 18px 0;
@@ -286,20 +180,23 @@ st.markdown("""
         line-height: 1.6;
     }
 
-    .status-card-active {
-        background: rgba(6, 78, 59, 0.4);
+    /* Status Visual Cards */
+    .status-active {
+        background: linear-gradient(145deg, rgba(6, 78, 59, 0.45) 0%, rgba(6, 95, 70, 0.25) 100%);
         border: 1px solid #10b981;
         border-radius: 12px;
-        padding: 1.2rem;
+        padding: 1.3rem;
         margin-bottom: 1.2rem;
+        box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.2);
     }
 
-    .status-card-paused {
-        background: rgba(120, 53, 15, 0.4);
+    .status-paused {
+        background: linear-gradient(145deg, rgba(120, 53, 15, 0.45) 0%, rgba(146, 64, 14, 0.25) 100%);
         border: 1px solid #f59e0b;
         border-radius: 12px;
-        padding: 1.2rem;
+        padding: 1.3rem;
         margin-bottom: 1.2rem;
+        box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.2);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -321,13 +218,13 @@ def init_supabase() -> Client:
 supabase = init_supabase()
 
 # ==========================================
-# HERO BANNER
+# 3D ELEVATED HEADER
 # ==========================================
 st.markdown("""
-<div class="spatial-banner">
-    <div class="badge-pill">⚡ AUTONOMOUS MEAL SYNC ENGINE</div>
-    <div class="title-text">Mess Conquers</div>
-    <p class="sub-text">Automated SpaceBasic reservations, credentials vault, and vacation management</p>
+<div class="spatial-hero">
+    <div class="hero-badge">⚡ AUTONOMOUS SYNC ENGINE</div>
+    <div class="hero-title">Mess Conquers</div>
+    <p class="hero-subtitle">High-availability automated meal reservations & session management</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -338,7 +235,7 @@ tab_telemetry, tab_register = st.tabs(["⚡ Service Status & Vacation", "🛠️
 # ==========================================
 with tab_telemetry:
     st.markdown("##### Account Status & Controls")
-    st.caption("Inspect your active daily schedule or pause automation when leaving campus.")
+    st.caption("Inspect your active daily schedule or pause automation during holidays.")
 
     lookup_protocol = st.radio(
         "Identifier Protocol",
@@ -370,13 +267,13 @@ with tab_telemetry:
                 st.write("")
                 if is_active:
                     st.markdown(f"""
-                    <div class="status-card-active">
-                        <div style="font-weight: 700; color: #34d399; font-size: 1.05rem; margin-bottom: 4px;">
+                    <div class="status-active">
+                        <div style="font-weight: 700; color: #34d399; font-size: 1.1rem; margin-bottom: 6px;">
                             ● STATUS: ACTIVE & RUNNING
                         </div>
-                        <div style="color: #e2e8f0; font-size: 0.94rem; line-height: 1.5;">
+                        <div style="color: #e2e8f0; font-size: 0.94rem; line-height: 1.6;">
                             Account: <b>{user_name}</b> ({query_val})<br>
-                            Protocol: <code>{auth_type}</code> | Alert Receiver: <code>{notif_email}</code><br>
+                            Protocol: <code>{auth_type}</code> | Expiration Alerts: <code>{notif_email}</code><br>
                             Daily execution window triggers automatically at 08:00 AM IST.
                         </div>
                     </div>
@@ -387,11 +284,11 @@ with tab_telemetry:
                         st.rerun()
                 else:
                     st.markdown(f"""
-                    <div class="status-card-paused">
-                        <div style="font-weight: 700; color: #fbbf24; font-size: 1.05rem; margin-bottom: 4px;">
+                    <div class="status-paused">
+                        <div style="font-weight: 700; color: #fbbf24; font-size: 1.1rem; margin-bottom: 6px;">
                             ⏸️ STATUS: PAUSED / EXPIRED
                         </div>
-                        <div style="color: #e2e8f0; font-size: 0.94rem; line-height: 1.5;">
+                        <div style="color: #e2e8f0; font-size: 0.94rem; line-height: 1.6;">
                             Account: <b>{user_name}</b> ({query_val})<br>
                             Bookings are paused. Daily runners bypass this profile until resumed.
                         </div>
@@ -422,14 +319,14 @@ with tab_register:
         index=0
     )
 
-    st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.1); margin: 1.2rem 0;'>", unsafe_allow_html=True)
+    st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 1.2rem 0;'>", unsafe_allow_html=True)
 
     with st.form("spatial_registration_console"):
         # OPTION A: DIRECT CREDENTIALS
         if "Option A" in auth_choice:
             st.markdown("#### 1. Identity & Credentials")
             st.markdown("""
-            <div class="guide-box">
+            <div class="guide-card">
                 <b>Direct Dispatch Mode:</b><br>
                 Enter your SpaceBasic login email and password. The system dynamically generates fresh session tokens during daily runs—no user IDs or manual link updates required.
             </div>
@@ -454,7 +351,7 @@ with tab_register:
         else:
             st.markdown("#### 1. User ID & Token Setup")
             st.markdown("""
-            <div class="guide-box">
+            <div class="guide-card">
                 <b>Token Retrieval Steps:</b><br>
                 1. Open SpaceBasic and go to <b>Mess -> Booking</b>.<br>
                 2. Right-click anywhere and select <b>Inspect</b> (or F12) -> open <b>Network</b> tab.<br>
@@ -485,13 +382,13 @@ with tab_register:
                 ).strip().lower()
 
             secret_input = st.text_area(
-                "SpaceBasic Authorization Token or Link",
+                "SpaceBasic Authentication Link or Bearer Token",
                 placeholder="Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
                 help="Paste the full Authorization Bearer string copied from Developer Tools."
             ).strip()
             email_input = None
 
-        st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.1); margin: 1.4rem 0;'>", unsafe_allow_html=True)
+        st.markdown("<hr style='border: 0.5px solid rgba(255,255,255,0.08); margin: 1.4rem 0;'>", unsafe_allow_html=True)
         st.markdown("#### 2. Meal Preferences & Skip Schedule")
 
         col_p1, col_p2 = st.columns(2)
