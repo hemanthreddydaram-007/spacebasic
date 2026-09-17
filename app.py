@@ -1,7 +1,6 @@
 import os
 import re
 import streamlit as st
-import streamlit.components.v1 as components
 from supabase import create_client, Client
 from security import encrypt_value
 
@@ -9,14 +8,14 @@ from security import encrypt_value
 # SYSTEM CORE CONFIGURATION
 # ==========================================
 st.set_page_config(
-    page_title="Mess Conquers • Floating Hub",
-    page_icon="💠",
+    page_title="Mess Conquers • Automation Hub",
+    page_icon="⚡",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
 
 # ==========================================
-# FLOATING SPATIAL PHYSICS & NEUMORPHIC GLASSCRAFT
+# STABLE 3D FLOATING CSS
 # ==========================================
 st.markdown("""
 <style>
@@ -26,59 +25,47 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
     }
 
-    /* Ambient Spatial Deep Void Background */
-    html, body, [data-testid="stAppViewContainer"], .stApp {
-        background-color: #060911 !important;
+    /* Dark Spatial Stage */
+    .stApp {
+        background-color: #070a13 !important;
         background-image: 
-            radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.18) 0%, transparent 50%),
-            radial-gradient(circle at 10% 90%, rgba(99, 102, 241, 0.1) 0%, transparent 45%),
-            radial-gradient(circle at 90% 70%, rgba(56, 189, 248, 0.08) 0%, transparent 40%) !important;
-        color: #f1f5f9 !important;
-        perspective: 1200px;
+            radial-gradient(circle at 50% -10%, rgba(14, 165, 233, 0.22) 0%, transparent 60%),
+            radial-gradient(circle at 10% 90%, rgba(99, 102, 241, 0.12) 0%, transparent 50%) !important;
+        color: #f8fafc !important;
     }
 
     header[data-testid="stHeader"] {
         background: transparent !important;
     }
 
-    /* Continuous Zero-G Floating Motion */
-    @keyframes floatingElevation {
-        0% {
-            transform: translateY(0px) rotateX(0deg);
+    /* Floating Keyframe Animation */
+    @keyframes floatingBob {
+        0%, 100% {
+            transform: translateY(0px);
             box-shadow: 
-                0 25px 45px -10px rgba(0, 0, 0, 0.9),
+                0 20px 40px -10px rgba(0, 0, 0, 0.9),
                 0 0 25px rgba(14, 165, 233, 0.15),
                 inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
         50% {
-            transform: translateY(-9px) rotateX(0.5deg);
+            transform: translateY(-8px);
             box-shadow: 
-                0 40px 65px -12px rgba(0, 0, 0, 0.95),
-                0 0 45px rgba(14, 165, 233, 0.28),
+                0 32px 55px -12px rgba(0, 0, 0, 0.95),
+                0 0 40px rgba(14, 165, 233, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.25);
-        }
-        100% {
-            transform: translateY(0px) rotateX(0deg);
-            box-shadow: 
-                0 25px 45px -10px rgba(0, 0, 0, 0.9),
-                0 0 25px rgba(14, 165, 233, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
     }
 
-    /* 3D Floating Hero Console */
+    /* 3D Floating Hero Banner */
     .floating-hero {
-        background: linear-gradient(145deg, rgba(17, 24, 39, 0.88) 0%, rgba(11, 15, 25, 0.95) 100%);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        background: linear-gradient(145deg, #111827 0%, #0c1220 100%);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-top: 1px solid rgba(56, 189, 248, 0.5);
-        border-radius: 24px;
-        padding: 2.4rem 1.8rem;
-        margin-bottom: 2.2rem;
+        border-radius: 20px;
+        padding: 2.2rem 1.8rem;
+        margin-bottom: 2rem;
         text-align: center;
-        animation: floatingElevation 6s ease-in-out infinite;
-        transition: transform 0.3s ease;
+        animation: floatingBob 5s ease-in-out infinite;
     }
 
     .hero-badge {
@@ -91,20 +78,20 @@ st.markdown("""
         border-radius: 9999px;
         font-size: 0.74rem;
         font-weight: 700;
-        letter-spacing: 0.1em;
+        letter-spacing: 0.08em;
         color: #38bdf8;
-        box-shadow: 0 0 16px rgba(56, 189, 248, 0.25);
-        margin-bottom: 0.8rem;
+        box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
+        margin-bottom: 0.75rem;
     }
 
     .hero-title {
         font-family: 'Space Grotesk', sans-serif;
-        font-size: 2.4rem;
+        font-size: 2.3rem;
         font-weight: 800;
         color: #ffffff;
+        margin: 0 0 0.3rem 0;
         letter-spacing: -0.02em;
-        margin-bottom: 0.35rem;
-        text-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+        text-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
     }
 
     .hero-sub {
@@ -113,52 +100,48 @@ st.markdown("""
         margin: 0;
     }
 
-    /* Floating Interactive 3D Form Card */
-    div[data-testid="stForm"], .floating-card {
-        background: linear-gradient(160deg, rgba(15, 23, 42, 0.88) 0%, rgba(9, 14, 26, 0.95) 100%) !important;
-        backdrop-filter: blur(25px) !important;
-        -webkit-backdrop-filter: blur(25px) !important;
+    /* 3D Elevated Form Surface */
+    div[data-testid="stForm"] {
+        background: linear-gradient(160deg, #0f172a 0%, #090e1a 100%) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.22) !important;
-        border-radius: 22px !important;
-        padding: 2.4rem !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+        border-radius: 20px !important;
+        padding: 2.2rem !important;
         box-shadow: 
-            0 30px 60px -15px rgba(0, 0, 0, 0.92),
-            0 0 35px rgba(14, 165, 233, 0.1),
-            inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
-        transform: translateZ(10px);
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease !important;
+            0 25px 50px -12px rgba(0, 0, 0, 0.85),
+            0 0 30px rgba(14, 165, 233, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+        transition: transform 0.25s ease, box-shadow 0.25s ease !important;
     }
 
     div[data-testid="stForm"]:hover {
-        transform: translateY(-4px) translateZ(18px);
+        transform: translateY(-3px) !important;
         box-shadow: 
-            0 40px 75px -15px rgba(0, 0, 0, 0.98),
-            0 0 45px rgba(14, 165, 233, 0.22),
-            inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+            0 35px 65px -15px rgba(0, 0, 0, 0.95),
+            0 0 40px rgba(14, 165, 233, 0.18),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
     }
 
     /* Inset Tactile Inputs */
     .stTextInput input, .stTextArea textarea, .stSelectbox select {
-        background: #030611 !important;
+        background: #030712 !important;
         border: 1px solid rgba(255, 255, 255, 0.1) !important;
         color: #ffffff !important;
-        border-radius: 12px !important;
-        padding: 0.8rem 1.1rem !important;
+        border-radius: 10px !important;
+        padding: 0.75rem 1rem !important;
         font-size: 0.95rem !important;
-        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.75) !important;
-        transition: all 0.25s ease !important;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7) !important;
+        transition: all 0.2s ease !important;
     }
 
     .stTextInput input:focus, .stTextArea textarea:focus, .stSelectbox select:focus {
         border-color: #38bdf8 !important;
         box-shadow: 
-            inset 0 2px 5px rgba(0, 0, 0, 0.9),
-            0 0 0 3px rgba(56, 189, 248, 0.28) !important;
-        transform: translateY(-1px);
+            inset 0 2px 4px rgba(0, 0, 0, 0.8),
+            0 0 0 3px rgba(56, 189, 248, 0.25) !important;
     }
 
-    /* Floating Elevated Button */
+    /* 3D Elevated Button */
     .stButton>button {
         background: linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%) !important;
         color: #ffffff !important;
@@ -168,26 +151,26 @@ st.markdown("""
         border-bottom: 3px solid #0369a1 !important;
         border-radius: 12px !important;
         padding: 0.85rem 1.8rem !important;
-        box-shadow: 0 12px 25px -4px rgba(2, 132, 199, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
-        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        box-shadow: 0 10px 22px -4px rgba(2, 132, 199, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+        transition: all 0.15s ease !important;
         width: 100%;
     }
 
     .stButton>button:hover {
-        transform: translateY(-3px) scale(1.01) !important;
-        box-shadow: 0 18px 32px -4px rgba(2, 132, 199, 0.75), inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 16px 28px -4px rgba(2, 132, 199, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
     }
 
     .stButton>button:active {
         transform: translateY(1px) !important;
-        box-shadow: 0 6px 14px rgba(2, 132, 199, 0.4) !important;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35) !important;
     }
 
-    /* Floating Tab Bar */
+    /* Tab Controls */
     .stTabs [data-baseweb="tab-list"] {
-        background: rgba(15, 23, 42, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 14px;
+        background: #0f172a;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
         padding: 6px;
         gap: 8px;
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
@@ -197,53 +180,49 @@ st.markdown("""
         font-weight: 600;
         font-size: 0.88rem;
         color: #94a3b8;
-        border-radius: 10px;
+        border-radius: 8px;
         padding: 8px 16px;
         border: none !important;
-        transition: all 0.2s ease;
     }
 
     .stTabs [aria-selected="true"] {
-        background: rgba(56, 189, 248, 0.18) !important;
+        background: rgba(56, 189, 248, 0.15) !important;
         color: #38bdf8 !important;
-        border: 1px solid rgba(56, 189, 248, 0.4) !important;
-        box-shadow: 0 4px 16px rgba(14, 165, 233, 0.25) !important;
+        border: 1px solid rgba(56, 189, 248, 0.35) !important;
     }
 
     .stTabs [data-baseweb="tab-highlight"] {
         display: none !important;
     }
 
-    /* Depth Guide Card */
     .guide-box {
-        background: #030611;
+        background: #030712;
         border: 1px solid rgba(56, 189, 248, 0.25);
         border-left: 4px solid #38bdf8;
-        border-radius: 12px;
-        padding: 16px 20px;
-        margin: 14px 0 20px 0;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin: 12px 0 18px 0;
         color: #cbd5e1;
         font-size: 0.92rem;
         line-height: 1.6;
-        box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.6);
     }
 
     .status-card-active {
-        background: linear-gradient(135deg, rgba(6, 78, 59, 0.5) 0%, rgba(6, 95, 70, 0.3) 100%);
+        background: linear-gradient(145deg, rgba(6, 78, 59, 0.5) 0%, rgba(6, 95, 70, 0.3) 100%);
         border: 1px solid #10b981;
-        border-radius: 14px;
-        padding: 1.4rem;
-        margin-bottom: 1.4rem;
-        box-shadow: 0 15px 30px -8px rgba(16, 185, 129, 0.25);
+        border-radius: 12px;
+        padding: 1.3rem;
+        margin-bottom: 1.2rem;
+        box-shadow: 0 12px 25px -5px rgba(16, 185, 129, 0.2);
     }
 
     .status-card-paused {
-        background: linear-gradient(135deg, rgba(120, 53, 15, 0.5) 0%, rgba(146, 64, 14, 0.3) 100%);
+        background: linear-gradient(145deg, rgba(120, 53, 15, 0.5) 0%, rgba(146, 64, 14, 0.3) 100%);
         border: 1px solid #f59e0b;
-        border-radius: 14px;
-        padding: 1.4rem;
-        margin-bottom: 1.4rem;
-        box-shadow: 0 15px 30px -8px rgba(245, 158, 11, 0.25);
+        border-radius: 12px;
+        padding: 1.3rem;
+        margin-bottom: 1.2rem;
+        box-shadow: 0 12px 25px -5px rgba(245, 158, 11, 0.2);
     }
 </style>
 """, unsafe_allow_html=True)
