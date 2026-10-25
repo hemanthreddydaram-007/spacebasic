@@ -57,7 +57,7 @@ def get_target_date_info():
 
 def extract_user_id(token, fallback_val=None):
     try:
-        decoded = pyjwt.decode(token, options={"verify_signature": False})
+        decoded = pyjwt.decode(token, options={"verify_signature": False}, algorithms=["HS256", "RS256"])
         uid = decoded.get("uid") or decoded.get("sub") or decoded.get("userId")
         if uid:
             return str(uid)
